@@ -1,0 +1,132 @@
+import { useEffect } from 'react';
+import { Link, useSearchParams } from 'react-router-dom';
+import { BodyPanel } from '../components/BodyPanel';
+import { CheckIn } from '../components/CheckIn';
+import { IndicatorCard } from '../components/IndicatorCard';
+import { LensBar } from '../components/LensBar';
+import { StatusBadge } from '../components/StatusGlyph';
+import { Button, LockIcon, Panel, ProvisionalTag, SimulatedTag } from '../components/ui';
+import { useApp, useT } from '../lib/store';
+import type { LogEntry } from '../lib/types';
+
+function logText(t: ReturnType<typeof useT>, entry: LogEntry): string {
+  if (entry.kind === 'mood') return t('log.mood', { n: entry.value ?? 0 });
+  if (entry.kind === 'ok') return t('log.ok');
+  return entry.text ?? '';
+}
+
+/** The crew member's day: check in, see every vital against their own normal, review the log. */
+export function Dashboard() {
+  const t = useT();
+  const dash = useApp((s) => s.dash);
+  const viewer = useApp((s) => s.viewer);
+  const setMember = useApp((s) => s.setMember);
+  const [params] = useSearchParams();
+  const focus = params.get('indicator');
+
+  useEffect(() => {
+    if (!focus || !dash) return;
+    document.getElementById(`indicator-${focus}`)?.scrollIntoView({ block: 'center', behavior: 'auto' });
+  }, [focus, dash]);
+
+  if (!dash) {
+    return (
+      <p className="text-muted" role="status">
+        {t('app.loading')}
+      </p>
+    );
+  }
+  const checkin = dash.last_checkin;
+
+  return (
+    <div className="space-y-4" data-testid="dashboard">
+      <Panel>
+        <div className="flex flex-wrap items-center gap-x-5 gap-y-3">
+          <div className="min-w-0">
+            <p className="text-sm text-muted">{dash.member.role}</p>
+            <h1 className="font-display text-2xl font-bold tracking-tight" data-testid="member-name">
+              {dash.member.name}
+            </h1>
+          </div>
+          <StatusBadge status={dash.overall} size="lg" />
+          <div className="text-sm text-muted">
+            <p>
+              {t('common.day', { n: dash.day })} · {dash.phase.name}
+            </p>
+            <p data-testid="last-checkin">
+              {checkin
+                ? t('dash.lastCheckin', { day: checkin.day, at: checkin.at }) + (checkin.simulated ? ` (${t('tag.simulatedShort')})` : '')
+                : t('dash.noCheckin')}
+            </p>
+          </div>
+          <div className="ml-auto flex flex-wrap items-center gap-2">
+            <SimulatedTag />
+            {dash.method_status === 'provisional' && <ProvisionalTag />}
+          </div>
+        </div>
+        {dash.acknowledged && (
+          <p className="mt-3 rounded-lg border border-nominal/50 bg-nominal/10 px-3 py-2 text-sm text-nominal" data-testid="acknowledged">
+            {t('dash.acknowledged')}
+          </p>
+        )}
+        {!dash.own && (
+          <div className="mt-3 flex flex-wrap items-center gap-3 rounded-lg border border-line bg-bg/40 px-3 py-2 text-sm" data-testid="viewing-other">
+            <LockIcon />
+            <span className="flex-1">{t('dash.viewingOther', { name: dash.member.name })}</span>
+            <Button onClick={() => setMember(viewer)}>{t('dash.backToMine')}</Button>
+          </div>
+        )}
+        {dash.day === 0 && (
+          <p className="mt-3 rounded-lg border border-line bg-bg/40 px-3 py-2 text-sm">
+            {t('dash.preflight')}{' '}
+            <Link to="/calibrate" className="underline decoration-accent underline-offset-2">
+              {t('nav.calibrate')}
+            </Link>
+          </p>
+        )}
+      </Panel>
+
+      {dash.own && dash.day >= 1 && <CheckIn dash={dash} />}
+
+      <LensBar />
+
+      <div className="grid gap-4 xl:grid-cols-[minmax(0,5fr)_minmax(0,7fr)]">
+        <div className="space-y-4">
+          <BodyPanel />
+          <Panel title={t('dash.notes')}>
+            {dash.logs_locked ? (
+              <div className="flex items-start gap-2 text-sm text-muted" data-testid="notes-locked">
+                <LockIcon />
+                <p>{t('privacy.notesLocked')}</p>
+              </div>
+            ) : dash.logs.length === 0 ? (
+              <p className="text-sm text-muted">{t('dash.noNotes')}</p>
+            ) : (
+              <ul className="space-y-2 text-sm" data-testid="notes">
+                {dash.logs.slice(0, 8).map((entry) => (
+                  <li key={`${entry.id}-${entry.day}`} className="flex gap-3">
+                    <span className="w-24 shrink-0 text-xs tabular-nums text-muted">
+                      {t('common.day', { n: entry.day })} · {entry.at}
+                    </span>
+                    <span>{logText(t, entry)}</span>
+                  </li>
+                ))}
+              </ul>
+            )}
+            {!dash.logs_locked && (
+              <p className="mt-3 flex items-center gap-1.5 text-xs text-muted">
+                <LockIcon size={13} /> {t('privacy.own')}
+              </p>
+            )}
+          </Panel>
+        </div>
+        <div className="grid content-start gap-4 md:grid-cols-2" data-testid="indicator-grid">
+          {dash.indicators.map((view) => (
+            <IndicatorCard key={view.id} view={view} highlight={focus === view.id} />
+          ))}
+          <p className="text-xs text-muted md:col-span-2">{t('dash.method')}</p>
+        </div>
+      </div>
+    </div>
+  );
+}

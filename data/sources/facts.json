@@ -1,0 +1,1203 @@
+[
+  {
+    "id": "hz-five-hazards",
+    "text": "NASA’s Human Research Program has pinpointed five hazards that astronauts will encounter on their journeys. These include space radiation, isolation and confinement, distance from Earth, gravity (and the lack of it), and closed or hostile environments.",
+    "quote": "These include space radiation, isolation and confinement, distance from Earth, gravity (and the lack of it), and closed or hostile environments.",
+    "url": "https://www.nasa.gov/hrp/hazards/",
+    "page_title": "5 Hazards of Human Spaceflight - NASA",
+    "fetched_at": "2026-11-14",
+    "links": {
+      "indicators": [],
+      "zones": [],
+      "hazards": [
+        "radiation",
+        "isolation",
+        "distance",
+        "gravity",
+        "hostile"
+      ],
+      "risks": []
+    }
+  },
+  {
+    "id": "hz-interact",
+    "text": "These hazards do not stand alone. They can feed off one another and exacerbate effects on the human body.",
+    "quote": "They can feed off one another and exacerbate effects on the human body",
+    "url": "https://www.nasa.gov/hrp/hazards/",
+    "page_title": "5 Hazards of Human Spaceflight - NASA",
+    "fetched_at": "2026-11-14",
+    "links": {
+      "indicators": [],
+      "zones": [],
+      "hazards": [
+        "radiation",
+        "isolation",
+        "distance",
+        "gravity",
+        "hostile"
+      ],
+      "risks": []
+    }
+  },
+  {
+    "id": "hz-test-beds",
+    "text": "The hazards’ effects on the human body are being studied using ground-based analogs, laboratories, and the International Space Station.",
+    "quote": "which are being studied using ground-based analogs, laboratories, and the International Space Station",
+    "url": "https://www.nasa.gov/hrp/hazards/",
+    "page_title": "5 Hazards of Human Spaceflight - NASA",
+    "fetched_at": "2026-11-14",
+    "links": {
+      "indicators": [],
+      "zones": [],
+      "hazards": [],
+      "risks": []
+    }
+  },
+  {
+    "id": "hz-radiation-summary",
+    "text": "Invisible to the human eye, space radiation is not only stealthy but considered one of the most hazardous aspects of spaceflight.",
+    "quote": "Invisible to the human eye, space radiation is not only stealthy but considered one of the most hazardous aspects of spaceflight.",
+    "url": "https://www.nasa.gov/hrp/hazards/",
+    "page_title": "5 Hazards of Human Spaceflight - NASA",
+    "fetched_at": "2026-11-14",
+    "links": {
+      "indicators": [],
+      "zones": [
+        "whole_body"
+      ],
+      "hazards": [
+        "radiation"
+      ],
+      "risks": []
+    }
+  },
+  {
+    "id": "hz-isolation-summary",
+    "text": "Behavioral responses occur among groups of people far from Earth who are isolated and confined in a small space over a long period of time.",
+    "quote": "Behavioral responses occur among groups of people far from Earth who are isolated and confined in a small space over a long period of time.",
+    "url": "https://www.nasa.gov/hrp/hazards/",
+    "page_title": "5 Hazards of Human Spaceflight - NASA",
+    "fetched_at": "2026-11-14",
+    "links": {
+      "indicators": [],
+      "zones": [
+        "brain"
+      ],
+      "hazards": [
+        "isolation"
+      ],
+      "risks": []
+    }
+  },
+  {
+    "id": "hz-isolation-crews",
+    "text": "Crews must be carefully chosen, trained, and supported to ensure they can work effectively as a team for months or years in space.",
+    "quote": "Crews must be carefully chosen, trained, and supported to ensure they can work effectively as a team for months or years in space.",
+    "url": "https://www.nasa.gov/hrp/hazards/",
+    "page_title": "5 Hazards of Human Spaceflight - NASA",
+    "fetched_at": "2026-11-14",
+    "links": {
+      "indicators": [],
+      "zones": [],
+      "hazards": [
+        "isolation"
+      ],
+      "risks": []
+    }
+  },
+  {
+    "id": "hz-distance-summary",
+    "text": "Instructions, new supplies, medical care, and more become increasingly challenging to receive from Earth as astronauts venture deeper into space.",
+    "quote": "Instructions, new supplies, medical care, and more become increasingly challenging to receive from Earth as astronauts venture deeper into space.",
+    "url": "https://www.nasa.gov/hrp/hazards/",
+    "page_title": "5 Hazards of Human Spaceflight - NASA",
+    "fetched_at": "2026-11-14",
+    "links": {
+      "indicators": [],
+      "zones": [],
+      "hazards": [
+        "distance"
+      ],
+      "risks": []
+    }
+  },
+  {
+    "id": "hz-distance-mars-miles",
+    "text": "Mars is, on average, 140 million miles from Earth.",
+    "quote": "Mars is, on average, 140 million miles from Earth.",
+    "url": "https://www.nasa.gov/hrp/hazards/",
+    "page_title": "5 Hazards of Human Spaceflight - NASA",
+    "fetched_at": "2026-11-14",
+    "links": {
+      "indicators": [],
+      "zones": [],
+      "hazards": [
+        "distance"
+      ],
+      "risks": []
+    },
+    "value": {
+      "number": 140,
+      "unit": "million miles"
+    }
+  },
+  {
+    "id": "hz-distance-three-years",
+    "text": "Rather than a three-day lunar trip, astronauts would be leaving our planet for roughly three years.",
+    "quote": "Rather than a three-day lunar trip, astronauts would be leaving our planet for roughly three years.",
+    "url": "https://www.nasa.gov/hrp/hazards/",
+    "page_title": "5 Hazards of Human Spaceflight - NASA",
+    "fetched_at": "2026-11-14",
+    "links": {
+      "indicators": [],
+      "zones": [],
+      "hazards": [
+        "distance"
+      ],
+      "risks": []
+    }
+  },
+  {
+    "id": "hz-distance-self-sufficiency",
+    "text": "Planning and self-sufficiency will be key to successful deep space missions.",
+    "quote": "Planning and self-sufficiency will be key to successful deep space missions.",
+    "url": "https://www.nasa.gov/hrp/hazards/",
+    "page_title": "5 Hazards of Human Spaceflight - NASA",
+    "fetched_at": "2026-11-14",
+    "links": {
+      "indicators": [],
+      "zones": [],
+      "hazards": [
+        "distance"
+      ],
+      "risks": []
+    }
+  },
+  {
+    "id": "hz-gravity-summary",
+    "text": "Astronauts' entire bodies – muscles, bones, inner ear, and organs – must adjust to the new gravities encountered on the space station or their spacecraft, as well as on the Moon, Mars, and Earth once they return home.",
+    "quote": "Astronauts' entire bodies – muscles, bones, inner ear, and organs – must adjust to the new gravities encountered on the space station or their spacecraft",
+    "url": "https://www.nasa.gov/hrp/hazards/",
+    "page_title": "5 Hazards of Human Spaceflight - NASA",
+    "fetched_at": "2026-11-14",
+    "links": {
+      "indicators": [],
+      "zones": [
+        "muscles",
+        "bones",
+        "inner_ear"
+      ],
+      "hazards": [
+        "gravity"
+      ],
+      "risks": []
+    }
+  },
+  {
+    "id": "hz-gravity-mars",
+    "text": "On Mars, astronauts would need to live and work in three-eighths of Earth’s gravitational pull for up to two years.",
+    "quote": "On Mars, astronauts would need to live and work in three-eighths of Earth’s gravitational pull for up to two years.",
+    "url": "https://www.nasa.gov/hrp/hazards/",
+    "page_title": "5 Hazards of Human Spaceflight - NASA",
+    "fetched_at": "2026-11-14",
+    "links": {
+      "indicators": [],
+      "zones": [],
+      "hazards": [
+        "gravity"
+      ],
+      "risks": []
+    },
+    "value": {
+      "number": 0.375,
+      "unit": "of Earth’s gravitational pull"
+    }
+  },
+  {
+    "id": "hz-gravity-adjusting",
+    "text": "Throughout this time, their bodies – muscles, bones, inner ear, and organs – will be adjusting to new gravitational loads.",
+    "quote": "Throughout this time, their bodies – muscles, bones, inner ear, and organs – will be adjusting to new gravitational loads.",
+    "url": "https://www.nasa.gov/hrp/hazards/",
+    "page_title": "5 Hazards of Human Spaceflight - NASA",
+    "fetched_at": "2026-11-14",
+    "links": {
+      "indicators": [],
+      "zones": [
+        "muscles",
+        "bones",
+        "inner_ear"
+      ],
+      "hazards": [
+        "gravity"
+      ],
+      "risks": []
+    }
+  },
+  {
+    "id": "hz-hostile-summary",
+    "text": "Maintaining a safe ecosystem inside a spacecraft presents unique challenges, from ensuring optimal temperatures, pressures, and lighting, to reducing noise, monitoring microbial communities, and tracking immune responses.",
+    "quote": "from ensuring optimal temperatures, pressures, and lighting, to reducing noise, monitoring microbial communities, and tracking immune responses",
+    "url": "https://www.nasa.gov/hrp/hazards/",
+    "page_title": "5 Hazards of Human Spaceflight - NASA",
+    "fetched_at": "2026-11-14",
+    "links": {
+      "indicators": [],
+      "zones": [],
+      "hazards": [
+        "hostile"
+      ],
+      "risks": []
+    }
+  },
+  {
+    "id": "hz-hostile-machine",
+    "text": "A spacecraft is not only a home, it’s also a machine.",
+    "quote": "A spacecraft is not only a home, it’s also a machine.",
+    "url": "https://www.nasa.gov/hrp/hazards/",
+    "page_title": "5 Hazards of Human Spaceflight - NASA",
+    "fetched_at": "2026-11-14",
+    "links": {
+      "indicators": [],
+      "zones": [],
+      "hazards": [
+        "hostile"
+      ],
+      "risks": []
+    }
+  },
+  {
+    "id": "hz-hostile-habitability",
+    "text": "Important habitability factors include temperature, pressure, lighting, noise, the presence of microbes, and more.",
+    "quote": "Important habitability factors include temperature, pressure, lighting, noise, the presence of microbes, and more.",
+    "url": "https://www.nasa.gov/hrp/hazards/",
+    "page_title": "5 Hazards of Human Spaceflight - NASA",
+    "fetched_at": "2026-11-14",
+    "links": {
+      "indicators": [],
+      "zones": [],
+      "hazards": [
+        "hostile"
+      ],
+      "risks": []
+    }
+  },
+  {
+    "id": "risk-immune",
+    "text": "The stresses of spaceflight can awaken inactive viruses inside the bodies of astronauts, leading to rashes and other symptoms. Ongoing work seeks to further understand changes in the immune system to better protect astronaut health.",
+    "quote": "The stresses of spaceflight can awaken inactive viruses inside the bodies of astronauts, leading to rashes and other symptoms.",
+    "url": "https://www.nasa.gov/hrp/risks/",
+    "page_title": "Risks of Human Spaceflight - NASA",
+    "fetched_at": "2026-11-14",
+    "links": {
+      "indicators": [],
+      "zones": [],
+      "hazards": [],
+      "risks": [
+        "immune"
+      ]
+    }
+  },
+  {
+    "id": "risk-sensorimotor",
+    "text": "Astronauts can experience motion sickness, issues with hand-eye or gait coordination, and dizziness during gravitational changes, making it difficult to walk or operate a vehicle. Ongoing research seeks to help astronauts recover faster from these changes so they can perform tasks inside and outside spacecraft.",
+    "quote": "Astronauts can experience motion sickness, issues with hand-eye or gait coordination, and dizziness during gravitational changes, making it difficult to walk or operate a vehicle.",
+    "url": "https://www.nasa.gov/hrp/risks/",
+    "page_title": "Risks of Human Spaceflight - NASA",
+    "fetched_at": "2026-11-14",
+    "links": {
+      "indicators": [],
+      "zones": [],
+      "hazards": [],
+      "risks": [
+        "sensorimotor"
+      ]
+    }
+  },
+  {
+    "id": "risk-cardiovascular",
+    "text": "Weightlessness alters blood circulation and how the heart and blood vessels function, potentially increasing the risk of cardiovascular events. Research focuses on minimizing these unhealthy changes.",
+    "quote": "Weightlessness alters blood circulation and how the heart and blood vessels function, potentially increasing the risk of cardiovascular events.",
+    "url": "https://www.nasa.gov/hrp/risks/",
+    "page_title": "Risks of Human Spaceflight - NASA",
+    "fetched_at": "2026-11-14",
+    "links": {
+      "indicators": [
+        "heart_rate"
+      ],
+      "zones": [],
+      "hazards": [],
+      "risks": [
+        "cardiovascular"
+      ]
+    }
+  },
+  {
+    "id": "risk-decompression",
+    "text": "Transitioning from a pressurized spacecraft to a lower-pressure spacesuit can cause health and mission complications when dissolved nitrogen starts to bubble within body tissues. Research focuses on developing better prevention and faster treatment options.",
+    "quote": "Transitioning from a pressurized spacecraft to a lower-pressure spacesuit can cause health and mission complications when dissolved nitrogen starts to bubble within body tissues.",
+    "url": "https://www.nasa.gov/hrp/risks/",
+    "page_title": "Risks of Human Spaceflight - NASA",
+    "fetched_at": "2026-11-14",
+    "links": {
+      "indicators": [],
+      "zones": [],
+      "hazards": [],
+      "risks": [
+        "decompression"
+      ]
+    }
+  },
+  {
+    "id": "risk-microbiome",
+    "text": "Skin and gut microbiomes can change in space, potentially increasing the risk of crew members getting sick. To help keep crews healthy, researchers are exploring these microbial ecosystems and how they evolve in space.",
+    "quote": "Skin and gut microbiomes can change in space, potentially increasing the risk of crew members getting sick.",
+    "url": "https://www.nasa.gov/hrp/risks/",
+    "page_title": "Risks of Human Spaceflight - NASA",
+    "fetched_at": "2026-11-14",
+    "links": {
+      "indicators": [],
+      "zones": [],
+      "hazards": [],
+      "risks": [
+        "microbiome"
+      ]
+    }
+  },
+  {
+    "id": "risk-hypoxia",
+    "text": "Astronauts on future deep space missions will take steps to avoid “the bends” during spacewalks, but following those steps also elevates the risk of mild hypoxia — a condition that occurs when oxygen levels in body tissues become lower than normal.",
+    "quote": "mild hypoxia — a condition that occurs when oxygen levels in body tissues become lower than normal",
+    "url": "https://www.nasa.gov/hrp/risks/",
+    "page_title": "Risks of Human Spaceflight - NASA",
+    "fetched_at": "2026-11-14",
+    "links": {
+      "indicators": [
+        "spo2"
+      ],
+      "zones": [],
+      "hazards": [],
+      "risks": [
+        "hypoxia"
+      ]
+    }
+  },
+  {
+    "id": "risk-nutrition",
+    "text": "A healthy, balanced diet is an essential element of crew health and performance. Ongoing research focuses on designing enjoyable, long-lasting, and nutritious meals for deep space missions and understanding the consequences of inadequate nutrition.",
+    "quote": "A healthy, balanced diet is an essential element of crew health and performance.",
+    "url": "https://www.nasa.gov/hrp/risks/",
+    "page_title": "Risks of Human Spaceflight - NASA",
+    "fetched_at": "2026-11-14",
+    "links": {
+      "indicators": [],
+      "zones": [],
+      "hazards": [],
+      "risks": [
+        "nutrition"
+      ]
+    }
+  },
+  {
+    "id": "risk-spacewalk",
+    "text": "Working in a spacesuit is challenging. In addition to cognitive fatigue and injury, crew members must also manage risks in the spacewalk environment, including decompression sickness, and low oxygen and high carbon dioxide levels. Research focuses on characterizing human performance in spacesuits and balancing pressure and oxygen levels.",
+    "quote": "crew members must also manage risks in the spacewalk environment, including decompression sickness, and low oxygen and high carbon dioxide levels",
+    "url": "https://www.nasa.gov/hrp/risks/",
+    "page_title": "Risks of Human Spaceflight - NASA",
+    "fetched_at": "2026-11-14",
+    "links": {
+      "indicators": [],
+      "zones": [],
+      "hazards": [],
+      "risks": [
+        "spacewalk"
+      ]
+    }
+  },
+  {
+    "id": "risk-fitness",
+    "text": "All astronauts perform exercise during their mission to counteract losses in bone density, muscle strength, and heart and blood vessel performance. Researchers are studying what types of exercise will best protect their health and their ability to perform spacewalks.",
+    "quote": "All astronauts perform exercise during their mission to counteract losses in bone density, muscle strength, and heart and blood vessel performance.",
+    "url": "https://www.nasa.gov/hrp/risks/",
+    "page_title": "Risks of Human Spaceflight - NASA",
+    "fetched_at": "2026-11-14",
+    "links": {
+      "indicators": [
+        "heart_rate",
+        "exercise_minutes"
+      ],
+      "zones": [],
+      "hazards": [],
+      "risks": [
+        "fitness"
+      ]
+    }
+  },
+  {
+    "id": "risk-sans",
+    "text": "The structure of the eyes and brain can change with spaceflight.  Research focuses on understanding the long-term health consequences of these changes and preventing them from occurring.",
+    "quote": "The structure of the eyes and brain can change with spaceflight.",
+    "url": "https://www.nasa.gov/hrp/risks/",
+    "page_title": "Risks of Human Spaceflight - NASA",
+    "fetched_at": "2026-11-14",
+    "links": {
+      "indicators": [],
+      "zones": [],
+      "hazards": [],
+      "risks": [
+        "sans"
+      ]
+    }
+  },
+  {
+    "id": "risk-bone",
+    "text": "Without gravity, bones break down and become more brittle, boosting the chances of painful breaks. Ongoing research seeks to better understand and quantify these losses, and help preserve bone strength through diet, exercise, and medication.",
+    "quote": "Without gravity, bones break down and become more brittle, boosting the chances of painful breaks.",
+    "url": "https://www.nasa.gov/hrp/risks/",
+    "page_title": "Risks of Human Spaceflight - NASA",
+    "fetched_at": "2026-11-14",
+    "links": {
+      "indicators": [],
+      "zones": [],
+      "hazards": [],
+      "risks": [
+        "bone"
+      ]
+    }
+  },
+  {
+    "id": "risk-behavioral",
+    "text": "Isolation, radiation, distance from Earth, and other intense space stressors may all take a toll on the mental health of the crew. Ongoing research seeks to better understand and quantify these psychological risks.",
+    "quote": "Isolation, radiation, distance from Earth, and other intense space stressors may all take a toll on the mental health of the crew.",
+    "url": "https://www.nasa.gov/hrp/risks/",
+    "page_title": "Risks of Human Spaceflight - NASA",
+    "fetched_at": "2026-11-14",
+    "links": {
+      "indicators": [
+        "mood"
+      ],
+      "zones": [],
+      "hazards": [],
+      "risks": [
+        "behavioral"
+      ]
+    }
+  },
+  {
+    "id": "risk-teamwork",
+    "text": "Selecting a crew that works well together is essential for mission success and safety. Researchers are studying how to help teams in prolonged isolation and confinement function efficiently and quickly recover after setbacks occur. They’re also mapping the myriad risks from miscommunications and related team tensions.",
+    "quote": "Selecting a crew that works well together is essential for mission success and safety.",
+    "url": "https://www.nasa.gov/hrp/risks/",
+    "page_title": "Risks of Human Spaceflight - NASA",
+    "fetched_at": "2026-11-14",
+    "links": {
+      "indicators": [],
+      "zones": [],
+      "hazards": [],
+      "risks": [
+        "teamwork"
+      ]
+    }
+  },
+  {
+    "id": "risk-sleep",
+    "text": "Space crews experience multiple hazards simultaneously. Stressors include chronic sleep loss, constant work demands, and irregularities in their internal biological clocks. Understanding how to reduce the effects of these stressors on crew health and safety is an ongoing area of research.",
+    "quote": "Stressors include chronic sleep loss, constant work demands, and irregularities in their internal biological clocks.",
+    "url": "https://www.nasa.gov/hrp/risks/",
+    "page_title": "Risks of Human Spaceflight - NASA",
+    "fetched_at": "2026-11-14",
+    "links": {
+      "indicators": [
+        "sleep_hours"
+      ],
+      "zones": [],
+      "hazards": [],
+      "risks": [
+        "sleep"
+      ]
+    }
+  },
+  {
+    "id": "risk-systems-support",
+    "text": "Future crews on deep space missions must be able to live and work in an environment where they may face unexpected problems with software, vehicles, or other systems. Research focuses on understanding when crews need information, the types and timing of required training, or other support options.",
+    "quote": "they may face unexpected problems with software, vehicles, or other systems",
+    "url": "https://www.nasa.gov/hrp/risks/",
+    "page_title": "Risks of Human Spaceflight - NASA",
+    "fetched_at": "2026-11-14",
+    "links": {
+      "indicators": [],
+      "zones": [],
+      "hazards": [],
+      "risks": [
+        "systems-support"
+      ]
+    }
+  },
+  {
+    "id": "risk-dynamic-loads",
+    "text": "During landing activities, crews risk getting injured. Understanding the likelihood of such injuries and how to better prevent them are areas of ongoing research.",
+    "quote": "During landing activities, crews risk getting injured.",
+    "url": "https://www.nasa.gov/hrp/risks/",
+    "page_title": "Risks of Human Spaceflight - NASA",
+    "fetched_at": "2026-11-14",
+    "links": {
+      "indicators": [],
+      "zones": [],
+      "hazards": [],
+      "risks": [
+        "dynamic-loads"
+      ]
+    }
+  },
+  {
+    "id": "risk-radiation-cancer",
+    "text": "Crews exposed to radiation from space may be more likely to develop cancer. Identifying the best ways to mitigate this risk and understand what interventions may help are ongoing research priorities.",
+    "quote": "Crews exposed to radiation from space may be more likely to develop cancer.",
+    "url": "https://www.nasa.gov/hrp/risks/",
+    "page_title": "Risks of Human Spaceflight - NASA",
+    "fetched_at": "2026-11-14",
+    "links": {
+      "indicators": [],
+      "zones": [],
+      "hazards": [],
+      "risks": [
+        "radiation-cancer"
+      ]
+    }
+  },
+  {
+    "id": "study-archer",
+    "text": "A study on Artemis II monitored astronauts' well-being, activity, and sleep patterns to learn more about human health and performance in deep space.",
+    "quote": "A study on Artemis II monitored astronauts' well-being, activity, and sleep patterns to learn more about human health and performance in deep space.",
+    "url": "https://www.nasa.gov/hrp/ongoing-hrp-research/",
+    "page_title": "Ongoing HRP Research - NASA",
+    "fetched_at": "2026-11-14",
+    "links": {
+      "indicators": [
+        "sleep_hours",
+        "exercise_minutes",
+        "mood"
+      ],
+      "zones": [],
+      "hazards": [],
+      "risks": []
+    }
+  },
+  {
+    "id": "study-immune-biomarkers",
+    "text": "Scientists analyzed blood and saliva samples from Artemis II crew members to see how deep space changes the immune system.",
+    "quote": "Scientists analyzed blood and saliva samples from Artemis II crew members to see how deep space changes the immune system.",
+    "url": "https://www.nasa.gov/hrp/ongoing-hrp-research/",
+    "page_title": "Ongoing HRP Research - NASA",
+    "fetched_at": "2026-11-14",
+    "links": {
+      "indicators": [],
+      "zones": [],
+      "hazards": [],
+      "risks": []
+    }
+  },
+  {
+    "id": "study-artemis-ii-standard-measures",
+    "text": "Crews supplied a consistent set of health information to a data bank so that future researchers can learn more about astronaut health.",
+    "quote": "Crews supplied a consistent set of health information to a data bank so that future researchers can learn more about astronaut health.",
+    "url": "https://www.nasa.gov/hrp/ongoing-hrp-research/",
+    "page_title": "Ongoing HRP Research - NASA",
+    "fetched_at": "2026-11-14",
+    "links": {
+      "indicators": [],
+      "zones": [],
+      "hazards": [],
+      "risks": []
+    }
+  },
+  {
+    "id": "study-b-complex",
+    "text": "Investigating if a daily B vitamin supplement can prevent or mitigate brain and eye changes that may affect some humans in space",
+    "quote": "Investigating if a daily B vitamin supplement can prevent or mitigate brain and eye changes that may affect some humans in space",
+    "url": "https://www.nasa.gov/hrp/ongoing-hrp-research/",
+    "page_title": "Ongoing HRP Research - NASA",
+    "fetched_at": "2026-11-14",
+    "links": {
+      "indicators": [],
+      "zones": [],
+      "hazards": [],
+      "risks": []
+    }
+  },
+  {
+    "id": "study-brain-fluid-pressure",
+    "text": "Examining the relationship between fluid pressure inside the skull and changes to the eyes and brain of astronauts",
+    "quote": "Examining the relationship between fluid pressure inside the skull and changes to the eyes and brain of astronauts",
+    "url": "https://www.nasa.gov/hrp/ongoing-hrp-research/",
+    "page_title": "Ongoing HRP Research - NASA",
+    "fetched_at": "2026-11-14",
+    "links": {
+      "indicators": [],
+      "zones": [],
+      "hazards": [],
+      "risks": []
+    }
+  },
+  {
+    "id": "study-cipher",
+    "text": "Providing a better understand of how the human body changes while orbiting the Earth via a suite of studies examining multiple body systems",
+    "quote": "Providing a better understand of how the human body changes while orbiting the Earth via a suite of studies examining multiple body systems",
+    "url": "https://www.nasa.gov/hrp/ongoing-hrp-research/",
+    "page_title": "Ongoing HRP Research - NASA",
+    "fetched_at": "2026-11-14",
+    "links": {
+      "indicators": [],
+      "zones": [],
+      "hazards": [],
+      "risks": []
+    }
+  },
+  {
+    "id": "study-manual-piloting",
+    "text": "Assessing how gravity transitions may affect the piloting capabilities of astronauts for future Moon landings",
+    "quote": "Assessing how gravity transitions may affect the piloting capabilities of astronauts for future Moon landings",
+    "url": "https://www.nasa.gov/hrp/ongoing-hrp-research/",
+    "page_title": "Ongoing HRP Research - NASA",
+    "fetched_at": "2026-11-14",
+    "links": {
+      "indicators": [],
+      "zones": [],
+      "hazards": [],
+      "risks": []
+    }
+  },
+  {
+    "id": "study-occupant-protection",
+    "text": "Surveying crew members' potential discomfort during re-entry to Earth and combining it with sensor data on spacecraft",
+    "quote": "Surveying crew members' potential discomfort during re-entry to Earth and combining it with sensor data on spacecraft",
+    "url": "https://www.nasa.gov/hrp/ongoing-hrp-research/",
+    "page_title": "Ongoing HRP Research - NASA",
+    "fetched_at": "2026-11-14",
+    "links": {
+      "indicators": [],
+      "zones": [],
+      "hazards": [],
+      "risks": []
+    }
+  },
+  {
+    "id": "study-spinal-fluid-biomarkers",
+    "text": "Detecting substances in the spinal fluid of astronauts associated with space-related brain and eye changes",
+    "quote": "Detecting substances in the spinal fluid of astronauts associated with space-related brain and eye changes",
+    "url": "https://www.nasa.gov/hrp/ongoing-hrp-research/",
+    "page_title": "Ongoing HRP Research - NASA",
+    "fetched_at": "2026-11-14",
+    "links": {
+      "indicators": [],
+      "zones": [],
+      "hazards": [],
+      "risks": []
+    }
+  },
+  {
+    "id": "study-standard-measures",
+    "text": "Collecting a consistent set of physiological and psychological measurements to better understand how spaceflight affects the bodies and minds of crew members",
+    "quote": "Collecting a consistent set of physiological and psychological measurements to better understand how spaceflight affects the bodies and minds of crew members",
+    "url": "https://www.nasa.gov/hrp/ongoing-hrp-research/",
+    "page_title": "Ongoing HRP Research - NASA",
+    "fetched_at": "2026-11-14",
+    "links": {
+      "indicators": [],
+      "zones": [],
+      "hazards": [],
+      "risks": []
+    }
+  },
+  {
+    "id": "study-thigh-cuff",
+    "text": "Testing if wearing tight thigh cuffs could keep more bodily fluids in the legs to help determine if future strategies can avert the eye disorders that can develop in space",
+    "quote": "Testing if wearing tight thigh cuffs could keep more bodily fluids in the legs",
+    "url": "https://www.nasa.gov/hrp/ongoing-hrp-research/",
+    "page_title": "Ongoing HRP Research - NASA",
+    "fetched_at": "2026-11-14",
+    "links": {
+      "indicators": [],
+      "zones": [],
+      "hazards": [],
+      "risks": []
+    }
+  },
+  {
+    "id": "study-venous-haemostasis",
+    "text": "Examining physical differences in astronauts that may contribute to blood flow and blood coagulation changes in space",
+    "quote": "Examining physical differences in astronauts that may contribute to blood flow and blood coagulation changes in space",
+    "url": "https://www.nasa.gov/hrp/ongoing-hrp-research/",
+    "page_title": "Ongoing HRP Research - NASA",
+    "fetched_at": "2026-11-14",
+    "links": {
+      "indicators": [],
+      "zones": [],
+      "hazards": [],
+      "risks": []
+    }
+  },
+  {
+    "id": "study-zero-t2",
+    "text": "Examining how exercise in space without a treadmill affects human health and performance ahead of deep space missions",
+    "quote": "Examining how exercise in space without a treadmill affects human health and performance ahead of deep space missions",
+    "url": "https://www.nasa.gov/hrp/ongoing-hrp-research/",
+    "page_title": "Ongoing HRP Research - NASA",
+    "fetched_at": "2026-11-14",
+    "links": {
+      "indicators": [
+        "exercise_minutes"
+      ],
+      "zones": [],
+      "hazards": [],
+      "risks": []
+    }
+  },
+  {
+    "id": "study-altered-immunity",
+    "text": "Analyzing blood, saliva, and urine samples to investigate how spaceflight alters the immune system",
+    "quote": "Analyzing blood, saliva, and urine samples to investigate how spaceflight alters the immune system",
+    "url": "https://www.nasa.gov/hrp/ongoing-hrp-research/",
+    "page_title": "Ongoing HRP Research - NASA",
+    "fetched_at": "2026-11-14",
+    "links": {
+      "indicators": [],
+      "zones": [],
+      "hazards": [],
+      "risks": []
+    }
+  },
+  {
+    "id": "study-food-acceptability",
+    "text": "Assessing how long-term spaceflight affects food appeal to improve current and future space food systems",
+    "quote": "Assessing how long-term spaceflight affects food appeal to improve current and future space food systems",
+    "url": "https://www.nasa.gov/hrp/ongoing-hrp-research/",
+    "page_title": "Ongoing HRP Research - NASA",
+    "fetched_at": "2026-11-14",
+    "links": {
+      "indicators": [],
+      "zones": [],
+      "hazards": [],
+      "risks": []
+    }
+  },
+  {
+    "id": "study-food-physiology",
+    "text": "Determining whether an enhanced spaceflight diet could help astronauts better adapt to space",
+    "quote": "Determining whether an enhanced spaceflight diet could help astronauts better adapt to space",
+    "url": "https://www.nasa.gov/hrp/ongoing-hrp-research/",
+    "page_title": "Ongoing HRP Research - NASA",
+    "fetched_at": "2026-11-14",
+    "links": {
+      "indicators": [],
+      "zones": [],
+      "hazards": [],
+      "risks": []
+    }
+  },
+  {
+    "id": "study-omics-archive",
+    "text": "Collecting astronauts’ blood, urine, saliva, feces, and cells to document how long-duration spaceflight influences human health and performance and changes the body at the molecular level",
+    "quote": "document how long-duration spaceflight influences human health and performance and changes the body at the molecular level",
+    "url": "https://www.nasa.gov/hrp/ongoing-hrp-research/",
+    "page_title": "Ongoing HRP Research - NASA",
+    "fetched_at": "2026-11-14",
+    "links": {
+      "indicators": [],
+      "zones": [],
+      "hazards": [],
+      "risks": []
+    }
+  },
+  {
+    "id": "study-space-gardening",
+    "text": "Surveying whether growing fresh vegetables in space can ease astronauts’ sense of isolation and confinement",
+    "quote": "Surveying whether growing fresh vegetables in space can ease astronauts’ sense of isolation and confinement",
+    "url": "https://www.nasa.gov/hrp/ongoing-hrp-research/",
+    "page_title": "Ongoing HRP Research - NASA",
+    "fetched_at": "2026-11-14",
+    "links": {
+      "indicators": [],
+      "zones": [],
+      "hazards": [],
+      "risks": []
+    }
+  },
+  {
+    "id": "study-spinal-health",
+    "text": "Scrutinizing scans of astronauts’ spines to inform strategies that counter bone and muscle loss in space",
+    "quote": "Scrutinizing scans of astronauts’ spines to inform strategies that counter bone and muscle loss in space",
+    "url": "https://www.nasa.gov/hrp/ongoing-hrp-research/",
+    "page_title": "Ongoing HRP Research - NASA",
+    "fetched_at": "2026-11-14",
+    "links": {
+      "indicators": [],
+      "zones": [],
+      "hazards": [],
+      "risks": []
+    }
+  },
+  {
+    "id": "study-tempus-pro",
+    "text": "Test-driving a commercial telemedicine device used to collect and integrate health data, potentially enabling remote, near real-time diagnoses",
+    "quote": "Test-driving a commercial telemedicine device used to collect and integrate health data, potentially enabling remote, near real-time diagnoses",
+    "url": "https://www.nasa.gov/hrp/ongoing-hrp-research/",
+    "page_title": "Ongoing HRP Research - NASA",
+    "fetched_at": "2026-11-14",
+    "links": {
+      "indicators": [],
+      "zones": [],
+      "hazards": [],
+      "risks": []
+    }
+  },
+  {
+    "id": "study-veggie-monitoring",
+    "text": "Monitoring microbial growth on hardware that stores crops in space to develop a better plant production system and ensure crew safety",
+    "quote": "Monitoring microbial growth on hardware that stores crops in space to develop a better plant production system and ensure crew safety",
+    "url": "https://www.nasa.gov/hrp/ongoing-hrp-research/",
+    "page_title": "Ongoing HRP Research - NASA",
+    "fetched_at": "2026-11-14",
+    "links": {
+      "indicators": [],
+      "zones": [],
+      "hazards": [],
+      "risks": []
+    }
+  },
+  {
+    "id": "csa-rad-key-challenge",
+    "text": "Radiation is one of the key challenges faced by astronauts living and working beyond the protective shield of Earth’s atmosphere.",
+    "quote": "Radiation is one of the key challenges faced by astronauts living and working beyond the protective shield of Earth’s atmosphere.",
+    "url": "https://www.asc-csa.gc.ca/eng/news/articles/2026/2026-02-26-monitoring-radiation-astronaut-health.asp",
+    "page_title": "Monitoring radiation for astronaut health | Canadian Space Agency",
+    "fetched_at": "2026-11-14",
+    "links": {
+      "indicators": [],
+      "zones": [],
+      "hazards": [
+        "radiation"
+      ],
+      "risks": []
+    }
+  },
+  {
+    "id": "csa-rad-neutron-share",
+    "text": "Neutron radiation, which contributes to about 30% of total radiation on the ISS, is especially harmful because it can cause serious biological damage and require specialized protective measures.",
+    "quote": "Neutron radiation, which contributes to about 30% of total radiation on the ISS, is especially harmful because it can cause serious biological damage",
+    "url": "https://www.asc-csa.gc.ca/eng/news/articles/2026/2026-02-26-monitoring-radiation-astronaut-health.asp",
+    "page_title": "Monitoring radiation for astronaut health | Canadian Space Agency",
+    "fetched_at": "2026-11-14",
+    "links": {
+      "indicators": [],
+      "zones": [],
+      "hazards": [
+        "radiation"
+      ],
+      "risks": []
+    },
+    "value": {
+      "number": 30,
+      "unit": "%"
+    }
+  },
+  {
+    "id": "csa-rad-bubble",
+    "text": "Bubble detectors, used by astronauts on the International Space Station, are a predecessor to the Canadian Active Neutron Spectrometer (CANS).",
+    "quote": "using bubble detectors, a predecessor to Canadian Active Neutron Spectrometer (CANS), on the International Space Station",
+    "url": "https://www.asc-csa.gc.ca/eng/news/articles/2026/2026-02-26-monitoring-radiation-astronaut-health.asp",
+    "page_title": "Monitoring radiation for astronaut health | Canadian Space Agency",
+    "fetched_at": "2026-11-14",
+    "links": {
+      "indicators": [],
+      "zones": [],
+      "hazards": [
+        "radiation"
+      ],
+      "risks": []
+    }
+  },
+  {
+    "id": "csa-rad-instruments",
+    "text": "Canada has significant expertise in radiation detection experiments on the ISS, including MOSFET, EVARM and Radi-N and Radi-N2.",
+    "quote": "Canada has significant expertise in radiation detection experiments on the ISS, including MOSFET, EVARM and Radi-N and Radi-N2.",
+    "url": "https://www.asc-csa.gc.ca/eng/news/articles/2026/2026-02-26-monitoring-radiation-astronaut-health.asp",
+    "page_title": "Monitoring radiation for astronaut health | Canadian Space Agency",
+    "fetched_at": "2026-11-14",
+    "links": {
+      "indicators": [],
+      "zones": [],
+      "hazards": [
+        "radiation"
+      ],
+      "risks": []
+    }
+  },
+  {
+    "id": "csa-rad-cans",
+    "text": "CANS (Canadian Active Neutron Spectrometer) is a compact and autonomous instrument designed to measure neutron radiation exposure in space.",
+    "quote": "a compact and autonomous instrument designed to measure neutron radiation exposure in space",
+    "url": "https://www.asc-csa.gc.ca/eng/news/articles/2026/2026-02-26-monitoring-radiation-astronaut-health.asp",
+    "page_title": "Monitoring radiation for astronaut health | Canadian Space Agency",
+    "fetched_at": "2026-11-14",
+    "links": {
+      "indicators": [],
+      "zones": [],
+      "hazards": [
+        "radiation"
+      ],
+      "risks": []
+    }
+  },
+  {
+    "id": "csa-rad-cans-continuous",
+    "text": "CANS improves upon previous radiation detection methods with the unique combined capabilities of working continuously and autonomously.",
+    "quote": "CANS improves upon previous radiation detection methods with the unique combined capabilities of working continuously and autonomously.",
+    "url": "https://www.asc-csa.gc.ca/eng/news/articles/2026/2026-02-26-monitoring-radiation-astronaut-health.asp",
+    "page_title": "Monitoring radiation for astronaut health | Canadian Space Agency",
+    "fetched_at": "2026-11-14",
+    "links": {
+      "indicators": [],
+      "zones": [],
+      "hazards": [
+        "radiation"
+      ],
+      "risks": []
+    }
+  },
+  {
+    "id": "csa-rad-iss-testbed",
+    "text": "For over 25 years, the ISS has been a test bed for new technology.",
+    "quote": "For over 25 years, the ISS has been a test bed for new technology.",
+    "url": "https://www.asc-csa.gc.ca/eng/news/articles/2026/2026-02-26-monitoring-radiation-astronaut-health.asp",
+    "page_title": "Monitoring radiation for astronaut health | Canadian Space Agency",
+    "fetched_at": "2026-11-14",
+    "links": {
+      "indicators": [],
+      "zones": [],
+      "hazards": [],
+      "risks": []
+    }
+  },
+  {
+    "id": "csa-rad-earth-applications",
+    "text": "Data collected could help develop better measures to reduce risks for astronauts’ health and also has potential applications on Earth, including cancer therapy, radiation protection for aircrews, nuclear threat detection and public safety, among others.",
+    "quote": "potential applications on Earth, including cancer therapy, radiation protection for aircrews, nuclear threat detection and public safety",
+    "url": "https://www.asc-csa.gc.ca/eng/news/articles/2026/2026-02-26-monitoring-radiation-astronaut-health.asp",
+    "page_title": "Monitoring radiation for astronaut health | Canadian Space Agency",
+    "fetched_at": "2026-11-14",
+    "links": {
+      "indicators": [],
+      "zones": [],
+      "hazards": [
+        "radiation"
+      ],
+      "risks": []
+    }
+  },
+  {
+    "id": "csa-sci-aging",
+    "text": "The effects observed in astronauts are similar to accelerated aging and health problems caused by a sedentary lifestyle.",
+    "quote": "The effects observed in astronauts are similar to accelerated aging and health problems caused by a sedentary lifestyle.",
+    "url": "https://www.asc-csa.gc.ca/eng/iss/science/why-do-we-conduct-science-experiments-in-space.asp",
+    "page_title": "Why do we conduct science experiments in space? | Canadian Space Agency",
+    "fetched_at": "2026-11-14",
+    "links": {
+      "indicators": [],
+      "zones": [],
+      "hazards": [],
+      "risks": []
+    }
+  },
+  {
+    "id": "csa-sci-six-months",
+    "text": "Studying the human body in space for six months gives us data that would take years to gather on Earth.",
+    "quote": "Studying the human body in space for six months gives us data that would take years to gather on Earth.",
+    "url": "https://www.asc-csa.gc.ca/eng/iss/science/why-do-we-conduct-science-experiments-in-space.asp",
+    "page_title": "Why do we conduct science experiments in space? | Canadian Space Agency",
+    "fetched_at": "2026-11-14",
+    "links": {
+      "indicators": [],
+      "zones": [],
+      "hazards": [],
+      "risks": []
+    }
+  },
+  {
+    "id": "csa-sci-earth-benefits",
+    "text": "Canadian scientists’ experiments have produced findings that can help people suffering from balance problems, such as seniors; osteoporosis; cardiovascular disorders; and Type-2 diabetes.",
+    "quote": "findings that can help people suffering from balance problems, such as seniors; osteoporosis; cardiovascular disorders; and Type-2 diabetes",
+    "url": "https://www.asc-csa.gc.ca/eng/iss/science/why-do-we-conduct-science-experiments-in-space.asp",
+    "page_title": "Why do we conduct science experiments in space? | Canadian Space Agency",
+    "fetched_at": "2026-11-14",
+    "links": {
+      "indicators": [],
+      "zones": [
+        "inner_ear",
+        "bones",
+        "heart"
+      ],
+      "hazards": [],
+      "risks": []
+    }
+  },
+  {
+    "id": "csa-sci-study-organs",
+    "text": "Canadian scientists use space to study our bones, heart, blood vessels and brain.",
+    "quote": "Canadian scientists use space to study our bones, heart, blood vessels and brain.",
+    "url": "https://www.asc-csa.gc.ca/eng/iss/science/why-do-we-conduct-science-experiments-in-space.asp",
+    "page_title": "Why do we conduct science experiments in space? | Canadian Space Agency",
+    "fetched_at": "2026-11-14",
+    "links": {
+      "indicators": [],
+      "zones": [
+        "bones",
+        "heart",
+        "brain"
+      ],
+      "hazards": [],
+      "risks": []
+    }
+  },
+  {
+    "id": "csa-sci-200-experiments",
+    "text": "On average, there are 200 international space experiments on board the ISS at any given time.",
+    "quote": "On average, there are 200 international space experiments on board the ISS at any given time.",
+    "url": "https://www.asc-csa.gc.ca/eng/iss/science/why-do-we-conduct-science-experiments-in-space.asp",
+    "page_title": "Why do we conduct science experiments in space? | Canadian Space Agency",
+    "fetched_at": "2026-11-14",
+    "links": {
+      "indicators": [],
+      "zones": [],
+      "hazards": [],
+      "risks": []
+    },
+    "value": {
+      "number": 200,
+      "unit": "experiments"
+    }
+  },
+  {
+    "id": "csa-sci-quality-of-life",
+    "text": "New information gained in space contributes to improved quality of life on Earth.",
+    "quote": "New information gained in space contributes to improved quality of life on Earth.",
+    "url": "https://www.asc-csa.gc.ca/eng/iss/science/why-do-we-conduct-science-experiments-in-space.asp",
+    "page_title": "Why do we conduct science experiments in space? | Canadian Space Agency",
+    "fetched_at": "2026-11-14",
+    "links": {
+      "indicators": [],
+      "zones": [],
+      "hazards": [],
+      "risks": []
+    }
+  },
+  {
+    "id": "csa-sci-older-adults",
+    "text": "Studying the way our body changes in space help us understand the impacts of reduced levels of physical activity and issues that affect older adult populations on Earth.",
+    "quote": "understand the impacts of reduced levels of physical activity and issues that affect older adult populations on Earth",
+    "url": "https://www.asc-csa.gc.ca/eng/iss/science/why-do-we-conduct-science-experiments-in-space.asp",
+    "page_title": "Why do we conduct science experiments in space? | Canadian Space Agency",
+    "fetched_at": "2026-11-14",
+    "links": {
+      "indicators": [],
+      "zones": [],
+      "hazards": [],
+      "risks": []
+    }
+  },
+  {
+    "id": "csa-sci-moon-mars",
+    "text": "Missions to the Moon and Mars mean longer trips and more risks for astronauts",
+    "quote": "Missions to the Moon and Mars mean longer trips and more risks for astronauts",
+    "url": "https://www.asc-csa.gc.ca/eng/iss/science/why-do-we-conduct-science-experiments-in-space.asp",
+    "page_title": "Why do we conduct science experiments in space? | Canadian Space Agency",
+    "fetched_at": "2026-11-14",
+    "links": {
+      "indicators": [],
+      "zones": [],
+      "hazards": [
+        "distance"
+      ],
+      "risks": []
+    }
+  },
+  {
+    "id": "csa-sci-more-weightlessness",
+    "text": "Missions to the Moon and Mars mean more time in weightlessness.",
+    "quote": "more time in weightlessness",
+    "url": "https://www.asc-csa.gc.ca/eng/iss/science/why-do-we-conduct-science-experiments-in-space.asp",
+    "page_title": "Why do we conduct science experiments in space? | Canadian Space Agency",
+    "fetched_at": "2026-11-14",
+    "links": {
+      "indicators": [],
+      "zones": [],
+      "hazards": [
+        "gravity"
+      ],
+      "risks": []
+    }
+  },
+  {
+    "id": "csa-sci-more-radiation",
+    "text": "Missions to the Moon and Mars mean more exposure to radiation.",
+    "quote": "more exposure to radiation",
+    "url": "https://www.asc-csa.gc.ca/eng/iss/science/why-do-we-conduct-science-experiments-in-space.asp",
+    "page_title": "Why do we conduct science experiments in space? | Canadian Space Agency",
+    "fetched_at": "2026-11-14",
+    "links": {
+      "indicators": [],
+      "zones": [],
+      "hazards": [
+        "radiation"
+      ],
+      "risks": []
+    }
+  },
+  {
+    "id": "csa-sci-more-isolation",
+    "text": "Missions to the Moon and Mars mean longer periods of isolation, very far from home.",
+    "quote": "longer periods of isolation, very far from home",
+    "url": "https://www.asc-csa.gc.ca/eng/iss/science/why-do-we-conduct-science-experiments-in-space.asp",
+    "page_title": "Why do we conduct science experiments in space? | Canadian Space Agency",
+    "fetched_at": "2026-11-14",
+    "links": {
+      "indicators": [],
+      "zones": [],
+      "hazards": [
+        "isolation"
+      ],
+      "risks": []
+    }
+  },
+  {
+    "id": "csa-sci-comm-delays",
+    "text": "Missions to the Moon and Mars mean increased delays in communication with Earth.",
+    "quote": "increased delays in communication with Earth",
+    "url": "https://www.asc-csa.gc.ca/eng/iss/science/why-do-we-conduct-science-experiments-in-space.asp",
+    "page_title": "Why do we conduct science experiments in space? | Canadian Space Agency",
+    "fetched_at": "2026-11-14",
+    "links": {
+      "indicators": [],
+      "zones": [],
+      "hazards": [
+        "distance"
+      ],
+      "risks": []
+    }
+  },
+  {
+    "id": "csa-sci-less-reliance",
+    "text": "Missions to the Moon and Mars mean less ability to rely on Earth for food, materials, and emergency medical assistance.",
+    "quote": "less ability to rely on Earth for food, materials, and emergency medical assistance",
+    "url": "https://www.asc-csa.gc.ca/eng/iss/science/why-do-we-conduct-science-experiments-in-space.asp",
+    "page_title": "Why do we conduct science experiments in space? | Canadian Space Agency",
+    "fetched_at": "2026-11-14",
+    "links": {
+      "indicators": [],
+      "zones": [],
+      "hazards": [
+        "distance"
+      ],
+      "risks": []
+    }
+  }
+]

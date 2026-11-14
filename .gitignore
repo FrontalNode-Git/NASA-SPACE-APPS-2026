@@ -1,14 +1,25 @@
-# NASA API key from https://api.nasa.gov (one key for the whole team)
-# Leave it empty to use NASA's DEMO_KEY (30 requests/hour)
-NASA_API_KEY=w7Rzqbfbh6FWp7FJ9tm7w6qdT7tKFnjDLRjHTRWd
+# secrets / local config
+.env
+.env.*
+!.env.example
 
-# Space weather (DONKI)
-DONKI_DAYS=7              # how many days of solar events to show
-DONKI_CACHE_S=900         # refresh every 15 minutes
+# python
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+.ruff_cache/
 
-# Demo timings (shortened for a live demo)
-VITAL_EARTH_DELAY_S=20       # light delay to Earth; real value is ~1140 (19 min)
-VITAL_OFFLINE_AFTER_S=30     # wearable counts as offline after this
-VITAL_STILL_TIMEOUT_S=60     # unanswered red alert + no movement, so escalate
-VITAL_TIMEOUT_S=180      # unanswered red alert, so escalate anyway
-VITAL_LIVE_WINDOW_S=90       # seconds of live readings the engine looks at
+# node / frontend
+node_modules/
+frontend/dist/
+frontend/test-results/
+frontend/playwright-report/
+frontend/.vite/
+*.tsbuildinfo
+
+# os / editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/

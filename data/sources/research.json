@@ -1,0 +1,314 @@
+[
+  {
+    "id": "archer",
+    "name": "ARCHeR",
+    "group": "artemis-ii",
+    "url": "https://www.nasa.gov/reference/archer/",
+    "fact_id": "study-archer",
+    "hazards": [],
+    "zones": [],
+    "risks": [
+      "sleep",
+      "behavioral"
+    ],
+    "indicators": [
+      "sleep_hours",
+      "exercise_minutes",
+      "mood"
+    ]
+  },
+  {
+    "id": "immune-biomarkers",
+    "name": "Immune Biomarkers",
+    "group": "artemis-ii",
+    "url": "https://www.nasa.gov/reference/immune-biomarkers/",
+    "fact_id": "study-immune-biomarkers",
+    "hazards": [],
+    "zones": [
+      "whole_body"
+    ],
+    "risks": [
+      "immune"
+    ],
+    "indicators": []
+  },
+  {
+    "id": "artemis-ii-standard-measures",
+    "name": "Artemis II Standard Measures",
+    "group": "artemis-ii",
+    "url": "https://www.nasa.gov/reference/artemis-ii-standard-measures/",
+    "fact_id": "study-artemis-ii-standard-measures",
+    "hazards": [],
+    "zones": [
+      "whole_body"
+    ],
+    "risks": [],
+    "indicators": []
+  },
+  {
+    "id": "b-complex",
+    "name": "B-Complex",
+    "group": "leo",
+    "url": "https://www.nasa.gov/reference/b-complex/",
+    "fact_id": "study-b-complex",
+    "hazards": [],
+    "zones": [
+      "brain",
+      "eyes"
+    ],
+    "risks": [
+      "sans"
+    ],
+    "indicators": []
+  },
+  {
+    "id": "brain-fluid-pressure",
+    "name": "Brain Fluid Pressure",
+    "group": "leo",
+    "url": "https://www.nasa.gov/reference/brain-fluid-pressure/",
+    "fact_id": "study-brain-fluid-pressure",
+    "hazards": [],
+    "zones": [
+      "brain",
+      "eyes"
+    ],
+    "risks": [
+      "sans"
+    ],
+    "indicators": []
+  },
+  {
+    "id": "cipher",
+    "name": "CIPHER",
+    "group": "leo",
+    "url": "https://www.nasa.gov/reference/cipher/",
+    "fact_id": "study-cipher",
+    "hazards": [],
+    "zones": [
+      "whole_body"
+    ],
+    "risks": [],
+    "indicators": []
+  },
+  {
+    "id": "manual-piloting",
+    "name": "Simulating Manual Piloting for Moon Landings",
+    "group": "leo",
+    "url": "https://www.nasa.gov/reference/simulating-manual-piloting-for-moon-landings/",
+    "fact_id": "study-manual-piloting",
+    "hazards": [
+      "gravity"
+    ],
+    "zones": [],
+    "risks": [
+      "sensorimotor"
+    ],
+    "indicators": []
+  },
+  {
+    "id": "occupant-protection",
+    "name": "Spacecraft Occupant Protection",
+    "group": "leo",
+    "url": "https://www.nasa.gov/reference/spacecraft-occupant-protection/",
+    "fact_id": "study-occupant-protection",
+    "hazards": [],
+    "zones": [],
+    "risks": [
+      "dynamic-loads"
+    ],
+    "indicators": []
+  },
+  {
+    "id": "spinal-fluid-biomarkers",
+    "name": "Spinal Fluid Biomarkers",
+    "group": "leo",
+    "url": "https://www.nasa.gov/reference/spinal-fluid-biomarkers/",
+    "fact_id": "study-spinal-fluid-biomarkers",
+    "hazards": [],
+    "zones": [
+      "brain",
+      "eyes"
+    ],
+    "risks": [
+      "sans"
+    ],
+    "indicators": []
+  },
+  {
+    "id": "standard-measures",
+    "name": "Standard Measures",
+    "group": "leo",
+    "url": "https://www.nasa.gov/reference/standard-measures/",
+    "fact_id": "study-standard-measures",
+    "hazards": [],
+    "zones": [
+      "whole_body",
+      "brain"
+    ],
+    "risks": [],
+    "indicators": []
+  },
+  {
+    "id": "thigh-cuff",
+    "name": "Thigh Cuff",
+    "group": "leo",
+    "url": "https://www.nasa.gov/reference/thigh-cuff/",
+    "fact_id": "study-thigh-cuff",
+    "hazards": [],
+    "zones": [
+      "eyes"
+    ],
+    "risks": [
+      "sans"
+    ],
+    "indicators": []
+  },
+  {
+    "id": "venous-haemostasis",
+    "name": "Venous Haemostasis",
+    "group": "leo",
+    "url": "https://www.nasa.gov/reference/venous-haemostasis/",
+    "fact_id": "study-venous-haemostasis",
+    "hazards": [],
+    "zones": [
+      "heart"
+    ],
+    "risks": [
+      "cardiovascular"
+    ],
+    "indicators": []
+  },
+  {
+    "id": "zero-t2",
+    "name": "Zero T2",
+    "group": "leo",
+    "url": "https://www.nasa.gov/reference/zero-t2/",
+    "fact_id": "study-zero-t2",
+    "hazards": [],
+    "zones": [
+      "muscles"
+    ],
+    "risks": [
+      "fitness"
+    ],
+    "indicators": [
+      "exercise_minutes"
+    ]
+  },
+  {
+    "id": "altered-immunity",
+    "name": "Altered Immunity",
+    "group": "past",
+    "url": "https://www.nasa.gov/missions/station/scientists-probe-how-long-term-spaceflight-alters-immunity/",
+    "fact_id": "study-altered-immunity",
+    "hazards": [],
+    "zones": [
+      "whole_body"
+    ],
+    "risks": [
+      "immune"
+    ],
+    "indicators": []
+  },
+  {
+    "id": "food-acceptability",
+    "name": "Food Acceptability",
+    "group": "past",
+    "url": "https://www.nasa.gov/humans-in-space/how-does-spaceflight-change-food-appeal/",
+    "fact_id": "study-food-acceptability",
+    "hazards": [],
+    "zones": [],
+    "risks": [
+      "nutrition"
+    ],
+    "indicators": []
+  },
+  {
+    "id": "food-physiology",
+    "name": "Food Physiology",
+    "group": "past",
+    "url": "https://www.nasa.gov/missions/station/enhanced-diet-may-help-astronauts-adapt-to-spaceflight/",
+    "fact_id": "study-food-physiology",
+    "hazards": [],
+    "zones": [],
+    "risks": [
+      "nutrition"
+    ],
+    "indicators": []
+  },
+  {
+    "id": "omics-archive",
+    "name": "Omics Archive",
+    "group": "past",
+    "url": "https://www.nasa.gov/reference/omics-archive/",
+    "fact_id": "study-omics-archive",
+    "hazards": [],
+    "zones": [
+      "whole_body"
+    ],
+    "risks": [],
+    "indicators": []
+  },
+  {
+    "id": "space-gardening",
+    "name": "Space Gardening",
+    "group": "past",
+    "url": "https://www.nasa.gov/humans-in-space/can-space-gardening-help-astronauts-cope-with-isolation/",
+    "fact_id": "study-space-gardening",
+    "hazards": [
+      "isolation"
+    ],
+    "zones": [
+      "brain"
+    ],
+    "risks": [
+      "behavioral"
+    ],
+    "indicators": []
+  },
+  {
+    "id": "spinal-health",
+    "name": "Spinal Health",
+    "group": "past",
+    "url": "https://www.nasa.gov/missions/station/astronauts-spines-under-scrutiny/",
+    "fact_id": "study-spinal-health",
+    "hazards": [],
+    "zones": [
+      "bones",
+      "muscles"
+    ],
+    "risks": [
+      "bone",
+      "fitness"
+    ],
+    "indicators": []
+  },
+  {
+    "id": "tempus-pro",
+    "name": "Tempus Pro",
+    "group": "past",
+    "url": "https://www.nasa.gov/reference/tempus-pro/",
+    "fact_id": "study-tempus-pro",
+    "hazards": [
+      "distance"
+    ],
+    "zones": [],
+    "risks": [],
+    "indicators": []
+  },
+  {
+    "id": "veggie-monitoring",
+    "name": "Veggie Monitoring",
+    "group": "past",
+    "url": "https://www.nasa.gov/missions/station/researchers-put-space-garden-microbes-under-the-microscope/",
+    "fact_id": "study-veggie-monitoring",
+    "hazards": [
+      "hostile"
+    ],
+    "zones": [],
+    "risks": [
+      "microbiome"
+    ],
+    "indicators": []
+  }
+]

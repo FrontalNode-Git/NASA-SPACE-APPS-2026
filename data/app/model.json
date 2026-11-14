@@ -1,0 +1,59 @@
+{
+  "method_status": "provisional",
+  "crew": [
+    { "id": "commander", "name": "A. Vega", "role": "Commander" },
+    { "id": "cmo", "name": "N. Okafor", "role": "Chief Medical Officer" },
+    { "id": "systems", "name": "L. Tanaka", "role": "Systems Officer" },
+    { "id": "engineer", "name": "M. Ruiz", "role": "Flight Engineer" }
+  ],
+  "indicators": [
+    { "id": "heart_rate", "name": "Resting heart rate", "unit": "bpm", "decimals": 0, "resolution": 1.0, "zones": ["heart"], "risks": ["cardiovascular", "fitness"], "private": false },
+    { "id": "spo2", "name": "Blood oxygen (SpO₂)", "unit": "%", "decimals": 0, "resolution": 0.5, "zones": ["whole_body"], "risks": ["hypoxia"], "private": false },
+    { "id": "temperature", "name": "Body temperature", "unit": "°C", "decimals": 1, "resolution": 0.1, "zones": ["whole_body"], "risks": [], "private": false },
+    { "id": "sleep_hours", "name": "Sleep", "unit": "h", "decimals": 1, "resolution": 0.25, "zones": ["brain"], "risks": ["sleep"], "private": false },
+    { "id": "exercise_minutes", "name": "Exercise", "unit": "min", "decimals": 0, "resolution": 5.0, "zones": ["muscles"], "risks": ["fitness"], "private": false },
+    { "id": "mood", "name": "Mood (self-report)", "unit": "of five", "decimals": 0, "resolution": 0.5, "zones": ["brain"], "risks": ["behavioral"], "private": true }
+  ],
+  "zones": [
+    { "id": "brain", "name": "Brain and mind", "anchor": [0.0, 1.62, 0.02] },
+    { "id": "eyes", "name": "Eyes", "anchor": [0.0, 1.52, 0.24] },
+    { "id": "inner_ear", "name": "Inner ear and balance", "anchor": [0.25, 1.5, 0.0] },
+    { "id": "heart", "name": "Heart and blood vessels", "anchor": [0.1, 0.92, 0.14] },
+    { "id": "gut", "name": "Gut", "anchor": [0.0, 0.32, 0.14] },
+    { "id": "skin", "name": "Skin", "anchor": [-0.66, 0.42, 0.04] },
+    { "id": "muscles", "name": "Muscles", "anchor": [-0.2, -0.5, 0.1] },
+    { "id": "bones", "name": "Bones", "anchor": [0.2, -1.2, 0.04] },
+    { "id": "whole_body", "name": "Whole body", "anchor": [0.0, 0.05, 0.0] }
+  ],
+  "environments": [
+    { "id": "space-station", "name": "Space station", "fact_ids": ["hz-test-beds", "csa-rad-iss-testbed", "csa-sci-200-experiments", "csa-rad-neutron-share"] },
+    { "id": "lunar-base", "name": "Lunar base", "fact_ids": ["hz-distance-three-years", "hz-gravity-summary", "csa-sci-moon-mars"] },
+    { "id": "mars-transit", "name": "Mars transit", "fact_ids": ["hz-distance-mars-miles", "hz-distance-three-years", "hz-distance-summary", "csa-sci-more-radiation", "csa-sci-more-isolation", "csa-sci-comm-delays"] },
+    { "id": "mars-surface", "name": "Mars surface", "fact_ids": ["hz-gravity-mars", "hz-gravity-adjusting", "csa-sci-less-reliance"] },
+    { "id": "pressurized-rover", "name": "Pressurized rover", "fact_ids": ["env-pressurized-rover"] }
+  ],
+  "mission": {
+    "name": "Fictional crewed Mars mission",
+    "note": "Simulated mission plan. The split between phases is illustrative.",
+    "total_days": 1095,
+    "basis_fact_ids": ["hz-distance-three-years"],
+    "phases": [
+      { "id": "earth", "name": "Earth, pre-flight", "start": -7, "end": 0, "environment": null, "basis_fact_ids": [] },
+      { "id": "transit-out", "name": "Transit to Mars", "start": 1, "end": 182, "environment": "mars-transit", "basis_fact_ids": ["hz-distance-three-years", "hz-distance-mars-miles"] },
+      { "id": "mars-surface", "name": "Mars surface", "start": 183, "end": 912, "environment": "mars-surface", "basis_fact_ids": ["hz-gravity-mars"] },
+      { "id": "return", "name": "Return to Earth", "start": 913, "end": 1095, "environment": "mars-transit", "basis_fact_ids": ["hz-distance-three-years"] }
+    ]
+  },
+  "features": [
+    { "id": "baseline", "name": "Personal baseline", "kind": "measure" },
+    { "id": "drift", "name": "Drift detection", "kind": "measure" },
+    { "id": "report", "name": "Report for ground", "kind": "measure" },
+    { "id": "body-scan", "name": "Body scan", "kind": "zones" },
+    { "id": "hazard-lens", "name": "Hazard lens", "kind": "hazards" }
+  ],
+  "slots": [
+    { "id": "distance-comm-delay", "where": "Mission › Communication delay to Earth", "reason": "Awaiting research" },
+    { "id": "radiation-dose-rate", "where": "Mission › Radiation dose rate per environment", "reason": "Awaiting research" },
+    { "id": "env-pressurized-rover", "where": "Mission › Pressurized rover environment", "reason": "Awaiting research" }
+  ]
+}

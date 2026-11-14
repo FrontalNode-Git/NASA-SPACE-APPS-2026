@@ -1,0 +1,61 @@
+[
+  {
+    "id": "radiation",
+    "short": "Radiation",
+    "name": "Space Radiation",
+    "url": "https://www.nasa.gov/hrp/hazard-space-radiation/",
+    "fact_ids": [
+      "hz-radiation-summary",
+      "csa-rad-key-challenge",
+      "csa-sci-more-radiation"
+    ]
+  },
+  {
+    "id": "isolation",
+    "short": "Isolation",
+    "name": "Isolation and Confinement",
+    "url": "https://www.nasa.gov/hrp/hazard-isolation-and-confinement/",
+    "fact_ids": [
+      "hz-isolation-summary",
+      "hz-isolation-crews",
+      "csa-sci-more-isolation"
+    ]
+  },
+  {
+    "id": "distance",
+    "short": "Distance",
+    "name": "Distance from Earth",
+    "url": "https://www.nasa.gov/hrp/hazard-distance-from-earth/",
+    "fact_ids": [
+      "hz-distance-summary",
+      "hz-distance-mars-miles",
+      "hz-distance-three-years",
+      "hz-distance-self-sufficiency",
+      "csa-sci-comm-delays",
+      "csa-sci-less-reliance"
+    ]
+  },
+  {
+    "id": "gravity",
+    "short": "Gravity",
+    "name": "Gravity Fields",
+    "url": "https://www.nasa.gov/hrp/hazard-gravity-fields/",
+    "fact_ids": [
+      "hz-gravity-summary",
+      "hz-gravity-mars",
+      "hz-gravity-adjusting",
+      "csa-sci-more-weightlessness"
+    ]
+  },
+  {
+    "id": "hostile",
+    "short": "Hostile environment",
+    "name": "Hostile/Closed Environments",
+    "url": "https://www.nasa.gov/hrp/hazard-hostile-closed-environments/",
+    "fact_ids": [
+      "hz-hostile-summary",
+      "hz-hostile-machine",
+      "hz-hostile-habitability"
+    ]
+  }
+]

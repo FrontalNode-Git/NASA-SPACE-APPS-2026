@@ -1,0 +1,206 @@
+[
+  {
+    "id": "immune",
+    "name": "Risk of Altered Immune System Responses",
+    "category": "physiology",
+    "url": "https://www.nasa.gov/reference/risk-of-altered-immune-system-responses/",
+    "fact_id": "risk-immune",
+    "hazards": [
+      "hostile"
+    ],
+    "zones": [
+      "skin",
+      "whole_body"
+    ]
+  },
+  {
+    "id": "sensorimotor",
+    "name": "Risk of Altered Sensorimotor and Vestibular Function",
+    "category": "physiology",
+    "url": "https://www.nasa.gov/reference/risk-of-altered-sensorimotor-and-vestibular-function/",
+    "fact_id": "risk-sensorimotor",
+    "hazards": [
+      "gravity"
+    ],
+    "zones": [
+      "inner_ear"
+    ]
+  },
+  {
+    "id": "cardiovascular",
+    "name": "Risk of Cardiovascular Adaptations",
+    "category": "physiology",
+    "url": "https://www.nasa.gov/reference/risk-of-cardiovascular-adaptations/",
+    "fact_id": "risk-cardiovascular",
+    "hazards": [
+      "gravity"
+    ],
+    "zones": [
+      "heart"
+    ]
+  },
+  {
+    "id": "decompression",
+    "name": "Risk of Decompression Sickness",
+    "category": "physiology",
+    "url": "https://www.nasa.gov/reference/risk-of-decompression-sickness/",
+    "fact_id": "risk-decompression",
+    "hazards": [],
+    "zones": [
+      "whole_body"
+    ]
+  },
+  {
+    "id": "microbiome",
+    "name": "Risk of Host-Microorganism Interactions",
+    "category": "physiology",
+    "url": "https://www.nasa.gov/reference/risk-of-host-microorganism-interactions/",
+    "fact_id": "risk-microbiome",
+    "hazards": [
+      "hostile"
+    ],
+    "zones": [
+      "skin",
+      "gut"
+    ]
+  },
+  {
+    "id": "hypoxia",
+    "name": "Risk of Hypoxia",
+    "category": "physiology",
+    "url": "https://www.nasa.gov/reference/risk-of-hypoxia/",
+    "fact_id": "risk-hypoxia",
+    "hazards": [],
+    "zones": [
+      "whole_body"
+    ]
+  },
+  {
+    "id": "nutrition",
+    "name": "Risk of Inadequate Food and Nutrition",
+    "category": "physiology",
+    "url": "https://www.nasa.gov/reference/risk-of-inadequate-food-and-nutrition/",
+    "fact_id": "risk-nutrition",
+    "hazards": [
+      "distance"
+    ],
+    "zones": []
+  },
+  {
+    "id": "spacewalk",
+    "name": "Risk of Injury and Compromised Performance from Spacewalks",
+    "category": "physiology",
+    "url": "https://www.nasa.gov/reference/risk-of-injury-and-compromised-performance-from-extravehicular-activity-eva/",
+    "fact_id": "risk-spacewalk",
+    "hazards": [],
+    "zones": []
+  },
+  {
+    "id": "fitness",
+    "name": "Risk of Reduced Cardiorespiratory and Musculoskeletal Fitness",
+    "category": "physiology",
+    "url": "https://www.nasa.gov/reference/risk-of-reduced-cardiorespiratory-and-musculoskeletal-fitness/",
+    "fact_id": "risk-fitness",
+    "hazards": [
+      "gravity"
+    ],
+    "zones": [
+      "muscles",
+      "bones",
+      "heart"
+    ]
+  },
+  {
+    "id": "sans",
+    "name": "Risk of Spaceflight Associated Neuro-ocular Syndrome (SANS)",
+    "category": "physiology",
+    "url": "https://www.nasa.gov/reference/risk-of-spaceflight-associated-neuro-ocular-syndrome-sans/",
+    "fact_id": "risk-sans",
+    "hazards": [],
+    "zones": [
+      "eyes",
+      "brain"
+    ]
+  },
+  {
+    "id": "bone",
+    "name": "Risk of Spaceflight-Induced Bone Changes",
+    "category": "physiology",
+    "url": "https://www.nasa.gov/reference/risk-of-spaceflight-induced-bone-changes/",
+    "fact_id": "risk-bone",
+    "hazards": [
+      "gravity"
+    ],
+    "zones": [
+      "bones"
+    ]
+  },
+  {
+    "id": "behavioral",
+    "name": "Risk of Behavioral Changes and Psychiatric Disorders",
+    "category": "behavioral",
+    "url": "https://www.nasa.gov/reference/risk-of-behavioral-conditions-and-psychiatric-disorders/",
+    "fact_id": "risk-behavioral",
+    "hazards": [
+      "isolation",
+      "radiation",
+      "distance"
+    ],
+    "zones": [
+      "brain"
+    ]
+  },
+  {
+    "id": "teamwork",
+    "name": "Risk of Inadequate Teamwork",
+    "category": "behavioral",
+    "url": "https://www.nasa.gov/reference/risk-of-inadequate-teamwork/",
+    "fact_id": "risk-teamwork",
+    "hazards": [
+      "isolation"
+    ],
+    "zones": []
+  },
+  {
+    "id": "sleep",
+    "name": "Risk of Inadequate Sleep and Irregular Schedules",
+    "category": "behavioral",
+    "url": "https://www.nasa.gov/reference/risk-from-inadequate-sleep-and-irregular-schedules/",
+    "fact_id": "risk-sleep",
+    "hazards": [],
+    "zones": []
+  },
+  {
+    "id": "systems-support",
+    "name": "Risk of Inadequate Systems Operations Support",
+    "category": "behavioral",
+    "url": "https://www.nasa.gov/reference/risk-of-inadequate-systems-operations-support/",
+    "fact_id": "risk-systems-support",
+    "hazards": [
+      "distance"
+    ],
+    "zones": []
+  },
+  {
+    "id": "dynamic-loads",
+    "name": "Risk of Injury from Dynamic Loads",
+    "category": "behavioral",
+    "url": "https://www.nasa.gov/reference/risk-of-injury-from-dynamic-loads/",
+    "fact_id": "risk-dynamic-loads",
+    "hazards": [],
+    "zones": []
+  },
+  {
+    "id": "radiation-cancer",
+    "name": "Risk of Radiation-Induced Cancers",
+    "category": "radiation",
+    "url": "https://www.nasa.gov/reference/risk-of-radiation-induced-cancers/",
+    "fact_id": "risk-radiation-cancer",
+    "hazards": [
+      "radiation"
+    ],
+    "zones": [
+      "whole_body"
+    ]
+  }
+]
