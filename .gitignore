@@ -1,0 +1,7 @@
+# Local-only configuration and credentials
+.env
+.env.*
+!.env.example
+config.local.js
+*.local.json
+
