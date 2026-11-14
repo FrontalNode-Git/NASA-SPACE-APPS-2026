@@ -80,6 +80,7 @@ test('daily check-in: what the crew member enters drives the dashboard', async (
   await expect(heart.getByTestId('source')).toHaveAttribute('data-source', 'manual');
   await expect(heart.locator('[data-status="call_ground"]')).toBeVisible(); // far outside this person's normal
   await expect(page.getByTestId('header-status').locator('[data-status="call_ground"]')).toBeVisible();
+  await expect(page.getByTestId('attention-banner')).toBeVisible(); // and the dashboard says so at the top
 
   // The entry belongs to its day: yesterday still shows the sensor value.
   await page.getByTestId('day-prev').click();
@@ -93,12 +94,14 @@ test('daily check-in: what the crew member enters drives the dashboard', async (
   await page.getByTestId('check-in-save').click();
   await expect(heart.getByTestId('latest')).toHaveText(sensorValue);
   await expect(heart.getByTestId('source')).toHaveAttribute('data-source', 'sensor');
+  await expect(page.getByTestId('attention-banner')).toHaveCount(0);
 
-  // A value that cannot be right is refused and nothing changes.
+  // A value that cannot be right is refused, the field is named and marked, and nothing changes.
   expected = /status of 422/; // the browser logs the server's refusal; that is the point of this step
   await page.getByTestId('check-in-spo2').fill('140');
   await page.getByTestId('check-in-save').click();
-  await expect(page.getByTestId('check-in').getByRole('alert')).toBeVisible();
+  await expect(page.getByTestId('check-in').getByRole('alert')).toContainText('Blood oxygen');
+  await expect(page.locator('[data-field="spo2"]')).toHaveAttribute('data-refused', 'true');
   await expect(card(page, 'spo2').getByTestId('source')).toHaveAttribute('data-source', 'sensor');
 
   // Mood is entered with one tap and stays private to the crew member.
@@ -119,6 +122,31 @@ test('check-in fills a reading the sensor missed', async ({ page }) => {
   await expect(temperature.getByTestId('missing-reminder')).toHaveCount(0);
 });
 
+test('call ground: the dashboard says why at the top and offers "I\'m OK" there', async ({ page }) => {
+  await open(page);
+  await expect(page.getByTestId('attention-banner')).toHaveCount(0); // a Watch does not ask for an answer
+  await page.getByTestId('check-in-heart_rate').fill('75');
+  await page.getByTestId('check-in-save').click();
+  const line = page.locator('[data-attention="heart_rate"]');
+  await expect(line).toHaveAttribute('data-status', 'call_ground');
+  await expect(line).toContainText('Far above your normal today');
+  await page.getByTestId('attention-ok').click();
+  await expect(page.getByTestId('acknowledged')).toBeVisible();
+  await expect(page.getByTestId('attention-banner')).toHaveCount(0);
+  await expect(line).toBeVisible(); // answering does not hide the reading that is off
+});
+
+test('header: every control is on screen, on one row on a laptop', async ({ page, isMobile }) => {
+  await open(page);
+  for (const id of ['day-stepper', 'viewer-select', 'presenter-toggle', 'judge-toggle', 'night-toggle']) {
+    await expect(page.getByTestId(id)).toBeInViewport({ ratio: 1 });
+  }
+  if (!isMobile) {
+    const header = await page.locator('header').first().boundingBox();
+    expect(header?.height ?? 0).toBeLessThan(80); // two rows would be over 100
+  }
+});
+
 test('dashboard tells the drift story on the demo day', async ({ page }) => {
   await open(page);
   const heart = card(page, 'heart_rate');
@@ -127,6 +155,11 @@ test('dashboard tells the drift story on the demo day', async ({ page }) => {
   await expect(heart.getByTestId('drift-message')).toContainText('Slowly drifting above your normal for 5 days');
   await expect(heart.getByTestId('confidence')).toContainText('Based on 7 pre-flight readings');
   await expect(page.getByTestId('header-status').locator('[data-status="watch"]')).toBeVisible();
+  // The reason is at the top of the dashboard, and it jumps to the card.
+  const line = page.locator('[data-attention="heart_rate"]');
+  await expect(line).toContainText('Slowly drifting above your normal for 5 days');
+  await line.click();
+  await expect(heart).toBeInViewport();
   await expect(page.getByTestId('body-scan')).toBeVisible();
   await expect(card(page, 'spo2').locator('p').filter({ hasText: /^[A-Z].{120,}/ })).toHaveCount(0); // no reading material on the cards
   // "Show as table" works on a chart
@@ -165,6 +198,10 @@ test('quick actions: log, I am OK, report, palette', async ({ page }) => {
   await expect(page.getByTestId('report-text')).toContainText('SIMULATED DATA');
   await expect(page.getByTestId('report-text')).not.toContainText('http');
   await expect(page.getByTestId('report-risks').getByRole('listitem')).toHaveCount(2);
+  // "Your normal" can be read without scrolling sideways, on a phone too.
+  const normal = await page.getByTestId('report').getByText(/· 7 readings/).locator('visible=true').first().boundingBox();
+  expect(normal).not.toBeNull();
+  expect((normal?.x ?? 0) + (normal?.width ?? 0)).toBeLessThanOrEqual(page.viewportSize()?.width ?? 0);
 });
 
 test('hazard lens filters the dashboard', async ({ page }) => {
@@ -286,6 +323,7 @@ test('night mode and the flat body view', async ({ page }) => {
   await expect(page.locator('html')).toHaveAttribute('data-theme', 'day');
   await page.getByRole('button', { name: 'Flat view' }).click();
   await expect(page.getByTestId('body-scan')).toHaveAttribute('data-mode', '2d');
+  await expect(page.getByTestId('flat-figure').locator('[data-outline]')).toBeVisible(); // a traced human outline
   await page.locator('[data-zone="heart"]').click();
   const detail = page.getByTestId('zone-detail');
   await expect(detail).toContainText('Heart and blood vessels');

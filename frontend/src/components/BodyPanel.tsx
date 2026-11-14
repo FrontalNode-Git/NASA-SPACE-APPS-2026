@@ -1,5 +1,5 @@
-import { lazy, Suspense, useMemo, useState } from 'react';
-import { BODY_PARTS, webglAvailable, zoneAnchors, zoneStatuses } from '../lib/body';
+import { lazy, Suspense, useId, useMemo, useState } from 'react';
+import { insidePoints, outlineLoops, webglAvailable, zoneAnchors, zoneStatuses } from '../lib/body';
 import { litIds } from '../lib/lens';
 import { useApp, useT } from '../lib/store';
 import type { Status, Zone } from '../lib/types';
@@ -22,27 +22,58 @@ interface ZoneViewProps {
   onSelect: (zone: string | null) => void;
 }
 
-/** Flat figure for devices without WebGL, or by choice. Same zones, same statuses. */
+const toPath = (loops: [number, number][][]) =>
+  loops.map((loop) => `M${loop.map(([x, y]) => `${px(x).toFixed(1)} ${py(y).toFixed(1)}`).join('L')}Z`).join('');
+
+/** The flat figure is traced from the same body as the particle view, once. */
+let flatFigure: { outline: string; inner: string; structures: [string, string][] } | null = null;
+function traceFigure() {
+  flatFigure ??= {
+    outline: toPath(outlineLoops(0)),
+    inner: toPath(outlineLoops(0.045)),
+    // Each particle of the skeleton and organs becomes a dot: a zero-length line with round ends.
+    structures: Object.entries(insidePoints()).map(([zone, points]) => [
+      zone,
+      points.map(([x, y]) => `M${px(x).toFixed(1)} ${py(y).toFixed(1)}h0`).join(''),
+    ]),
+  };
+  return flatFigure;
+}
+
+/** Flat figure for devices without WebGL, or by choice. Same body, same zones, same statuses. */
 function BodyScan2D({ zones, statuses, lit, lensActive, selected, onSelect }: ZoneViewProps) {
+  const id = useId();
+  const figure = traceFigure();
   return (
-    <svg viewBox="0 0 260 236" className="h-full w-full" aria-hidden="true">
-      <g className="text-muted" fill="currentColor" opacity={0.28} stroke="currentColor" strokeLinecap="round">
-        {BODY_PARTS.map((part, i) =>
-          part.kind === 'ellipsoid' ? (
-            <ellipse key={i} cx={px(part.c[0])} cy={py(part.c[1])} rx={part.r[0] * SCALE} ry={part.r[1] * SCALE} stroke="none" />
-          ) : (
-            <line
-              key={i}
-              x1={px(part.a[0])}
-              y1={py(part.a[1])}
-              x2={px(part.b[0])}
-              y2={py(part.b[1])}
-              strokeWidth={part.r * 2 * SCALE}
-              fill="none"
-            />
-          ),
-        )}
+    <svg viewBox="0 0 260 236" className="h-full w-full" aria-hidden="true" data-testid="flat-figure">
+      <g className="text-muted">
+        <defs>
+          <pattern id={`${id}-lines`} width="6" height="2" patternUnits="userSpaceOnUse">
+            <line x1="0" y1="0.5" x2="6" y2="0.5" stroke="currentColor" strokeWidth="0.45" />
+          </pattern>
+        </defs>
+        <path d={figure.outline} fill="currentColor" fillOpacity={0.09} />
+        <path d={figure.outline} fill={`url(#${id}-lines)`} opacity={0.3} />
+        <path d={figure.inner} fill="none" stroke="currentColor" strokeOpacity={0.28} strokeWidth={0.5} />
+        <path d={figure.outline} fill="none" stroke="currentColor" strokeOpacity={0.9} strokeWidth={0.9} strokeLinejoin="round" data-outline />
       </g>
+      {figure.structures.map(([zoneId, dots]) => {
+        const status = statuses[zoneId] ?? 'nominal';
+        const dim = lensActive && !lit.includes(zoneId);
+        const tone = lensActive || selected === zoneId ? 'text-accent' : STATUS_META[status].text;
+        return (
+          <path
+            key={zoneId}
+            d={dots}
+            className={tone}
+            fill="none"
+            stroke="currentColor"
+            strokeWidth={0.85}
+            strokeLinecap="round"
+            opacity={dim ? 0.12 : status === 'nominal' && selected !== zoneId ? 0.5 : 0.9}
+          />
+        );
+      })}
       {zones
         .filter((z) => z.id !== 'whole_body')
         .flatMap((zone) => {
@@ -63,7 +94,7 @@ function BodyScan2D({ zones, statuses, lit, lensActive, selected, onSelect }: Zo
               ) : status === 'call_ground' ? (
                 <rect x={-5.5} y={-5.5} width={11} height={11} rx={1} fill="currentColor" />
               ) : (
-                <circle r={on ? 5 : 3.6} fill="currentColor" />
+                <circle r={on ? 4.6 : 3.1} fill="currentColor" />
               )}
               {on && <circle r={10} fill="none" stroke="currentColor" strokeWidth={1.4} />}
             </g>
@@ -197,7 +228,7 @@ export function BodyPanel() {
         </button>
       }
     >
-      <div className="relative h-[430px] overflow-hidden rounded-lg bg-bg/60" data-testid="body-scan" data-mode={flat ? '2d' : '3d'}>
+      <div className="scan-stage relative h-[430px] overflow-hidden rounded-lg" data-testid="body-scan" data-mode={flat ? '2d' : '3d'}>
         {flat ? (
           <BodyScan2D {...shared} />
         ) : (

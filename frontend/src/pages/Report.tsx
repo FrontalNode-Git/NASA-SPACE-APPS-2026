@@ -93,7 +93,36 @@ export function ReportPage() {
         </div>
         {report.acknowledged && <p className="mt-3 text-sm text-nominal">{t('dash.acknowledged')}</p>}
 
-        <div className="relative mt-4 overflow-x-auto">
+        {/* Phone: one block per indicator, because five columns do not fit. Wider: the table. */}
+        <ul className="mt-4 divide-y divide-line/70 border-t border-line/70 text-sm sm:hidden" aria-label={t('report.indicators')} data-testid="report-list">
+          {report.indicators.map((row) => (
+            <li key={row.id} className="py-3">
+              <p className="flex items-center justify-between gap-3">
+                <span className="font-medium">{row.name}</span>
+                <span className="inline-flex shrink-0 items-center gap-1.5">
+                  <StatusGlyph status={row.status} size={12} />
+                  {t(`status.${row.status}`)}
+                </span>
+              </p>
+              <dl className="mt-1.5 grid grid-cols-[auto_1fr] gap-x-3 gap-y-0.5">
+                <dt className="text-muted">{t('report.latest')}</dt>
+                <dd className="tabular-nums">{row.missing_today ? t('chart.noReading') : `${row.latest} ${row.unit}`}</dd>
+                <dt className="text-muted">{t('report.normal')}</dt>
+                <dd className="tabular-nums">
+                  {row.normal ? `${row.normal} · ${t('report.readings', { n: row.based_on })}` : '—'}
+                </dd>
+                {row.drift && (
+                  <>
+                    <dt className="text-muted">{t('report.trend')}</dt>
+                    <dd>{row.drift}</dd>
+                  </>
+                )}
+              </dl>
+            </li>
+          ))}
+        </ul>
+
+        <div className="relative mt-4 hidden overflow-x-auto sm:block">
           <table className="w-full min-w-[560px] text-left text-sm">
             <caption className="sr-only">{t('report.indicators')}</caption>
             <thead className="text-xs uppercase tracking-wide text-muted">

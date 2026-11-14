@@ -2,7 +2,7 @@ import { Billboard, Html, Line } from '@react-three/drei';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import * as THREE from 'three';
-import { buildCloud, zoneAnchors } from '../lib/body';
+import { buildCloud, INSIDE, PAD, SHELL, zoneAnchors } from '../lib/body';
 import type { Status, Zone } from '../lib/types';
 import { prefersReducedMotion, readTheme } from './Chart';
 import { StatusGlyph } from './StatusGlyph';
@@ -42,54 +42,135 @@ function statusColor(status: Status, theme: ReturnType<typeof readTheme>): strin
   return status === 'call_ground' ? theme.call : status === 'watch' ? theme.watch : theme.nominal;
 }
 
+// Round, soft particles. The skin is solid towards the viewer and faint on the far side, so
+// the figure reads as a body instead of a see-through cloud; the skeleton and organs glow
+// through it. A bright line travels up the body like a scanner.
+const VERTEX = /* glsl */ `
+  attribute vec3 aColor;
+  attribute float aKind;
+  uniform float uTime;
+  uniform float uSweep;
+  uniform float uHalfHeight;
+  varying vec3 vColor;
+  varying float vAlpha;
+
+  void main() {
+    vec4 mv = modelViewMatrix * vec4(position, 1.0);
+    float alpha;
+    float size;
+    if (aKind < 0.5) {
+      float facing = dot(normalize(normalMatrix * normal), normalize(-mv.xyz));
+      float front = smoothstep(-0.2, 0.3, facing);
+      float rim = pow(1.0 - abs(facing), 3.0);
+      alpha = mix(0.06, 0.6, front) + rim * 0.3;
+      size = 0.022;
+    } else if (aKind < 1.5) {
+      alpha = 0.6;
+      size = 0.019;
+    } else {
+      alpha = 0.32;
+      size = 0.022;
+    }
+    float line = mix(-2.0, 2.0, fract(uTime * 0.11));
+    float band = aKind > 1.5 ? 0.0 : uSweep * exp(-pow((position.y - line) / 0.06, 2.0));
+
+    vColor = aColor * (1.0 + band * 0.7);
+    vAlpha = min(1.0, alpha + band * 0.16);
+    gl_PointSize = max(1.6, size * (1.0 + band * 0.25) * projectionMatrix[1][1] * uHalfHeight / -mv.z);
+    gl_Position = projectionMatrix * mv;
+  }
+`;
+const FRAGMENT = /* glsl */ `
+  varying vec3 vColor;
+  varying float vAlpha;
+
+  void main() {
+    float edge = smoothstep(0.5, 0.3, length(gl_PointCoord - 0.5));
+    if (edge < 0.02) discard;
+    gl_FragColor = vec4(vColor, vAlpha * edge);
+    #include <colorspace_fragment>
+  }
+`;
+
 function Particles({ zones, statuses, lit, lensActive, selected, night }: Omit<BodyScanProps, 'cards' | 'onSelect'>) {
   const cloud = useMemo(() => buildCloud(zones), [zones]);
   const geometry = useMemo(() => {
     const g = new THREE.BufferGeometry();
     g.setAttribute('position', new THREE.BufferAttribute(cloud.positions, 3));
-    g.setAttribute('color', new THREE.BufferAttribute(new Float32Array(cloud.count * 3), 3));
+    g.setAttribute('normal', new THREE.BufferAttribute(cloud.normals, 3));
+    g.setAttribute('aKind', new THREE.BufferAttribute(cloud.kinds, 1));
+    g.setAttribute('aColor', new THREE.BufferAttribute(new Float32Array(cloud.count * 3), 3));
     return g;
   }, [cloud]);
+  const uniforms = useMemo(() => ({ uTime: { value: 0 }, uSweep: { value: 1 }, uHalfHeight: { value: 215 } }), []);
+  const material = useMemo(
+    () =>
+      new THREE.ShaderMaterial({
+        uniforms,
+        vertexShader: VERTEX,
+        fragmentShader: FRAGMENT,
+        transparent: true,
+        depthWrite: false,
+        blending: THREE.AdditiveBlending,
+      }),
+    [uniforms],
+  );
   useEffect(() => () => geometry.dispose(), [geometry]);
+  useEffect(() => () => material.dispose(), [material]);
+
+  const reduced = prefersReducedMotion();
+  useFrame(({ clock, size, gl }) => {
+    uniforms.uTime.value = clock.elapsedTime;
+    uniforms.uSweep.value = reduced ? 0 : 1;
+    uniforms.uHalfHeight.value = size.height * gl.getPixelRatio() * 0.5;
+  });
 
   useEffect(() => {
     const theme = readTheme();
-    const base = new THREE.Color(theme.muted).multiplyScalar(0.55);
+    const base = new THREE.Color(theme.muted).multiplyScalar(0.6);
     const accent = new THREE.Color(theme.accent);
+    const calm = new THREE.Color(theme.nominal).multiplyScalar(0.6); // a healthy skeleton and organs
+    const faint = base.clone().multiplyScalar(0.22);
     const wholeIndex = zones.findIndex((z) => z.id === 'whole_body');
     const wholeLit = lit.includes('whole_body');
     const wholeStatus = statuses.whole_body ?? 'nominal';
-    const zoneColors = zones.map((z) => {
+    // What a zone looks like on the skin, and as a structure inside the body.
+    const skinColors = zones.map((z) => {
       const status = statuses[z.id] ?? 'nominal';
-      const isLit = lit.includes(z.id);
-      if (lensActive) return isLit ? accent.clone() : base.clone().multiplyScalar(0.22);
+      if (lensActive) return lit.includes(z.id) ? accent : faint;
       if (status !== 'nominal') return new THREE.Color(statusColor(status, theme));
-      if (selected === z.id) return accent.clone();
-      return new THREE.Color(theme.text).multiplyScalar(0.62);
+      if (selected === z.id) return accent;
+      return new THREE.Color(theme.text).multiplyScalar(0.66);
     });
-    const colors = geometry.getAttribute('color') as THREE.BufferAttribute;
+    const insideColors = zones.map((z, i) => {
+      const status = statuses[z.id] ?? 'nominal';
+      return !lensActive && status === 'nominal' && selected !== z.id ? calm : (skinColors[i] ?? calm);
+    });
     const fallback = lensActive
       ? wholeLit
         ? accent.clone().multiplyScalar(0.5)
-        : base.clone().multiplyScalar(0.22)
+        : faint
       : wholeStatus !== 'nominal'
         ? new THREE.Color(statusColor(wholeStatus, theme)).multiplyScalar(0.55)
         : selected === 'whole_body'
           ? accent.clone().multiplyScalar(0.6)
           : base;
+    const padColor = lensActive ? faint : new THREE.Color(theme.muted).multiplyScalar(0.5);
+    const colors = geometry.getAttribute('aColor') as THREE.BufferAttribute;
+    const mixed = new THREE.Color();
     for (let i = 0; i < cloud.count; i++) {
+      const kind = cloud.kinds[i] ?? SHELL;
       const zi = cloud.zoneOf[i] ?? -1;
-      const c = zi >= 0 && zi !== wholeIndex ? (zoneColors[zi] ?? fallback) : fallback;
-      colors.setXYZ(i, c.r, c.g, c.b);
+      if (kind === PAD) mixed.copy(padColor);
+      else if (kind === INSIDE) mixed.copy(insideColors[zi] ?? calm);
+      else if (zi >= 0 && zi !== wholeIndex) mixed.copy(fallback).lerp(skinColors[zi] ?? fallback, cloud.zoneWeight[i] ?? 0);
+      else mixed.copy(fallback);
+      colors.setXYZ(i, mixed.r, mixed.g, mixed.b);
     }
     colors.needsUpdate = true;
   }, [cloud, geometry, zones, statuses, lit, lensActive, selected, night]);
 
-  return (
-    <points geometry={geometry}>
-      <pointsMaterial size={0.026} sizeAttenuation vertexColors transparent opacity={0.95} depthWrite={false} />
-    </points>
-  );
+  return <points geometry={geometry} material={material} frustumCulled={false} />;
 }
 
 /** Target marker: its outline repeats the status shape (circle / triangle / square). */

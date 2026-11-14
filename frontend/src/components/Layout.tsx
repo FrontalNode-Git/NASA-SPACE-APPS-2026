@@ -71,7 +71,7 @@ function DayStepper() {
       <button type="button" className={step} onClick={() => setDay(day - 1)} disabled={day <= 0} aria-label={t('header.prevDay')} data-testid="day-prev">
         <span aria-hidden="true">‹</span>
       </button>
-      <span className="min-w-[7.5rem] text-center text-sm font-medium tabular-nums" data-testid="day-label">
+      <span className="min-w-[6.5rem] text-center text-sm font-medium tabular-nums sm:min-w-[7.5rem]" data-testid="day-label">
         {t('common.day', { n: day })}
       </span>
       <button type="button" className={step} onClick={() => setDay(day + 1)} disabled={day >= max} aria-label={t('header.nextDay')} data-testid="day-next">
@@ -90,7 +90,15 @@ function Header() {
   const night = useApp((s) => s.night);
   const set = useApp((s) => s.set);
   const run = useApp((s) => s.run);
-  const chip = 'min-h-[40px] rounded-lg border border-line bg-panel px-3 text-sm hover:border-accent';
+  const chip = 'min-h-[40px] flex-1 whitespace-nowrap rounded-lg border border-line bg-panel px-3 text-sm hover:border-accent sm:flex-none';
+  // The full label from 1280 px up and a short one below, so the header stays on one row on
+  // a laptop. The accessible name is always the full label.
+  const label = (full: string, short: string) => (
+    <>
+      <span className="xl:hidden">{t(short)}</span>
+      <span className="hidden xl:inline">{t(full)}</span>
+    </>
+  );
 
   return (
     <header className="border-b border-line bg-panel/70 print:hidden">
@@ -99,7 +107,7 @@ function Header() {
           <span className="font-display text-xl font-bold tracking-tight">
             VITA<span className="text-accent">-L</span>
           </span>
-          <span className="hidden text-sm text-muted xl:inline">{t('app.tagline')}</span>
+          <span className="hidden text-sm text-muted 2xl:inline">{t('app.tagline')}</span>
         </NavLink>
         {dash && (
           <span className="ml-auto flex items-center gap-2 text-sm sm:ml-0" data-testid="header-status">
@@ -107,14 +115,15 @@ function Header() {
             <SimulatedTag />
           </span>
         )}
-        <div className="relative flex w-full items-center gap-2 overflow-x-auto pb-1 sm:w-auto sm:flex-1 sm:flex-wrap sm:justify-end sm:overflow-visible sm:pb-0 [&>*]:shrink-0">
+        {/* Phone: day and crew member on one row, the three buttons on the next. Wider: one row. */}
+        <div className="flex w-full flex-wrap items-center gap-2 sm:w-auto sm:flex-1 sm:justify-end" data-testid="header-controls">
           <DayStepper />
-          <label className="flex items-center gap-1.5 text-sm">
-            <span className="text-muted">{t('header.signedIn')}</span>
+          <label className="flex min-w-0 flex-1 items-center gap-1.5 text-sm sm:flex-none">
+            <span className="sr-only text-muted xl:not-sr-only">{t('header.signedIn')}</span>
             <select
               value={viewer}
               onChange={(e) => setViewer(e.target.value)}
-              className="min-h-[40px] rounded-lg border border-line bg-panel px-2 text-sm"
+              className="min-h-[40px] w-full min-w-0 rounded-lg border border-line bg-panel px-2 text-sm sm:w-auto"
               data-testid="viewer-select"
             >
               {bundle?.crew.map((m) => (
@@ -124,15 +133,39 @@ function Header() {
               ))}
             </select>
           </label>
-          <button type="button" className={chip} onClick={() => run({ type: 'presenter' })} data-testid="presenter-toggle" aria-keyshortcuts="P">
-            {t('action.presenter')}
-          </button>
-          <button type="button" className={chip} onClick={() => run({ type: 'judge' })} data-testid="judge-toggle" aria-keyshortcuts="J">
-            {t('action.judge')}
-          </button>
-          <button type="button" className={chip} onClick={() => set({ night: !night })} aria-pressed={night} data-testid="night-toggle" aria-keyshortcuts="N">
-            {t('action.night')}
-          </button>
+          <div className="flex w-full gap-2 sm:w-auto">
+            <button
+              type="button"
+              className={chip}
+              onClick={() => run({ type: 'presenter' })}
+              data-testid="presenter-toggle"
+              aria-keyshortcuts="P"
+              aria-label={t('action.presenter')}
+            >
+              {label('action.presenter', 'short.presenter')}
+            </button>
+            <button
+              type="button"
+              className={chip}
+              onClick={() => run({ type: 'judge' })}
+              data-testid="judge-toggle"
+              aria-keyshortcuts="J"
+              aria-label={t('action.judge')}
+            >
+              {label('action.judge', 'short.judge')}
+            </button>
+            <button
+              type="button"
+              className={chip}
+              onClick={() => set({ night: !night })}
+              aria-pressed={night}
+              data-testid="night-toggle"
+              aria-keyshortcuts="N"
+              aria-label={t('action.night')}
+            >
+              {label('action.night', 'short.night')}
+            </button>
+          </div>
         </div>
       </div>
     </header>

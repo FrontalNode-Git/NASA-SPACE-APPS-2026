@@ -47,6 +47,9 @@ export const STRINGS: Record<string, string> = {
   'short.report': 'Report',
   'short.lens': 'Lens',
   'short.palette': 'Find',
+  'short.presenter': 'Presenter',
+  'short.judge': 'Judge',
+  'short.night': 'Night',
 
   'toast.saved': 'Saved',
   'toast.ok': "Saved: I'm OK",
@@ -75,6 +78,7 @@ export const STRINGS: Record<string, string> = {
   'checkin.invalid': 'One of these values cannot be right. Please check and try again.',
   'checkin.hint': 'What you enter replaces the sensor value for this day. Clear a field to go back to the sensor.',
   'checkin.unsaved': 'not saved yet',
+  'checkin.refused': 'check this value',
   'checkin.entered': 'entered by you',
   'checkin.sensor': 'from sensor (simulated)',
   'checkin.missing': 'no reading yet',
@@ -122,6 +126,15 @@ export const STRINGS: Record<string, string> = {
   'ind.sensor': 'sensor',
   'drift.above': 'Slowly drifting above your normal for {n} days',
   'drift.below': 'Slowly drifting below your normal for {n} days',
+
+  'attention.none': 'Every reading is inside its own normal band.',
+  'attention.above': 'Above your normal today',
+  'attention.below': 'Below your normal today',
+  'attention.aboveFar': 'Far above your normal today',
+  'attention.belowFar': 'Far below your normal today',
+  'attention.private': 'details are private to this crew member',
+  'attention.show': 'Show',
+  'attention.call': 'A reading is far from your normal. Check it, then tell ground how you are.',
 
   'privacy.locked': 'Private to this crew member. You see the status level only.',
   'privacy.notesLocked': 'Personal notes are visible only to the crew member who wrote them.',

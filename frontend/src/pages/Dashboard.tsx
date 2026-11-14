@@ -1,5 +1,6 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
+import { Attention } from '../components/Attention';
 import { BodyPanel } from '../components/BodyPanel';
 import { CheckIn } from '../components/CheckIn';
 import { IndicatorCard } from '../components/IndicatorCard';
@@ -23,11 +24,24 @@ export function Dashboard() {
   const setMember = useApp((s) => s.setMember);
   const [params] = useSearchParams();
   const focus = params.get('indicator');
+  // The card last opened from the "needs attention" list. Kept apart from `focus` so that
+  // saving a check-in afterwards does not scroll the page back to it.
+  const [jumped, setJumped] = useState<string | null>(null);
+  const memberId = dash?.member.id;
+  const day = dash?.day;
 
   useEffect(() => {
     if (!focus || !dash) return;
     document.getElementById(`indicator-${focus}`)?.scrollIntoView({ block: 'center', behavior: 'auto' });
   }, [focus, dash]);
+  useEffect(() => {
+    setJumped(null);
+  }, [memberId, day]);
+
+  const jump = (indicator: string) => {
+    setJumped(indicator);
+    document.getElementById(`indicator-${indicator}`)?.scrollIntoView({ block: 'center', behavior: 'auto' });
+  };
 
   if (!dash) {
     return (
@@ -64,6 +78,7 @@ export function Dashboard() {
             {dash.method_status === 'provisional' && <ProvisionalTag />}
           </div>
         </div>
+        {dash.day >= 1 && <Attention dash={dash} onJump={jump} />}
         {dash.acknowledged && (
           <p className="mt-3 rounded-lg border border-nominal/50 bg-nominal/10 px-3 py-2 text-sm text-nominal" data-testid="acknowledged">
             {t('dash.acknowledged')}
@@ -122,7 +137,7 @@ export function Dashboard() {
         </div>
         <div className="grid content-start gap-4 md:grid-cols-2" data-testid="indicator-grid">
           {dash.indicators.map((view) => (
-            <IndicatorCard key={view.id} view={view} highlight={focus === view.id} />
+            <IndicatorCard key={view.id} view={view} highlight={focus === view.id || jumped === view.id} />
           ))}
           <p className="text-xs text-muted md:col-span-2">{t('dash.method')}</p>
         </div>

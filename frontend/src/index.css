@@ -33,9 +33,40 @@ html {
   background: rgb(var(--bg));
 }
 
+/* The page sits on a faint engineering grid: a fine one, with a stronger line every fifth
+   cell. The lines use the border colour, so night mode follows. Panels stay solid on top. */
 body {
   @apply bg-bg font-sans text-ink antialiased;
   margin: 0;
+  background-image:
+    linear-gradient(rgb(var(--border) / 0.34) 1px, transparent 1px),
+    linear-gradient(90deg, rgb(var(--border) / 0.34) 1px, transparent 1px),
+    linear-gradient(rgb(var(--border) / 0.15) 1px, transparent 1px),
+    linear-gradient(90deg, rgb(var(--border) / 0.15) 1px, transparent 1px);
+  background-size:
+    120px 120px,
+    120px 120px,
+    24px 24px,
+    24px 24px;
+  background-position: -1px -1px;
+}
+
+/* The body scan stands on a finer grid that fades towards the edges. */
+.scan-stage {
+  background-color: rgb(var(--bg) / 0.7);
+  background-image:
+    radial-gradient(ellipse at 50% 46%, transparent 38%, rgb(var(--bg) / 0.92) 100%),
+    linear-gradient(rgb(var(--border) / 0.6) 1px, transparent 1px),
+    linear-gradient(90deg, rgb(var(--border) / 0.6) 1px, transparent 1px),
+    linear-gradient(rgb(var(--border) / 0.26) 1px, transparent 1px),
+    linear-gradient(90deg, rgb(var(--border) / 0.26) 1px, transparent 1px);
+  background-size:
+    100% 100%,
+    80px 80px,
+    80px 80px,
+    16px 16px,
+    16px 16px;
+  background-position: center;
 }
 
 :focus-visible {
@@ -65,5 +96,9 @@ input[type='range'] {
     --border: 150 150 150;
     --text: 17 17 17;
     --muted: 80 80 80;
+  }
+  body,
+  .scan-stage {
+    background-image: none;
   }
 }

@@ -151,21 +151,31 @@ Code: [backend/app/](backend/app/) · tests: [backend/tests/](backend/tests/) ·
 ## Frontend
 
 Code: [frontend/src/](frontend/src/) · run `npm run typecheck`, `npm test` and
-`npm run build` in `frontend/` (20 unit tests and 44 end-to-end checks pass today).
+`npm run build` in `frontend/` (28 unit tests and 50 end-to-end checks pass today).
 
 ### Small
 
-- [ ] **Look at the reworked dashboard on a laptop and a phone**
-  The check-in panel, the day stepper in the header and the compact hazard filter pass their
-  tests but have not been checked by eye since the rework.
-  *Done when:* someone has gone through every screen at 1366×768 and at phone width
-  (390×844) and fixed or listed what looks wrong.
-- [ ] **Say which check-in value was refused**
-  When the server refuses a check-in, the panel shows one general sentence. The server's
-  answer names the vital, but `request()` in [frontend/src/lib/api.ts](frontend/src/lib/api.ts)
-  throws it away.
-  *Where:* [frontend/src/components/CheckIn.tsx](frontend/src/components/CheckIn.tsx).
-  *Done when:* the message names the field and that field is marked.
+- [x] **Look at the reworked dashboard on a laptop and a phone**
+  Done on 14 November: all six screens were looked at in Edge at 1366×768 and 390×844.
+  Fixed: the header fits on one row on a laptop and nothing in it is cut off on a phone; the
+  check-in is one row of fields on a laptop and two per row on a phone; the dashboard says
+  at the top which reading is off and why; the report shows one block per indicator on a
+  phone. What still looks wrong is in the next two items.
+- [ ] **Show that the screen tabs scroll sideways on a phone**
+  At 390 px the tab strip under the header ends in the middle of "Mission timeline". Report,
+  Calibrate and Optional modules are reached by swiping, and nothing on screen says so.
+  *Where:* `Nav` in [frontend/src/components/Layout.tsx](frontend/src/components/Layout.tsx).
+  *Done when:* a phone user can see that there are more tabs, or all six fit.
+- [ ] **Phase names are cut off on the phone mission bar**
+  At 390 px the bar under the mission slider shows "Transi…" and "Return …".
+  *Where:* [frontend/src/components/MissionScrubber.tsx](frontend/src/components/MissionScrubber.tsx).
+  *Done when:* each phase name can be read at phone width.
+- [x] **Say which check-in value was refused**
+  Done on 14 November: `request()` in [frontend/src/lib/api.ts](frontend/src/lib/api.ts) keeps
+  the server's sentence (`ApiError.detail`), and
+  [frontend/src/components/CheckIn.tsx](frontend/src/components/CheckIn.tsx) shows it and marks
+  the field. The field is found by the indicator name at the start of that sentence; an id in
+  the server's answer would be sturdier (a backend change).
 - [ ] **Send `viewer` on report and calibration calls** ↔
   Goes with the first Backend item. *Where:* `report`, `reportHtmlUrl`, `calibration` and
   `clearCalibration` in [frontend/src/lib/api.ts](frontend/src/lib/api.ts).

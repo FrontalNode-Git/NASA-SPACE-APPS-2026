@@ -23,12 +23,27 @@ function sessionId(): string {
 
 const SESSION = sessionId();
 
+/** A refused request. `detail` is the server's own sentence when it sent one, for example
+ *  "Blood oxygen (SpO₂): that value cannot be right, please check it". */
+export class ApiError extends Error {
+  constructor(
+    message: string,
+    readonly status: number,
+    readonly detail: string | null,
+  ) {
+    super(message);
+    this.name = 'ApiError';
+  }
+}
+
 async function request<T>(path: string, init?: RequestInit): Promise<T> {
   const headers: Record<string, string> = { 'X-Vital-Session': SESSION };
   if (init?.body) headers['Content-Type'] = 'application/json';
   const res = await fetch(API + path, { ...init, headers });
   if (!res.ok) {
-    throw new Error(`${res.status} ${res.statusText} for ${path}`);
+    const body: unknown = await res.json().catch(() => null);
+    const detail = (body as { detail?: unknown } | null)?.detail;
+    throw new ApiError(`${res.status} ${res.statusText} for ${path}`, res.status, typeof detail === 'string' ? detail : null);
   }
   return (await res.json()) as T;
 }

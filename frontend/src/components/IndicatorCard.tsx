@@ -1,3 +1,4 @@
+import { driftText } from '../lib/attention';
 import { isLit } from '../lib/lens';
 import { useApp, useT } from '../lib/store';
 import type { IndicatorView } from '../lib/types';
@@ -5,11 +6,6 @@ import { Chart, type ThemeColors } from './Chart';
 import { Icon, indicatorIcon } from './Icon';
 import { StatusBadge } from './StatusGlyph';
 import { LockIcon, Tag } from './ui';
-
-export function driftText(t: ReturnType<typeof useT>, view: IndicatorView): string | null {
-  if (!view.drift?.flag || !view.drift.direction) return null;
-  return t(view.drift.direction === 'above' ? 'drift.above' : 'drift.below', { n: view.drift.days });
-}
 
 function fmt(value: number | null | undefined, decimals: number): string {
   return value === null || value === undefined ? '—' : value.toFixed(decimals);
