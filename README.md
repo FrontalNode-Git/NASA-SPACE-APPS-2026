@@ -11,6 +11,19 @@ Astronauts on Space Missions*.
 > members; none of the readings are theirs. The alert method is
 > labelled **provisional**. VITAL is not a medical device and gives no diagnosis.
 
+## What it does
+
+- **Personal baseline.** Seven pre-flight readings per crew member set "your normal" for each indicator.
+- **Daily check-in.** Resting heart rate, blood oxygen, body temperature, sleep, exercise and mood.
+- **Drift detection.** Every reading is compared with that personal normal, and two trend detectors
+  (EWMA and CUSUM) catch slow changes a single reading would miss.
+- **Clear status.** Nominal ●, Watch ▲ or Call ground ■, always with a colour, a shape, a word and a reason.
+- **Body scan and Hazard Lens.** An interactive figure whose body zones follow the statuses, and a lens
+  that shows how NASA's five spaceflight hazards relate to the body.
+- **Crew view and reports.** The medical officer sees everyone's status, most urgent first; each crew
+  member has a daily report for ground, and the medical officer can send a crew report to the Commander.
+- **Mission timeline.** A simulated 1,095-day Mars mission across its phases and environments.
+
 - What is still open: [TODO.md](TODO.md)
 - Presenting it: [docs/PRESENTERS.md](docs/PRESENTERS.md)
 
@@ -101,7 +114,7 @@ demo scenario.
 
 1. **Dashboard.** The *Check-in* panel is where readings are entered. Type a heart rate and
    press *Save check-in*: the card, the status in the header and the body scan follow what
-   you typed. Clear the field and save again to go back to the sensor value.
+   you typed. Clear the field and save again to go back to the simulated value.
 2. **‹ Mission day ›** in the header steps through days. Day 8 is a quiet day; on day 20 the
    resting heart rate has been drifting for five days and the status is *Watch*.
 3. **Signed in as** switches crew member. As the Chief Medical Officer, open **Crew**: the
@@ -191,6 +204,11 @@ The same checks run on every push, in [.github/workflows/ci.yml](.github/workflo
   does not show the sources; the full list is [docs/SOURCES.txt](docs/SOURCES.txt). Places
   still waiting for a sourced fact show *Planned · Not in this version yet* and are listed in
   [docs/PENDING.md](docs/PENDING.md).
+- **Privacy.** Mood values, notes, personal reports and pre-flight calibration are visible only to the
+  crew member they belong to. Everyone else, including the medical officer, sees status levels only.
+- **NASA API key.** Not needed today: it is only for the live space-weather module, which is off. When
+  that module is approved, copy `backend/.env.example` to `backend/.env` and put the key after
+  `NASA_API_KEY=`. Never commit `.env`.
 - **Optional modules are off.** The four flags in [backend/.env.example](backend/.env.example)
   stay `false` until the team approves live data. In the app they are listed on the *Planned
   next* screen, without the flag names.
@@ -204,3 +222,16 @@ The same checks run on every push, in [.github/workflows/ci.yml](.github/workflo
 | Old screens after a frontend change | You are looking at the last build | `npm run build` again, or use `npm run dev` |
 | `address already in use` | Something else is on port 7860 | Stop it, or pick another `--port` (for `npm run dev`, set `API_TARGET=http://127.0.0.1:<port>` to match) |
 | Numbers that make no sense after experimenting | Entries you typed earlier are still stored | *Reset demo* |
+
+## Use of AI
+
+We used Claude (Anthropic) as an assistant for coding, design and fact-checking. The team chose the
+challenge, the concept, the indicators and the sources, and reviewed every change. All health content
+comes from NASA and Canadian Space Agency pages (see [docs/SOURCES.txt](docs/SOURCES.txt)), not from AI.
+
+## Credits
+
+Health content: NASA Human Research Program and Canadian Space Agency public pages, listed in
+[docs/SOURCES.txt](docs/SOURCES.txt). VITAL is not affiliated with or endorsed by NASA or the CSA.
+
+Interface icons: from a "health and wellness" icon pack (see [frontend/src/assets/icons/README.txt](frontend/src/assets/icons/README.txt)); licence being confirmed.
