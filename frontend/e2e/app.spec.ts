@@ -584,3 +584,149 @@ test('the ear zone is called "Ear canal" everywhere', async ({ page }) => {
   await expect(page.getByTestId('command-palette')).not.toContainText('Inner ear');
   void zone;
 });
+
+test('the heart beats at the resting heart rate on screen', async ({ page }) => {
+  await open(page);
+  const scan = page.getByTestId('body-scan');
+  await expect(scan).toHaveAttribute('data-heart-bpm', '63');
+  // Type a faster rate in the check-in: the pulse follows what is on screen.
+  await page.getByTestId('check-in-heart_rate').fill('75');
+  await page.getByTestId('check-in-save').click();
+  await expect(scan).toHaveAttribute('data-heart-bpm', '75');
+  // The flat view beats too, once per heartbeat: 75 a minute is 0.8 s a beat.
+  await page.getByRole('button', { name: 'Flat view' }).click();
+  const heart = page.getByTestId('flat-figure').locator('path.heart-beat');
+  await expect(heart).toHaveCount(1);
+  await expect(heart).toHaveAttribute('style', /animation-duration:\s*0\.8/);
+  // Nothing is drawn as beating when nobody has asked for it to move less.
+  await page.getByTestId('check-in-heart_rate').fill('');
+  await page.getByTestId('check-in-save').click();
+  await expect(scan).toHaveAttribute('data-heart-bpm', '63'); // the sensor value is back
+});
+
+test('the heart stays still when the system asks for less motion', async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  await open(page);
+  await expect(page.getByTestId('body-scan')).toBeVisible();
+  await expect(page.getByTestId('body-scan')).not.toHaveAttribute('data-heart-bpm', /.+/);
+});
+
+test('one reading is laid on every crew member\'s own normal', async ({ page }) => {
+  await open(page, '/crew');
+  const panel = page.getByTestId('same-reading');
+  await expect(panel).toBeVisible();
+  await expect(panel.locator('li[data-member]')).toHaveCount(4);
+  const z = async (member: string) => Number(await panel.locator(`li[data-member="${member}"]`).getByTestId('same-spreads').getAttribute('data-z'));
+
+  // The engineer's 63 bpm: far above the Commander's own normal, below the Systems Officer's.
+  await expect(panel.getByTestId('same-value')).toHaveValue('63');
+  expect(await z('commander')).toBeGreaterThan(3);
+  expect(await z('engineer')).toBeGreaterThan(1.4);
+  expect(await z('engineer')).toBeLessThan(2.1);
+  expect(await z('systems')).toBeLessThan(0);
+  await expect(panel.locator('li[data-member="commander"]')).toContainText('spreads above their normal');
+  await expect(panel.locator('li[data-member="systems"]')).toContainText('spreads below their normal');
+  await expect(panel.locator('li[data-member="engineer"]')).toContainText('above your normal'); // the viewer's own row
+  await expect(panel.getByTestId('same-marker')).toHaveCount(4);
+
+  // Try another value: every row follows.
+  await panel.getByTestId('same-value').fill('56.1');
+  await expect(panel.locator('li[data-member="commander"]')).toContainText('right at their normal');
+  expect(await z('engineer')).toBeLessThan(-0.5);
+  await panel.getByTestId('same-reset').click();
+  await expect(panel.getByTestId('same-value')).toHaveValue('63');
+  await expect(panel.getByTestId('same-reset')).toHaveCount(0);
+
+  // Another vital, from the same crew: its own unit, and the private one is not offered.
+  await panel.locator('[data-vital="sleep_hours"]').click();
+  await expect(panel.locator('[data-vital="sleep_hours"]')).toHaveAttribute('aria-pressed', 'true');
+  await expect(panel.locator('[data-vital="mood"]')).toHaveCount(0);
+  await expect(panel.getByTestId('same-value')).toHaveValue('7.6');
+  await expect(panel).toContainText('h');
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
+});
+
+test('the background follows the status of the person on screen', async ({ page }) => {
+  await open(page);
+  const field = page.getByTestId('particle-field');
+  await expect(field).toHaveAttribute('data-mood', 'ripple'); // the engineer is on Watch
+  await page.getByTestId('viewer-select').selectOption('commander');
+  await expect(field).toHaveAttribute('data-mood', 'calm');
+  await page.getByTestId('viewer-select').selectOption('systems');
+  await expect(field).toHaveAttribute('data-mood', 'tense'); // Call ground
+  // It is decoration only: not read out, and it never takes a click.
+  await expect(field).toHaveAttribute('aria-hidden', 'true');
+  expect(await field.evaluate((el) => getComputedStyle(el).pointerEvents)).toBe('none');
+});
+
+test('the mission timeline plays: the whole app moves with the day', async ({ page }) => {
+  await open(page);
+  const play = page.getByTestId('play-toggle');
+  const label = page.getByTestId('day-label');
+  const progress = page.getByTestId('mission-progress');
+  await expect(play).toHaveAttribute('aria-pressed', 'false');
+  await expect(label).toHaveText('Mission day 20');
+  await expect(progress).toHaveAttribute('aria-valuenow', '20');
+  await expect(play).toHaveText(''); // an icon, no words
+
+  await play.click();
+  await expect(play).toHaveAttribute('aria-pressed', 'true');
+  await expect(play).toHaveAttribute('data-state', 'playing');
+  await expect(label).not.toHaveText('Mission day 20');
+  const first = Number(await progress.getAttribute('aria-valuenow'));
+  expect(first).toBeGreaterThan(20);
+  await expect.poll(async () => Number(await progress.getAttribute('aria-valuenow')), { timeout: 5000 }).toBeGreaterThan(first);
+  // The dashboard follows the day: its charts and status are for the day on the clock.
+  await expect(page.getByTestId('dashboard')).toBeVisible();
+  await expect(page.getByRole('heading', { name: /^Check-in · mission day (2[1-9]|[3-9]\d)/ })).toBeVisible();
+
+  // Faster, then paused: the day stays where it stops.
+  await page.getByTestId('play-speed').click();
+  await expect(page.getByTestId('play-speed')).toHaveText('×4');
+  await play.click();
+  await expect(play).toHaveAttribute('aria-pressed', 'false');
+  await expect(page.getByTestId('play-speed')).toHaveCount(0);
+  const stopped = await label.innerText();
+  await page.waitForTimeout(1300);
+  await expect(label).toHaveText(stopped);
+
+  // Choosing a day by hand takes over from playback.
+  await play.click();
+  await expect(play).toHaveAttribute('aria-pressed', 'true');
+  await page.getByTestId('day-next').click();
+  await expect(play).toHaveAttribute('aria-pressed', 'false');
+
+  // The T key does the same as the button.
+  await page.keyboard.press('t');
+  await expect(play).toHaveAttribute('aria-pressed', 'true');
+  await page.keyboard.press('t');
+  await expect(play).toHaveAttribute('aria-pressed', 'false');
+});
+
+test('playback runs to the last day and stops there', async ({ page }) => {
+  await open(page, '/mission');
+  await page.getByRole('button', { name: 'Mission day 913' }).click();
+  await expect(page.getByTestId('phase-name')).toHaveText('Return to Earth');
+  const play = page.getByTestId('play-toggle');
+  await play.click();
+  await page.getByTestId('play-speed').click(); // ×4
+  await page.getByTestId('play-speed').click(); // ×16
+  await expect(page.getByTestId('play-speed')).toHaveAttribute('data-speed', '16');
+  await expect(play).toHaveAttribute('aria-pressed', 'false', { timeout: 20000 });
+  await expect(page.getByTestId('day-label')).toHaveText('Mission day 1095');
+  await expect(page.getByTestId('mission-progress')).toHaveAttribute('aria-valuenow', '1095');
+  // Play again from the end starts over from before launch.
+  await play.click();
+  await expect(page.getByTestId('day-label')).not.toHaveText('Mission day 1095');
+  await play.click();
+});
+
+test('playback is reachable from Find and by voice words', async ({ page }) => {
+  await open(page);
+  await page.locator('[data-quick="palette"]').click();
+  await page.getByTestId('command-palette').getByRole('combobox').fill('play');
+  await page.keyboard.press('Enter');
+  await expect(page.getByTestId('play-toggle')).toHaveAttribute('aria-pressed', 'true');
+  await page.getByTestId('play-toggle').click();
+  await expect(page.getByTestId('play-toggle')).toHaveAttribute('aria-pressed', 'false');
+});

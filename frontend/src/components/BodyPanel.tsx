@@ -1,7 +1,9 @@
 import { lazy, Suspense, useId, useMemo, useState } from 'react';
 import { insidePoints, outlineLoops, webglAvailable, zoneAnchors, zoneStatuses } from '../lib/body';
+import { beatRate } from '../lib/heartbeat';
 import { litIds } from '../lib/lens';
 import { useApp, useT } from '../lib/store';
+import { prefersReducedMotion } from './Chart';
 import type { Status, Zone } from '../lib/types';
 import type { ScanCard } from './BodyScan';
 import { STATUS_META, StatusBadge, StatusGlyph } from './StatusGlyph';
@@ -20,6 +22,8 @@ interface ZoneViewProps {
   lensActive: boolean;
   selected: string | null;
   onSelect: (zone: string | null) => void;
+  /** The resting heart rate on screen; the heart pulses at this rate. */
+  heartBpm?: number | null;
 }
 
 const toPath = (loops: [number, number][][]) =>
@@ -41,9 +45,10 @@ function traceFigure() {
 }
 
 /** Flat figure for devices without WebGL, or by choice. Same body, same zones, same statuses. */
-function BodyScan2D({ zones, statuses, lit, lensActive, selected, onSelect }: ZoneViewProps) {
+function BodyScan2D({ zones, statuses, lit, lensActive, selected, onSelect, heartBpm }: ZoneViewProps) {
   const id = useId();
   const figure = traceFigure();
+  const rate = beatRate(heartBpm);
   return (
     <svg viewBox="0 0 260 236" className="h-full w-full" aria-hidden="true" data-testid="flat-figure">
       <g className="text-muted">
@@ -65,7 +70,9 @@ function BodyScan2D({ zones, statuses, lit, lensActive, selected, onSelect }: Zo
           <path
             key={zoneId}
             d={dots}
-            className={tone}
+            // The heart and its vessels beat at the resting heart rate, once the person has one.
+            className={`${tone}${zoneId === 'heart' && rate !== null ? ' heart-beat' : ''}`}
+            style={zoneId === 'heart' && rate !== null ? { animationDuration: `${(1 / rate).toFixed(3)}s` } : undefined}
             fill="none"
             stroke="currentColor"
             strokeWidth={0.85}
@@ -210,7 +217,10 @@ export function BodyPanel() {
       status: v.status,
     }));
   const flat = view2d || !hasWebgl;
-  const shared: ZoneViewProps = { zones: bundle.zones, statuses, lit, lensActive: lens.length > 0, selected, onSelect: select };
+  const heart = (dash?.indicators ?? []).find((v) => v.id === 'heart_rate' && !v.locked);
+  const heartBpm = heart?.latest ?? null;
+  const beating = beatRate(heartBpm) !== null && !prefersReducedMotion();
+  const shared: ZoneViewProps = { zones: bundle.zones, statuses, lit, lensActive: lens.length > 0, selected, onSelect: select, heartBpm };
   const zone = bundle.zones.find((z) => z.id === selected);
 
   return (
@@ -228,7 +238,7 @@ export function BodyPanel() {
         </button>
       }
     >
-      <div className="scan-stage relative h-[430px] overflow-hidden rounded-lg" data-testid="body-scan" data-mode={flat ? '2d' : '3d'}>
+      <div className="scan-stage relative h-[430px] overflow-hidden rounded-lg" data-testid="body-scan" data-mode={flat ? '2d' : '3d'} data-heart-bpm={beating ? heartBpm : undefined}>
         {flat ? (
           <BodyScan2D {...shared} />
         ) : (

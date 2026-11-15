@@ -68,6 +68,18 @@ input[type='range'] {
   min-height: 32px;
 }
 
+/* The flat figure's heart and vessels beat once per heartbeat (the duration is set inline from
+   the resting heart rate). Only brightness and line weight change, and the rate is capped. */
+@keyframes heart-beat {
+  0%, 100% { stroke-width: 0.85; opacity: 0.55; }
+  8% { stroke-width: 1.7; opacity: 1; }
+  30% { stroke-width: 1.3; opacity: 0.85; }
+  50% { stroke-width: 0.85; opacity: 0.6; }
+}
+.heart-beat {
+  animation: heart-beat 1s ease-out infinite;
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,

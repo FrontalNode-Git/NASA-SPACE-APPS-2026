@@ -28,14 +28,14 @@ Code: [backend/app/](backend/app/) · tests: [backend/tests/](backend/tests/) ·
 - [ ] **Follow the new crew names (15 November)**
   The four crew roles now carry the team's names in [data/app/model.json](data/app/model.json):
   S. Sinnis (Commander), R. Falelaki (Chief Medical Officer), P. Kotsomitopoulos (Systems
-  Officer), G. Kiousopoulos (Flight Engineer). Two things in the backend still assume the old ones.
-  *Failing test:* line 77 of [backend/tests/test_crew_report.py](backend/tests/test_crew_report.py)
-  looks for `"M. Ruiz"` in the printable crew report. Change it to `"G. Kiousopoulos"`, or
-  better, read the name from the crew list so it cannot go stale again.
+  Officer), G. Kiousopoulos (Flight Engineer). One thing in the backend still assumes the old ones.
+  *Test (fixed on 15 November):* a line in
+  [backend/tests/test_crew_report.py](backend/tests/test_crew_report.py) looked for `"M. Ruiz"`
+  and turned CI red after the rename. It now reads the engineer's name from the crew list.
   *Wording:* the report disclaimers and banner in [backend/app/report.py](backend/app/report.py)
   say "fictional crew" and "fictional crew member". With real names on screen that is no
   longer true; "simulated data" is. The README and the presenter guide were already reworded.
-  *Done when:* `python -m pytest` passes again and no report text calls the crew fictional.
+  *Done when:* no report text calls the crew fictional (`python -m pytest` already passes).
 - [ ] **Ask "who is looking?" on every crew-member route** ↔
   The dashboard and crew routes hide mood and notes from everyone but their owner. The report
   and calibration routes never ask: `GET /api/v1/members/engineer/report` returns the
@@ -162,7 +162,7 @@ Code: [backend/app/](backend/app/) · tests: [backend/tests/](backend/tests/) ·
 ## Frontend
 
 Code: [frontend/src/](frontend/src/) · run `npm run typecheck`, `npm test` and
-`npm run build` in `frontend/` (34 unit tests and 60 end-to-end checks pass today).
+`npm run build` in `frontend/` (41 unit tests and 84 end-to-end checks pass today).
 
 ### Small
 
@@ -177,6 +177,19 @@ Code: [frontend/src/](frontend/src/) · run `npm run typecheck`, `npm test` and
 - [x] **Phase names are cut off on the phone mission bar**
   Done on 15 November: the bar shows the phase lengths to scale and the names sit under it,
   each with its day range.
+- [x] **Play the mission timeline (15 November)**
+  A play / pause icon next to the day stepper (key `T`, Find, or the words "play" and "pause" by
+  voice) moves the mission day forward by itself, half a second a step, at ×1, ×4 or ×16 days a
+  step; the dashboard, charts, body scan and background follow. A hairline across the top of
+  the page shows how far through the mission the day is, phases to scale. Choosing a day by hand
+  stops it, and it stops at day 1,095.
+- [x] **Three visual effects (15 November)**
+  *The heart beats at the resting heart rate on screen* (the heart and vessels of the body scan,
+  and the flat view; capped at 150 beats a minute, still under reduced motion). *Same reading,
+  four normals* on the Crew screen: one value laid on each person's own band, in that person's
+  own spreads, with a slider to try other values; it adds no thresholds or verdicts. *The
+  background follows the status* of the person on screen: calm, rippling amber, tense red.
+  Nothing flashes and none of it carries a status on its own.
 - [x] **UI pass of 15 November**
   Decided by the team lead, one item at a time: *Planned next* replaces the Optional modules
   and Pending wording; one legend above the charts; plain words for the drift checks (method

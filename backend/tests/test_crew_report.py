@@ -56,7 +56,7 @@ def test_only_the_medical_officer_gets_the_crew_report(client):
     assert client.get(CREW, params={"viewer": "nobody", "day": DAY}).status_code in {403, 404}
 
 
-def test_medical_officer_sends_the_crew_report_to_the_commander(client):
+def test_medical_officer_sends_the_crew_report_to_the_commander(client, content):
     for member in ("engineer", "cmo", "commander"):
         _note(client, member)
     assert client.get(f"{CREW}/notices", params={"viewer": "commander"}).json() == []
@@ -74,7 +74,8 @@ def test_medical_officer_sends_the_crew_report_to_the_commander(client):
     assert "private thought of commander" in text
     assert "private thought of cmo" not in text and "private thought of engineer" not in text
     page = client.get(f"{CREW}/notices/{notice['id']}/report.html", params={"viewer": "commander"})
-    assert page.status_code == 200 and "private thought of cmo" not in page.text and "M. Ruiz" in page.text
+    engineer = next(m for m in content.model.crew if m.id == "engineer")  # read the name, so a rename cannot break this
+    assert page.status_code == 200 and "private thought of cmo" not in page.text and engineer.name in page.text
 
     # The medical officer sees that it was sent, without the Commander's copy. Nobody else sees it.
     (mine,) = client.get(f"{CREW}/notices", params={"viewer": "cmo"}).json()

@@ -59,7 +59,7 @@ below adds the detail worth pointing at.
 | 2 | **Dashboard**, day 8, the Check-in panel | "Every day starts here. The crew member confirms what the sensors read or types their own values." |
 | 3 | Day 8, blood oxygen card | "A quiet day. Every vital is inside this person's own band: Nominal, a circle." |
 | 4 | Day 20, resting heart rate card | "63 beats per minute. Their normal is 58.7 give or take 2.5, so no single reading looks alarming. But the trend line has been outside the band for five days." |
-| 5 | Day 20, heart zone lit on the body scan | "So the status is Watch: a triangle, on the card, in the header and on the body. Colour, shape and word, never colour alone." |
+| 5 | Day 20, heart zone lit on the body scan (it beats at the 63 bpm on screen) | "So the status is Watch: a triangle, on the card, in the header and on the body. Colour, shape and word, never colour alone." |
 | 6 | "I'm OK" saved | "One key, K, tells ground 'I'm OK'. It goes on the record at once." |
 | 7 | **Report for ground** | "The day in one page: statuses, the drift, the notes, the related NASA risks. Copy it or print it." |
 | 8 | Dashboard with the **Gravity** filter on | "The hazard filter. Choose Gravity and everything not linked to it dims." |
@@ -94,10 +94,15 @@ after the walkthrough, on day 20, signed in as the Flight Engineer.
    person it is far outside their normal."
 3. Clear the field and press **Save check-in** again. The sensor value (63) returns.
 
-A second option: sign in as **Chief Medical Officer**. The temperature field is empty
+A second option: open **Crew** and look at *Same reading, four normals*. The Flight Engineer's
+63 bpm is placed on everyone's own band: 1.7 spreads above their own normal, but 3.4 above the
+Commander's and 1.2 below the Systems Officer's. Drag the slider, or pick another vital, and
+every row follows. It is the whole idea of the app in one picture.
+
+A third option: sign in as **Chief Medical Officer**. The temperature field is empty
 because the sensor missed it. Type `36.7`, save, and the reminder disappears.
 
-A third option: sign in as **Chief Medical Officer** and open **Report for ground**. It opens
+A fourth option: sign in as **Chief Medical Officer** and open **Report for ground**. It opens
 on *Whole crew*: all four crew members in one report, ready to copy or print. Mood values and
 notes of the other three are not in it. Press **Notify the Commander**, then sign in as
 **Commander**: a notice at the top of every screen says the medical officer sent the crew
@@ -243,6 +248,7 @@ the heart rate), and you will be explaining noise instead of the story.
 | `Shift`+`1`…`5` | Radiation, Isolation, Distance, Gravity, Hostile environment |
 | `/` | Search everything |
 | `N` | Night mode |
+| `T` | Play / pause the mission timeline (the day moves on by itself; `×1`, `×4`, `×16` set the speed) |
 | `Esc` | Close whatever is open |
 
 **Scenarios in the Judge drawer**

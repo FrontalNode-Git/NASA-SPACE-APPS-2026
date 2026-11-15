@@ -42,6 +42,40 @@ function ReceivedNotice() {
   );
 }
 
+/**
+ * A hairline across the top of the page: how far through the mission the viewed day is, with the
+ * phases drawn to scale. It moves as the timeline plays and is the only graphic playback adds.
+ */
+function MissionProgress() {
+  const t = useT();
+  const day = useApp((s) => s.day);
+  const playing = useApp((s) => s.playing);
+  const mission = useApp((s) => s.bundle?.mission);
+  const total = mission?.total_days ?? 1095;
+  const percent = Math.min(100, Math.max(0, (day / total) * 100));
+  const edges = (mission?.phases ?? []).filter((p) => p.end > 0 && p.end < total).map((p) => (p.end / total) * 100);
+  return (
+    <div
+      role="progressbar"
+      aria-label={t('progress.mission')}
+      aria-valuemin={0}
+      aria-valuemax={total}
+      aria-valuenow={day}
+      aria-valuetext={t('common.day', { n: day })}
+      data-testid="mission-progress"
+      className="pointer-events-none fixed inset-x-0 top-0 z-50 h-[3px] bg-line/40 print:hidden"
+    >
+      <div
+        className="h-full bg-accent ease-linear motion-reduce:transition-none"
+        style={{ width: `${percent}%`, transitionProperty: 'width', transitionDuration: playing ? '500ms' : '160ms' }}
+      />
+      {edges.map((edge) => (
+        <span key={edge} className="absolute top-0 h-full w-px bg-bg" style={{ left: `${edge}%` }} />
+      ))}
+    </div>
+  );
+}
+
 function isTyping(target: EventTarget | null): boolean {
   if (!(target instanceof HTMLElement)) return false;
   return target.isContentEditable || ['INPUT', 'TEXTAREA', 'SELECT'].includes(target.tagName);
@@ -77,6 +111,7 @@ function useShortcuts() {
         r: () => s.run({ type: 'report' }),
         h: () => s.run({ type: 'toggle_lens' }),
         n: () => s.run({ type: 'toggle_night' }),
+        t: () => s.run({ type: 'play' }),
         p: () => s.run({ type: 'presenter' }),
         j: () => s.run({ type: 'judge' }),
         '/': () => useApp.setState({ paletteOpen: true }),
@@ -98,18 +133,57 @@ function DayStepper() {
   const day = useApp((s) => s.day);
   const max = useApp((s) => s.config?.max_day ?? 1095);
   const setDay = useApp((s) => s.setDay);
-  const step = 'flex h-10 w-10 items-center justify-center rounded-lg border border-line bg-panel text-lg hover:border-accent disabled:opacity-40';
+  const playing = useApp((s) => s.playing);
+  const speed = useApp((s) => s.playSpeed);
+  const run = useApp((s) => s.run);
+  const cycleSpeed = useApp((s) => s.cycleSpeed);
+  const step = 'flex h-10 w-9 items-center justify-center rounded-lg border border-line bg-panel text-lg hover:border-accent disabled:opacity-40 sm:w-10';
   return (
     <span className="flex items-center gap-1.5" data-testid="day-stepper">
       <button type="button" className={step} onClick={() => setDay(day - 1)} disabled={day <= 0} aria-label={t('header.prevDay')} data-testid="day-prev">
         <span aria-hidden="true">‹</span>
       </button>
-      <span className="min-w-[6.5rem] text-center text-sm font-medium tabular-nums sm:min-w-[7.5rem]" data-testid="day-label">
+      <span className="min-w-[5.25rem] text-center text-sm font-medium tabular-nums sm:min-w-[7.5rem]" data-testid="day-label">
         {t('common.day', { n: day })}
       </span>
       <button type="button" className={step} onClick={() => setDay(day + 1)} disabled={day >= max} aria-label={t('header.nextDay')} data-testid="day-next">
         <span aria-hidden="true">›</span>
       </button>
+      {/* Play moves the mission day forward by itself. Icon only: a triangle, or two bars while it runs. */}
+      <button
+        type="button"
+        className={`${step} ${playing ? 'border-accent text-accent' : ''}`}
+        onClick={() => run({ type: 'play' })}
+        aria-pressed={playing}
+        aria-label={t(playing ? 'header.pause' : 'header.play')}
+        aria-keyshortcuts="T"
+        title={t(playing ? 'header.pause' : 'header.play')}
+        data-testid="play-toggle"
+        data-state={playing ? 'playing' : 'paused'}
+      >
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
+          {playing ? (
+            <>
+              <rect x="3.5" y="2.5" width="3" height="11" rx="0.8" />
+              <rect x="9.5" y="2.5" width="3" height="11" rx="0.8" />
+            </>
+          ) : (
+            <path d="M4.5 2.7v10.6a.5.5 0 0 0 .77.42l8.2-5.3a.5.5 0 0 0 0-.84l-8.2-5.3a.5.5 0 0 0-.77.42Z" />
+          )}
+        </svg>
+      </button>
+      {playing && (
+        <button
+          type="button"
+          className="flex h-10 w-9 items-center justify-center rounded-lg border border-line bg-panel text-xs font-semibold tabular-nums hover:border-accent sm:w-10"
+          onClick={cycleSpeed}
+          aria-label={t('header.speed', { n: speed })}
+          data-testid="play-speed"
+          data-speed={speed}
+        >
+          ×{speed}
+        </button>
+      )}
     </span>
   );
 }
@@ -311,6 +385,7 @@ export function Layout() {
   return (
     <div className="min-h-screen pb-28">
       <ParticleField />
+      <MissionProgress />
       <a href="#main" className="sr-only focus:not-sr-only focus:absolute focus:left-2 focus:top-2 focus:z-50 focus:rounded focus:bg-accent focus:px-3 focus:py-2 focus:text-bg">
         {t('app.skip')}
       </a>

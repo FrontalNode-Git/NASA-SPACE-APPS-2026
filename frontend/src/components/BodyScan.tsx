@@ -3,6 +3,7 @@ import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import * as THREE from 'three';
 import { buildCloud, INSIDE, PAD, SHELL, zoneAnchors } from '../lib/body';
+import { beatAt, beatRate } from '../lib/heartbeat';
 import type { Status, Zone } from '../lib/types';
 import { prefersReducedMotion, readTheme } from './Chart';
 import { StatusGlyph } from './StatusGlyph';
@@ -25,6 +26,8 @@ export interface BodyScanProps {
   onSelect: (zone: string | null) => void;
   cards: ScanCard[];
   night: boolean;
+  /** The resting heart rate on screen. The heart pulses at this rate; null means no pulse. */
+  heartBpm?: number | null;
 }
 
 type V3 = [number, number, number];
@@ -48,6 +51,8 @@ function statusColor(status: Status, theme: ReturnType<typeof readTheme>): strin
 const VERTEX = /* glsl */ `
   attribute vec3 aColor;
   attribute float aKind;
+  attribute float aPulse;
+  uniform float uBeat;
   uniform float uTime;
   uniform float uSweep;
   uniform float uHalfHeight;
@@ -74,9 +79,10 @@ const VERTEX = /* glsl */ `
     float line = mix(-2.0, 2.0, fract(uTime * 0.11));
     float band = aKind > 1.5 ? 0.0 : uSweep * exp(-pow((position.y - line) / 0.06, 2.0));
 
-    vColor = aColor * (1.0 + band * 0.7);
-    vAlpha = min(1.0, alpha + band * 0.16);
-    gl_PointSize = max(1.6, size * (1.0 + band * 0.25) * projectionMatrix[1][1] * uHalfHeight / -mv.z);
+    float beat = aPulse * uBeat;
+    vColor = aColor * (1.0 + band * 0.7 + beat * 0.9);
+    vAlpha = min(1.0, alpha + band * 0.16 + beat * 0.22);
+    gl_PointSize = max(1.6, size * (1.0 + band * 0.25 + beat * 0.55) * projectionMatrix[1][1] * uHalfHeight / -mv.z);
     gl_Position = projectionMatrix * mv;
   }
 `;
@@ -92,7 +98,7 @@ const FRAGMENT = /* glsl */ `
   }
 `;
 
-function Particles({ zones, statuses, lit, lensActive, selected, night }: Omit<BodyScanProps, 'cards' | 'onSelect'>) {
+function Particles({ zones, statuses, lit, lensActive, selected, night, heartBpm }: Omit<BodyScanProps, 'cards' | 'onSelect'>) {
   const cloud = useMemo(() => buildCloud(zones), [zones]);
   const geometry = useMemo(() => {
     const g = new THREE.BufferGeometry();
@@ -100,9 +106,14 @@ function Particles({ zones, statuses, lit, lensActive, selected, night }: Omit<B
     g.setAttribute('normal', new THREE.BufferAttribute(cloud.normals, 3));
     g.setAttribute('aKind', new THREE.BufferAttribute(cloud.kinds, 1));
     g.setAttribute('aColor', new THREE.BufferAttribute(new Float32Array(cloud.count * 3), 3));
+    // The structures inside the heart zone (the heart and the blood vessels) are what pulses.
+    const heart = zones.findIndex((z) => z.id === 'heart');
+    const pulse = new Float32Array(cloud.count);
+    for (let i = 0; i < cloud.count; i++) pulse[i] = heart >= 0 && cloud.kinds[i] === INSIDE && cloud.zoneOf[i] === heart ? 1 : 0;
+    g.setAttribute('aPulse', new THREE.BufferAttribute(pulse, 1));
     return g;
-  }, [cloud]);
-  const uniforms = useMemo(() => ({ uTime: { value: 0 }, uSweep: { value: 1 }, uHalfHeight: { value: 215 } }), []);
+  }, [cloud, zones]);
+  const uniforms = useMemo(() => ({ uTime: { value: 0 }, uSweep: { value: 1 }, uHalfHeight: { value: 215 }, uBeat: { value: 0 } }), []);
   const material = useMemo(
     () =>
       new THREE.ShaderMaterial({
@@ -119,9 +130,13 @@ function Particles({ zones, statuses, lit, lensActive, selected, night }: Omit<B
   useEffect(() => () => material.dispose(), [material]);
 
   const reduced = prefersReducedMotion();
+  const bpm = useRef(heartBpm);
+  bpm.current = heartBpm;
   useFrame(({ clock, size, gl }) => {
     uniforms.uTime.value = clock.elapsedTime;
     uniforms.uSweep.value = reduced ? 0 : 1;
+    const rate = beatRate(bpm.current);
+    uniforms.uBeat.value = reduced || rate === null ? 0 : beatAt(clock.elapsedTime * rate);
     uniforms.uHalfHeight.value = size.height * gl.getPixelRatio() * 0.5;
   });
 

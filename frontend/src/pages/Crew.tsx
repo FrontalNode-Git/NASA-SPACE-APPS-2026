@@ -1,5 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import { STATUS_META, StatusBadge } from '../components/StatusGlyph';
+import { SameReading } from '../components/SameReading';
 import { LockIcon, PageHeader, Panel, SimulatedTag, Tag } from '../components/ui';
 import { useApp, useT } from '../lib/store';
 
@@ -67,6 +68,8 @@ export function Crew() {
           </button>
         ))}
       </div>
+
+      <SameReading />
 
       <Panel className="mt-4" title={t('crew.privacyTitle')}>
         <div className="flex items-start gap-3 text-sm" data-testid="privacy-note">

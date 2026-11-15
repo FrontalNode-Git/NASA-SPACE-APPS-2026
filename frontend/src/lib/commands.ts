@@ -11,6 +11,7 @@ export type Command =
   | { type: 'report' }
   | { type: 'toggle_lens' }
   | { type: 'toggle_night' }
+  | { type: 'play'; on?: boolean }
   | { type: 'presenter' }
   | { type: 'judge' }
   | { type: 'zone'; zone: string }
@@ -51,6 +52,7 @@ export function buildPaletteItems(bundle: Bundle, t: (key: string) => string): P
     ['report', 'action.report', 'R', { type: 'report' }],
     ['lens', 'action.lens', 'H', { type: 'toggle_lens' }],
     ['night', 'action.night', 'N', { type: 'toggle_night' }],
+    ['play', 'action.play', 'T', { type: 'play' }],
     ['presenter', 'action.presenter', 'P', { type: 'presenter' }],
     ['judge', 'action.judge', 'J', { type: 'judge' }],
   ];
@@ -136,6 +138,8 @@ export function parseVoice(phrase: string, bundle: Bundle): Command | null {
   if (/\b(im|i am) (ok|okay)\b/.test(text)) return { type: 'ok' };
   if (/\breport\b/.test(text)) return { type: 'report' };
   if (/\bnight\b/.test(text)) return { type: 'toggle_night' };
+  if (/^(play|resume)( the)?( mission| timeline| story)*$/.test(text)) return { type: 'play', on: true };
+  if (/^(pause|stop)( the)?( mission| timeline| story)*$/.test(text)) return { type: 'play', on: false };
 
   const verb = text.match(/^(?:show|open|go to|lens) (.+)$/);
   const target = verb?.[1] ?? text;

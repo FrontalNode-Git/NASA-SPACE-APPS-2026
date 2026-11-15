@@ -61,12 +61,19 @@ export interface AppState extends Persisted {
   quickLogOpen: boolean;
   judgeOpen: boolean;
   presenter: { active: boolean; step: number; auto: boolean };
+  /** The mission timeline is playing: the day moves forward by itself. */
+  playing: boolean;
+  /** Mission days per step (a step is half a second): 1, 4 or 16. */
+  playSpeed: 1 | 4 | 16;
   navigate: (route: string) => void;
 
   init: () => Promise<void>;
   refresh: () => Promise<void>;
   setNavigator: (fn: (route: string) => void) => void;
   setDay: (day: number) => void;
+  togglePlay: () => void;
+  stopPlay: () => void;
+  cycleSpeed: () => void;
   setSeed: (seed: string) => void;
   setMember: (member: string) => void;
   setViewer: (viewer: string) => void;
@@ -101,6 +108,16 @@ const ZONE_NAMES: Record<string, string> = { inner_ear: 'Ear canal' };
 /** The bundle as the screens should see it: same data, with the team's zone names. */
 function withZoneNames(bundle: Bundle): Bundle {
   return { ...bundle, zones: bundle.zones.map((z) => (ZONE_NAMES[z.id] ? { ...z, name: ZONE_NAMES[z.id] as string } : z)) };
+}
+
+/** Half a second per step: slow enough to follow, and at most two refreshes a second. */
+const PLAY_STEP_MS = 500;
+let playTimer: ReturnType<typeof setInterval> | null = null;
+function clearPlayTimer() {
+  if (playTimer !== null) {
+    clearInterval(playTimer);
+    playTimer = null;
+  }
 }
 
 let toastId = 0;
@@ -140,6 +157,8 @@ export const useApp = create<AppState>((set, get) => ({
   quickLogOpen: false,
   judgeOpen: false,
   presenter: { active: false, step: 0, auto: false },
+  playing: false,
+  playSpeed: 1,
   navigate: () => undefined,
 
   t: translate,
@@ -172,10 +191,38 @@ export const useApp = create<AppState>((set, get) => ({
 
   setNavigator: (fn) => set({ navigate: fn }),
   setDay: (day) => {
+    get().stopPlay(); // choosing a day by hand takes over from the timeline
     const max = get().config?.max_day ?? 1095;
     set({ day: Math.max(0, Math.min(max, Math.round(day))) });
     void get().refresh();
   },
+
+  // Play the mission timeline: every step moves the day forward and the whole app follows
+  // (the dashboard, the charts, the body scan, the background). It stops at the last day.
+  togglePlay: () => {
+    if (get().playing) {
+      get().stopPlay();
+      return;
+    }
+    const max = get().config?.max_day ?? 1095;
+    if (get().day >= max) set({ day: 0 }); // at the end, play starts again from before launch
+    set({ playing: true });
+    const step = () => {
+      const top = get().config?.max_day ?? 1095;
+      const next = Math.min(top, get().day + get().playSpeed);
+      set({ day: next });
+      void get().refresh();
+      if (next >= top) get().stopPlay();
+    };
+    clearPlayTimer();
+    step();
+    playTimer = setInterval(step, PLAY_STEP_MS);
+  },
+  stopPlay: () => {
+    clearPlayTimer();
+    if (get().playing) set({ playing: false });
+  },
+  cycleSpeed: () => set({ playSpeed: get().playSpeed === 1 ? 4 : get().playSpeed === 4 ? 16 : 1 }),
   setSeed: (seed) => {
     set({ seed });
     void get().refresh();
@@ -307,6 +354,9 @@ export const useApp = create<AppState>((set, get) => ({
       case 'toggle_night':
         s.set({ night: !s.night });
         break;
+      case 'play':
+        if (command.on === undefined || command.on !== s.playing) s.togglePlay();
+        break;
       case 'presenter':
         set({ presenter: { active: !s.presenter.active, step: 0, auto: false } });
         break;
@@ -325,6 +375,7 @@ export const useApp = create<AppState>((set, get) => ({
   },
 
   resetDemo: async () => {
+    get().stopPlay();
     await api.resetDemo().catch(() => undefined);
     set({
       viewer: DEFAULT_MEMBER,
