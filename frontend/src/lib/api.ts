@@ -2,7 +2,7 @@
  * The only place the frontend talks to the backend. Response shapes live in ./types.ts and
  * are pinned on the backend side by backend/tests/test_contract.py. See docs/API.md.
  */
-import type { AppConfig, Bundle, CalibrationValues, CrewTile, Dashboard, LogEntry, Report } from './types';
+import type { AppConfig, Bundle, CalibrationValues, CrewNotice, CrewReport, CrewTile, Dashboard, LogEntry, Report } from './types';
 
 const API = '/api/v1';
 const SESSION_KEY = 'vita-l-session';
@@ -84,5 +84,18 @@ export const api = {
   /** A plain link cannot send headers, so the printable report takes the session in the query. */
   reportHtmlUrl: (member: string, day: number, seed: string) =>
     `${API}/members/${member}/report.html${qs({ day, seed, session: SESSION })}`,
+  /** Every member's report in one. The server gives it to the Chief Medical Officer only. */
+  crewReport: (viewer: string, day: number, seed: string) => request<CrewReport>(`/crew/report${qs({ viewer, day, seed })}`),
+  crewReportHtmlUrl: (viewer: string, day: number, seed: string) =>
+    `${API}/crew/report.html${qs({ viewer, day, seed, session: SESSION })}`,
+  /** The medical officer sends the day's crew report to the Commander. */
+  notifyCommander: (viewer: string, day: number, seed: string) =>
+    request<CrewNotice>(`/crew/report/notify${qs({ viewer, day, seed })}`, { method: 'POST' }),
+  /** Crew reports this viewer sent or received, newest first. */
+  crewNotices: (viewer: string) => request<CrewNotice[]>(`/crew/report/notices${qs({ viewer })}`),
+  readNotice: (viewer: string, id: number) =>
+    request<{ ok: boolean }>(`/crew/report/notices/${id}/read${qs({ viewer })}`, { method: 'POST' }),
+  noticeHtmlUrl: (viewer: string, id: number) =>
+    `${API}/crew/report/notices/${id}/report.html${qs({ viewer, session: SESSION })}`,
   resetDemo: () => request<{ ok: boolean }>('/demo/reset', { method: 'POST' }),
 };

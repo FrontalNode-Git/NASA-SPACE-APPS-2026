@@ -1,14 +1,14 @@
-# VITA-L
+# VITAL
 
 **Your normal, not Earth's normal.** A health check-in dashboard for a crew on a long space
-mission. Each crew member enters their daily vitals, and VITA-L compares every reading with
+mission. Each crew member enters their daily vitals, and VITAL compares every reading with
 that person's own pre-flight baseline instead of a population range.
 
 Team ACG DSA · NASA Space Apps Challenge 2026 · *Create Health Monitoring Software for
 Astronauts on Space Missions*.
 
 > All readings in the app are **simulated** and the crew is fictional. The alert method is
-> labelled **provisional**. VITA-L is not a medical device and gives no diagnosis.
+> labelled **provisional**. VITAL is not a medical device and gives no diagnosis.
 
 - What is still open: [TODO.md](TODO.md)
 - Presenting it: [docs/PRESENTERS.md](docs/PRESENTERS.md)
@@ -81,12 +81,17 @@ demo scenario.
    resting heart rate has been drifting for five days and the status is *Watch*.
 3. **Signed in as** switches crew member. As the Chief Medical Officer, open **Crew**: the
    most urgent person comes first, and mood and notes stay private to their owner.
-4. **Report for ground** is the day's summary, ready to copy or print.
+4. **Report for ground** is the day's summary, ready to copy or print. Signed in as the
+   Chief Medical Officer it covers the whole crew in one report, without the other members'
+   mood values and notes, and **Notify the Commander** sends it to the Commander.
 5. **Presenter mode** (button in the header, or press `P`) walks through the whole story in
    ten steps. **Judge drawer** (`J`) jumps to any day and switches scenario.
 6. *Reset demo* (in Presenter mode or the Judge drawer) puts everything back.
 
 Statuses always use a colour, a shape and a word: Nominal ●, Watch ▲, Call ground ■.
+
+Adding `?tour` to the address (http://localhost:7860/?tour) opens the app straight into
+Presenter mode. Use that form when you send the app to someone as a link.
 
 ### See it on a phone or a second laptop
 
@@ -168,7 +173,7 @@ The same checks run on every push, in [.github/workflows/ci.yml](.github/workflo
 | You see | Cause | Fix |
 |---|---|---|
 | `{"detail":"Not Found"}` at http://localhost:7860 | The interface was not built when the server started | `npm run build` in `frontend/`, then restart the server |
-| "VITA-L could not reach its data service." | The server is not running | Start it (step 2) and press *Try again* |
+| "VITAL could not reach its data service." | The server is not running | Start it (step 2) and press *Try again* |
 | Old screens after a frontend change | You are looking at the last build | `npm run build` again, or use `npm run dev` |
 | `address already in use` | Something else is on port 7860 | Stop it, or pick another `--port` (for `npm run dev`, set `API_TARGET=http://127.0.0.1:<port>` to match) |
 | Numbers that make no sense after experimenting | Entries you typed earlier are still stored | *Reset demo* |

@@ -91,11 +91,32 @@ def test_report(client):
     assert set(report) == {
         "title", "simulated", "disclaimer", "method_status", "generated_at", "member", "mission_day",
         "phase", "seed", "overall", "overall_label", "acknowledged", "indicators", "drifts", "missing",
-        "notes", "linked_risks", "text",
+        "notes", "notes_private", "linked_risks", "text",
     }
     assert set(report["indicators"][0]) == {
-        "id", "name", "unit", "status", "status_label", "latest", "normal", "drift", "based_on",
+        "id", "name", "unit", "status", "status_label", "private", "latest", "normal", "drift", "based_on",
         "missing_today", "risk_ids",
     }
     assert set(report["notes"][0]) == {"day", "at", "kind", "text", "value"}
     assert set(report["linked_risks"][0]) == {"id", "name"}
+
+
+def test_crew_report(client):
+    crew = client.get("/api/v1/crew/report", params={"viewer": "cmo", "day": DAY}).json()
+    assert set(crew) == {
+        "title", "simulated", "disclaimer", "privacy", "method_status", "generated_at", "requested_by",
+        "mission_day", "phase", "seed", "overall", "overall_label", "attention", "members", "text",
+    }
+    assert set(crew["requested_by"]) == {"id", "name", "role"}
+    # each member is a full report, the same shape as GET /members/{id}/report
+    own = client.get("/api/v1/members/cmo/report", params={"day": DAY}).json()
+    assert all(set(m) == set(own) for m in crew["members"])
+
+
+def test_crew_report_notice(client):
+    sent = client.post("/api/v1/crew/report/notify", params={"viewer": "cmo", "day": DAY}).json()
+    assert set(sent) == {"id", "from", "to", "day", "sent_at", "overall", "read", "report"}
+    (received,) = client.get("/api/v1/crew/report/notices", params={"viewer": "commander"}).json()
+    assert set(received) == set(sent)
+    crew = client.get("/api/v1/crew/report", params={"viewer": "cmo", "day": DAY}).json()
+    assert set(received["report"]) == set(crew)

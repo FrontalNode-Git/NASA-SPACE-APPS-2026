@@ -231,6 +231,8 @@ export interface ReportRow {
   unit: string;
   status: Status;
   status_label: string;
+  /** Someone else's private indicator: only the status level is reported. */
+  private: boolean;
   latest: string;
   normal: string | null;
   drift: string | null;
@@ -256,8 +258,41 @@ export interface Report {
   drifts: string[];
   missing: string[];
   notes: { day: number; at: string; kind: string; text: string | null; value: number | null }[];
+  /** True when the reader is not the member: their notes are left out. */
+  notes_private: boolean;
   linked_risks: { id: string; name: string }[];
   text: string;
+}
+
+/** The report for the whole crew, for the Chief Medical Officer: one full report per member. */
+export interface CrewReport {
+  title: string;
+  simulated: boolean;
+  disclaimer: string;
+  privacy: string;
+  method_status: string;
+  generated_at: string;
+  requested_by: CrewMember;
+  mission_day: number;
+  phase: { id: string; name: string };
+  seed: string;
+  overall: Status;
+  overall_label: string;
+  attention: CrewMember[];
+  members: Report[];
+  text: string;
+}
+
+/** A crew report the medical officer sent to the Commander. Only the recipient gets `report`. */
+export interface CrewNotice {
+  id: number;
+  from: CrewMember;
+  to: CrewMember;
+  day: number;
+  sent_at: string;
+  overall: Status;
+  read: boolean;
+  report: CrewReport | null;
 }
 
 export interface ModuleFlag {

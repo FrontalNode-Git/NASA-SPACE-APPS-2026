@@ -98,37 +98,76 @@ export function QuickBar() {
 
 const ENTRY_KEYS = ['entry.exercise', 'entry.sleptWell', 'entry.sleptPoorly', 'entry.ateWell', 'entry.tired', 'entry.energised'];
 
-/** Quick log: open (1 tap or L), then one tap on a mood or an entry saves and closes. */
+/** Choosing one of these takes the other off: they cannot both be true. */
+const OPPOSITES: Record<string, string> = {
+  'entry.sleptWell': 'entry.sleptPoorly',
+  'entry.sleptPoorly': 'entry.sleptWell',
+  'entry.tired': 'entry.energised',
+  'entry.energised': 'entry.tired',
+};
+
+const Tick = () => (
+  <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+    <path d="M3 8.5l3.2 3.2L13 4.8" />
+  </svg>
+);
+
+/**
+ * Quick log: open (1 tap or L), choose a mood, any number of entries and an optional note,
+ * then Save sends them together. Tapping a choice again takes it off.
+ */
 export function QuickLog() {
   const t = useT();
   const open = useApp((s) => s.quickLogOpen);
   const viewer = useApp((s) => s.viewer);
   const crew = useApp((s) => s.bundle?.crew);
   const day = useApp((s) => s.day);
+  const [mood, setMood] = useState<number | null>(null);
+  const [picked, setPicked] = useState<string[]>([]);
   const [note, setNote] = useState('');
   const first = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
-    if (open) first.current?.focus();
-    else setNote('');
+    if (open) {
+      first.current?.focus();
+    } else {
+      setMood(null);
+      setPicked([]);
+      setNote('');
+    }
   }, [open]);
 
   if (!open) return null;
   const close = () => useApp.setState({ quickLogOpen: false });
-  const save = (kind: 'mood' | 'entry' | 'note', extra: { value?: number; text?: string }) => {
-    useApp.getState().log(kind, extra);
+  const toggle = (key: string) =>
+    setPicked(picked.includes(key) ? picked.filter((k) => k !== key) : [...picked.filter((k) => k !== OPPOSITES[key]), key]);
+  const count = (mood === null ? 0 : 1) + picked.length + (note.trim() ? 1 : 0);
+  const save = () => {
+    if (count === 0) return;
+    useApp.getState().logMany([
+      ...(mood === null ? [] : [{ kind: 'mood' as const, value: mood }]),
+      // In the order they are shown, not the order they were tapped.
+      ...ENTRY_KEYS.filter((key) => picked.includes(key)).map((key) => ({ kind: 'entry' as const, text: t(key) })),
+      ...(note.trim() ? [{ kind: 'note' as const, text: note.trim() }] : []),
+    ]);
     close();
   };
   const me = crew?.find((m) => m.id === viewer);
+  const choice = (on: boolean) =>
+    on ? 'border-accent bg-accent/15 text-accent' : 'border-line bg-bg/50 hover:border-accent';
 
   return (
     <div className="fixed inset-0 z-40 flex items-end justify-center bg-black/60 p-3 sm:items-center" onClick={close}>
-      <div
+      <form
         role="dialog"
         aria-modal="true"
         aria-label={t('quicklog.title')}
-        className="w-full max-w-md rounded-2xl border border-line bg-panel p-5 shadow-2xl"
+        className="max-h-full w-full max-w-md overflow-y-auto rounded-2xl border border-line bg-panel p-5 shadow-2xl"
         onClick={(e) => e.stopPropagation()}
+        onSubmit={(e) => {
+          e.preventDefault();
+          save();
+        }}
         data-testid="quick-log"
       >
         <h2 className="font-display text-lg font-semibold">{t('quicklog.title')}</h2>
@@ -144,9 +183,12 @@ export function QuickLog() {
               ref={value === 1 ? first : undefined}
               type="button"
               data-mood={value}
-              onClick={() => save('mood', { value })}
+              aria-pressed={mood === value}
+              onClick={() => setMood(mood === value ? null : value)}
               aria-label={t('quicklog.moodValue', { n: value })}
-              className="min-h-[52px] rounded-lg border border-line bg-bg/50 font-display text-xl font-bold hover:border-accent hover:text-accent"
+              className={`min-h-[52px] rounded-lg border font-display text-xl font-bold ${
+                mood === value ? 'border-accent bg-accent text-bg' : 'border-line bg-bg/50 hover:border-accent hover:text-accent'
+              }`}
             >
               {value}
             </button>
@@ -159,47 +201,45 @@ export function QuickLog() {
 
         <h3 className="mt-4 text-sm font-semibold">{t('quicklog.entries')}</h3>
         <div className="mt-2 flex flex-wrap gap-2">
-          {ENTRY_KEYS.map((key) => (
-            <button
-              key={key}
-              type="button"
-              onClick={() => save('entry', { text: t(key) })}
-              className="min-h-[52px] rounded-lg border border-line bg-bg/50 px-3 text-sm hover:border-accent"
-            >
-              {t(key)}
-            </button>
-          ))}
+          {ENTRY_KEYS.map((key) => {
+            const on = picked.includes(key);
+            return (
+              <button
+                key={key}
+                type="button"
+                data-entry={key.slice('entry.'.length)}
+                aria-pressed={on}
+                onClick={() => toggle(key)}
+                className={`flex min-h-[52px] items-center gap-1.5 rounded-lg border px-3 text-sm ${choice(on)}`}
+              >
+                {on && <Tick />}
+                {t(key)}
+              </button>
+            );
+          })}
         </div>
 
-        <form
-          className="mt-4 flex gap-2"
-          onSubmit={(e) => {
-            e.preventDefault();
-            if (note.trim()) save('note', { text: note.trim() });
-          }}
-        >
-          <label className="sr-only" htmlFor="quick-note">
-            {t('quicklog.note')}
-          </label>
-          <input
-            id="quick-note"
-            value={note}
-            onChange={(e) => setNote(e.target.value)}
-            maxLength={280}
-            placeholder={t('quicklog.note')}
-            className="min-h-[44px] flex-1 rounded-lg border border-line bg-bg px-3 text-sm placeholder:text-muted"
-          />
-          <Button primary disabled={!note.trim()} onClick={() => note.trim() && save('note', { text: note.trim() })}>
-            {t('common.save')}
-          </Button>
-        </form>
-        <p className="mt-3 flex items-center gap-1 text-xs text-muted">{t('privacy.own')}</p>
-        <div className="mt-3 text-right">
-          <button type="button" onClick={close} className="min-h-[44px] px-3 text-sm text-muted underline underline-offset-2">
+        <label className="sr-only" htmlFor="quick-note">
+          {t('quicklog.note')}
+        </label>
+        <input
+          id="quick-note"
+          value={note}
+          onChange={(e) => setNote(e.target.value)}
+          maxLength={280}
+          placeholder={t('quicklog.note')}
+          className="mt-4 min-h-[44px] w-full rounded-lg border border-line bg-bg px-3 text-sm placeholder:text-muted"
+        />
+        <p className="mt-3 text-xs text-muted">{count === 0 ? t('quicklog.pickSomething') : t('privacy.own')}</p>
+        <div className="mt-3 flex items-center justify-end gap-2">
+          <button type="button" onClick={close} className="min-h-[52px] px-3 text-sm text-muted underline underline-offset-2">
             {t('common.close')}
           </button>
+          <Button primary className="min-h-[52px] min-w-[8rem]" disabled={count === 0} onClick={save} data-testid="quick-log-save">
+            {count > 1 ? t('quicklog.saveCount', { n: count }) : t('quicklog.save')}
+          </Button>
         </div>
-      </div>
+      </form>
     </div>
   );
 }

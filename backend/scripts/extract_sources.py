@@ -1,4 +1,4 @@
-"""Source extractor / verifier for the VITA-L source lock.
+"""Source extractor / verifier for the VITAL source lock.
 
 1. Downloads the five approved seed pages (or reads saved copies with --from-dir).
 2. Writes data/sources/approved_urls.json: the seeds plus every NASA/CSA page linked

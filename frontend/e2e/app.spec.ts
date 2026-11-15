@@ -181,9 +181,27 @@ test('quick actions: log, I am OK, report, palette', async ({ page }) => {
   await open(page);
   await expect(page.getByTestId('quick-bar').locator('[data-icon]')).toHaveCount(6);
   await page.locator('[data-quick="quick-log"]').click();
-  await page.locator('[data-mood="4"]').click(); // second tap saves
+  // Nothing chosen yet: nothing to save.
+  await expect(page.getByTestId('quick-log-save')).toBeDisabled();
+  // A mood and several entries go in together; tapping a choice again takes it off.
+  await page.locator('[data-mood="4"]').click();
+  await page.locator('[data-entry="exercise"]').click();
+  await page.locator('[data-entry="ateWell"]').click();
+  await page.locator('[data-entry="tired"]').click();
+  await page.locator('[data-entry="tired"]').click();
+  await expect(page.locator('[data-entry="tired"]')).toHaveAttribute('aria-pressed', 'false');
+  // Opposites cannot both be chosen.
+  await page.locator('[data-entry="sleptPoorly"]').click();
+  await page.locator('[data-entry="sleptWell"]').click();
+  await expect(page.locator('[data-entry="sleptPoorly"]')).toHaveAttribute('aria-pressed', 'false');
+  await expect(page.getByTestId('quick-log')).toBeVisible(); // choosing does not close it
+  await expect(page.getByTestId('quick-log-save')).toHaveText('Save (4)');
+  await page.getByTestId('quick-log-save').click();
+  await expect(page.getByTestId('toast')).toHaveCount(1); // one confirmation for the batch
   await expect(page.getByTestId('toast').first()).toContainText('Saved');
   await expect(page.getByTestId('quick-log')).toBeHidden();
+  for (const text of ['Exercise done', 'Ate well', 'Slept well']) await expect(page.getByTestId('notes')).toContainText(text);
+  await expect(page.getByTestId('notes')).not.toContainText('Feeling tired');
 
   await page.locator('[data-quick="ok"]').click();
   await expect(page.getByTestId('acknowledged')).toBeVisible();
@@ -330,4 +348,120 @@ test('night mode and the flat body view', async ({ page }) => {
   await expect(detail).toContainText('Resting heart rate');
   await expect(detail).toContainText('bpm');
   await expect(detail).toContainText('Risk of Cardiovascular Adaptations');
+});
+
+test('an entry made while the server cannot be reached is kept and sent later', async ({ page }) => {
+  await open(page);
+  expected = /requestfailed: .*\/logs|console: Failed to load resource/;
+  await page.route('**/api/v1/members/*/logs*', (route) => route.abort());
+
+  await page.locator('[data-quick="ok"]').click();
+  const notice = page.getByTestId('outbox-notice');
+  await expect(notice).toContainText('Waiting to send: 1');
+  await expect(page.getByTestId('toast').first()).toContainText('Not sent yet');
+  await expect(page.getByTestId('acknowledged')).toBeHidden(); // nothing claims it was saved
+
+  // A reload does not lose it, and the app tries again by itself (still cut off here).
+  const retried = page.waitForEvent('requestfailed', (r) => r.url().includes('/logs'));
+  await page.reload();
+  await expect(page.getByTestId('outbox-notice')).toContainText('Waiting to send: 1');
+  await retried;
+  await expect(page.getByTestId('outbox-notice')).toContainText('Waiting to send: 1');
+
+  // The server answers again: the entry goes through and the notice clears.
+  await page.unroute('**/api/v1/members/*/logs*');
+  await page.getByTestId('outbox-notice').getByRole('button').click();
+  await expect(page.getByTestId('outbox-notice')).toBeHidden();
+  await expect(page.getByTestId('acknowledged')).toBeVisible();
+  await expect(page.getByTestId('notes')).toContainText("I'm OK");
+});
+
+test('the medical officer gets the crew report and can send it to the Commander', async ({ page }) => {
+  await open(page);
+  // The engineer writes a note. It must never reach anyone else's crew report.
+  await page.locator('[data-quick="quick-log"]').click();
+  await page.locator('#quick-note').fill('engineer private note');
+  await page.getByTestId('quick-log-save').click();
+  await expect(page.getByTestId('notes')).toContainText('engineer private note');
+
+  // Anyone but the medical officer only has their own report and no way to switch.
+  await page.locator('[data-quick="report"]').click();
+  await expect(page.getByTestId('report')).toHaveAttribute('data-scope', 'own');
+  await expect(page.getByTestId('report-scope')).toHaveCount(0);
+  await page.getByTestId('viewer-select').selectOption('commander');
+  await expect(page.getByTestId('report')).toHaveAttribute('data-scope', 'own');
+  await expect(page.getByTestId('report-scope')).toHaveCount(0);
+  await expect(page.getByTestId('crew-notice')).toHaveCount(0);
+
+  // The medical officer opens on the whole crew.
+  await page.getByTestId('viewer-select').selectOption('cmo');
+  await page.locator('[data-quick="quick-log"]').click();
+  await page.locator('#quick-note').fill('medical officer private note');
+  await page.getByTestId('quick-log-save').click();
+  await page.locator('[data-quick="report"]').click();
+  await expect(page.getByTestId('report')).toHaveAttribute('data-scope', 'crew');
+  await expect(page.getByTestId('report-crew').locator('[data-member]')).toHaveCount(4);
+  await expect(page.getByTestId('report-crew-summary').getByRole('listitem')).toHaveCount(4);
+  const text = page.getByTestId('report-text');
+  await expect(text).toContainText('VITAL CREW REPORT FOR GROUND');
+  await expect(text).toContainText('SIMULATED DATA');
+  for (const name of ['A. Vega', 'N. Okafor', 'L. Tanaka', 'M. Ruiz']) await expect(text).toContainText(name);
+  await expect(page.getByTestId('report')).not.toContainText('engineer private note');
+  const engineer = page.locator('[data-member="engineer"]');
+  await expect(engineer).toContainText('Slowly drifting above their normal');
+  await expect(engineer.getByTestId('report-notes-private')).toBeVisible();
+  await expect(engineer.getByText('Private', { exact: true }).locator('visible=true')).toHaveCount(1); // the mood value
+  // The medical officer's own section keeps their own details.
+  await expect(page.locator('[data-member="cmo"]')).toContainText('medical officer private note');
+  // Nothing runs off the side of the screen.
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
+
+  // Send it to the Commander.
+  await expect(page.getByTestId('report-notify-button')).toHaveText('Notify the Commander');
+  await page.getByTestId('report-notify-button').click();
+  await expect(page.getByTestId('toast').filter({ hasText: 'sent to the Commander' })).toBeVisible();
+  await expect(page.getByTestId('report-notify')).toContainText('Sent to the Commander at');
+  await expect(page.getByTestId('report-notify-button')).toHaveText('Send again');
+  await expect(page.getByTestId('crew-notice')).toHaveCount(0); // the sender gets no notice
+
+  // The Commander sees the notice on whatever screen they are on, and opens the report from it.
+  await page.getByTestId('viewer-select').selectOption('commander');
+  await page.locator('[data-quick="palette"]').click();
+  await page.getByTestId('command-palette').getByRole('combobox').fill('crew');
+  await page.keyboard.press('Enter');
+  await expect(page.getByTestId('crew-grid')).toBeVisible();
+  const notice = page.getByTestId('crew-notice');
+  await expect(notice).toContainText('Chief Medical Officer N. Okafor sent you the crew report for mission day 20');
+  await page.getByTestId('crew-notice-open').click();
+  await expect(page.getByTestId('report')).toHaveAttribute('data-scope', 'received');
+  await expect(page.getByTestId('report-received')).toContainText('Sent by Chief Medical Officer N. Okafor');
+  await expect(page.getByTestId('report-crew').locator('[data-member]')).toHaveCount(4);
+  // Built for the Commander: nobody else's notes, not even the sender's.
+  await expect(page.getByTestId('report')).not.toContainText('engineer private note');
+  await expect(page.getByTestId('report')).not.toContainText('medical officer private note');
+  await expect(page.locator('[data-member="cmo"]').getByTestId('report-notes-private')).toBeVisible();
+  await expect(page.locator('[data-member="commander"]').getByTestId('report-notes-private')).toHaveCount(0);
+  await expect(page.getByTestId('report-notify')).toHaveCount(0); // only the medical officer sends
+  // Once opened, the notice is gone; the report stays one tap away.
+  await expect(page.getByTestId('crew-notice')).toHaveCount(0);
+  await page.locator('[data-scope-choice="own"]').click();
+  await expect(page.getByTestId('report-text')).toContainText('Commander A. Vega');
+  await expect(page.getByTestId('report-text')).not.toContainText('M. Ruiz');
+  await page.locator('[data-scope-choice="received"]').click();
+  await expect(page.getByTestId('report-text')).toContainText('M. Ruiz');
+});
+
+test('a link ending in ?tour opens straight into the guided walkthrough', async ({ page }) => {
+  await page.goto('/?tour');
+  await expect(page.getByTestId('presenter')).toBeVisible();
+  await expect(page.getByTestId('presenter-step')).toHaveText('1 / 10');
+  await expect(page.getByTestId('calibrate')).toBeVisible(); // step 1 has already moved the app
+  await page.getByTestId('presenter-next').click();
+  await expect(page.getByTestId('presenter-step')).toHaveText('2 / 10');
+  await expect(page.getByTestId('check-in')).toBeVisible();
+
+  // A plain link opens the app itself, with no walkthrough in the way.
+  await page.goto('/');
+  await expect(page.locator('#main')).toBeVisible();
+  await expect(page.getByTestId('presenter')).toHaveCount(0);
 });

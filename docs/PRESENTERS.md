@@ -1,23 +1,42 @@
-# Presenting VITA-L
+# Presenting VITAL
 
-For whoever demos or pitches VITA-L. You do not need to know the code. Starting the app is in
+For whoever demos or pitches VITAL. You do not need to know the code. Starting the app is in
 the [README](../README.md); this page is what to click, what to say and what to avoid.
 
 **The one idea to land:** *Your normal, not Earth's normal.* On a long mission the useful
 question is not "is this value normal for a human?" but "is this value normal for **this
-person**?". VITA-L learns each crew member's own baseline before launch and compares every
+person**?". VITAL learns each crew member's own baseline before launch and compares every
 reading with it.
+
+---
+
+## If the app was sent to you as a link
+
+Nothing to install: open the link in Edge, Chrome, Firefox or Safari, on a laptop or a phone.
+
+- **Add `?tour` to the end of the link** (for example `https://<the address>/?tour`) and the
+  app opens straight into the guided walkthrough below, at step 1. Send that version to
+  anyone who will look at the app without one of us there. The plain link opens the app itself.
+- **Each browser gets its own copy of the demo.** What you type is not seen by anyone else
+  who has the link, and their entries do not appear on your screen.
+- **Reset demo** (press `J`, or the button in Presenter mode) puts your copy back to the start.
+- Entries are kept while the server is running. If it is restarted they are gone, so do not
+  rely on something you typed yesterday still being there.
+- For a recording, open the `?tour` link, press **Auto-play** and read the captions aloud:
+  ten steps, two minutes.
 
 ---
 
 ## Five minutes before
 
-1. Start the app and open **http://localhost:7860** (steps in the [README](../README.md)).
+1. Open the link you were sent. If you are running the app on your own laptop instead, start
+   it and open **http://localhost:7860** (steps in the [README](../README.md)).
 2. Press `F11` for full screen. Keep the zoom at 100%, or 110% on a projector.
 3. Press `J`, then **Reset demo**. Close the drawer with `Esc`.
 4. Check the header. It must show **Watch ▲**, **Mission day 20** and **Signed in as Flight
    Engineer**. If it does not, press **Reset demo** again.
-5. Close other tabs and silence notifications. The app needs no internet.
+5. Close other tabs and silence notifications. Run from your own laptop, the app needs no
+   internet; opened from a link, it needs the connection to that link.
 
 Keyboard shortcuts do nothing while the cursor is inside a text field. Click an empty part
 of the page first.
@@ -64,7 +83,7 @@ day 34.
 
 ## The hands-on moment (30 seconds, optional)
 
-This shows that VITA-L is something the crew **types into**, not something they read. Do it
+This shows that VITAL is something the crew **types into**, not something they read. Do it
 after the walkthrough, on day 20, signed in as the Flight Engineer.
 
 1. In **Check-in**, change *Resting heart rate* to `75` and press **Save check-in**.
@@ -75,6 +94,12 @@ after the walkthrough, on day 20, signed in as the Flight Engineer.
 
 A second option: sign in as **Chief Medical Officer**. The temperature field is empty
 because the sensor missed it. Type `36.7`, save, and the reminder disappears.
+
+A third option: sign in as **Chief Medical Officer** and open **Report for ground**. It opens
+on *Whole crew*: all four crew members in one report, ready to copy or print. Mood values and
+notes of the other three are not in it. Press **Notify the Commander**, then sign in as
+**Commander**: a notice at the top of every screen says the medical officer sent the crew
+report, and **Open report** shows it. *My report* switches back to the person's own.
 
 **Always undo what you typed, or press Reset demo.** A value left in place stays in the
 chart and changes the trend on later days, so the walkthrough will no longer match this page.
@@ -98,14 +123,14 @@ emergency medical assistance. In NASA's words, planning and self-sufficiency wil
 **The idea (30 s).** A crew that far away has to notice change by itself, early. NASA says
 astronauts' entire bodies must adjust to the new gravities they encounter. Our premise, and
 it is ours, not NASA's: for a body that is adapting, the most useful comparison is with the
-same person before launch. So VITA-L uses each person as their own ruler. *Your normal, not
+same person before launch. So VITAL uses each person as their own ruler. *Your normal, not
 Earth's normal.*
 
 **The demo (90 s).** Run the walkthrough above. If time is short, show steps 2, 4, 5 and 10.
 
 **What it is, honestly (20 s).** The readings are simulated and the crew is fictional; every
 screen says so. The alert rules are plain statistics against a personal baseline and are
-labelled provisional. VITA-L flags a change and tells the crew to call ground. It does not
+labelled provisional. VITAL flags a change and tells the crew to call ground. It does not
 diagnose.
 
 **Close (10 s).** "Six vitals, four crew members, one question asked every day: is this
@@ -147,13 +172,19 @@ surgeon, not a diagnosis.
 
 **Who can see what?**
 Mood and personal notes are visible only to their owner. Everyone else, including the
-Chief Medical Officer, sees the status level. In this demo "Signed in as" is a role switch;
-a real sign-in is on our list.
+Chief Medical Officer, sees the status level. The Chief Medical Officer can get one report
+for ground that covers the whole crew, and can send it to the Commander. The same rule holds
+in both copies: mood values and notes of anyone but the reader are left out, so the
+Commander's copy does not carry the medical officer's notes either. In this demo "Signed in as" is a role switch; a real sign-in is on our list.
 
 **Does it need a connection to Earth?**
 No. It runs as one small service next to the crew, and the app itself calls nothing
 outside (voice input is the one part that depends on the browser). The report for ground
 is a page you copy or print, to send when a link is available.
+
+**What if the app cannot reach its server when I save?**
+Nothing is lost. The entry is kept in the browser, the screen says "Waiting to send", and it
+is sent by itself when the server answers again. "Saved" only appears once the server has it.
 
 **What happens to entries if it restarts?**
 Today they are lost: entries are kept in memory. Saving them permanently is on our list.
@@ -185,7 +216,7 @@ fewer false alerts.
 | Problem | Do this |
 |---|---|
 | The screen does not match this page | `J` → **Reset demo** |
-| "VITA-L could not reach its data service." | The server stopped. Restart it ([README](../README.md)), then **Try again** |
+| "VITAL could not reach its data service." | The server stopped. Restart it ([README](../README.md)), then **Try again** |
 | The body scan is slow or blank | Press **Flat view** on the body scan panel |
 | A key does nothing | Click an empty part of the page, then press it again |
 | A judge moves to a random day and sees an alert you cannot explain | "That is a chance reading outside this person's band. It is why we call the method provisional." Then go back to day 20 |
@@ -204,7 +235,7 @@ the heart rate), and you will be explaining noise instead of the story.
 | `P` | Presenter mode on / off |
 | `J` | Judge drawer: any mission day, three scenarios, Reset demo |
 | `K` | "I'm OK" |
-| `L` | Quick log (mood, one-tap entries, a short note) |
+| `L` | Quick log: a mood, any number of entries and a short note, then **Save** |
 | `R` | Report for ground |
 | `H` | Hazard filter: jump to it, or clear it |
 | `Shift`+`1`…`5` | Radiation, Isolation, Distance, Gravity, Hostile environment |

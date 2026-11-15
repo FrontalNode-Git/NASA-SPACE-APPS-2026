@@ -2,8 +2,9 @@ import { create } from 'zustand';
 import { api } from './api';
 import type { Command } from './commands';
 import { toggleHazard } from './lens';
+import { addPending, deliver, loadOutbox, newId, saveOutbox, type PendingItem } from './outbox';
 import { translate } from './strings';
-import type { AppConfig, Bundle, CrewTile, Dashboard, LogEntry } from './types';
+import type { AppConfig, Bundle, CrewNotice, CrewTile, Dashboard, LogEntry } from './types';
 
 export interface Toast {
   id: number;
@@ -47,9 +48,13 @@ export interface AppState extends Persisted {
   seed: string;
   dash: Dashboard | null;
   crew: CrewTile[] | null;
+  /** Crew reports the viewer sent (medical officer) or received (Commander). */
+  notices: CrewNotice[];
   lens: string[];
   selectedZone: string | null;
   toasts: Toast[];
+  /** How many entries are waiting in the browser because the server was not reached. */
+  pending: number;
   paletteOpen: boolean;
   quickLogOpen: boolean;
   judgeOpen: boolean;
@@ -70,6 +75,10 @@ export interface AppState extends Persisted {
   dismissToast: (id: number) => void;
   set: (patch: Partial<AppState>) => void;
   log: (kind: LogEntry['kind'], extra?: { value?: number; text?: string }) => void;
+  /** Several entries saved together (the quick log): one confirmation for the whole batch. */
+  logMany: (entries: { kind: LogEntry['kind']; value?: number; text?: string }[]) => void;
+  enqueue: (items: PendingItem | PendingItem[]) => void;
+  flushOutbox: (opts?: { manual?: boolean }) => Promise<void>;
   run: (command: Command) => void;
   resetDemo: () => Promise<void>;
   t: (key: string, params?: Record<string, string | number>) => string;
@@ -77,6 +86,19 @@ export interface AppState extends Persisted {
 
 let toastId = 0;
 let requestId = 0;
+let outbox: PendingItem[] = loadOutbox();
+let watching = false;
+
+/** Try the waiting entries again when the browser comes back online, and every 15 seconds. */
+function startOutboxWatch(get: () => AppState) {
+  if (watching || typeof window === 'undefined') return;
+  watching = true;
+  const tick = () => void get().flushOutbox();
+  window.addEventListener('online', tick);
+  window.setInterval(tick, 15000);
+  tick();
+}
+let flushing = false;
 
 export const useApp = create<AppState>((set, get) => ({
   ...loadPersisted(),
@@ -89,9 +111,11 @@ export const useApp = create<AppState>((set, get) => ({
   seed: 'demo',
   dash: null,
   crew: null,
+  notices: [],
   lens: [],
   selectedZone: null,
   toasts: [],
+  pending: outbox.length,
   paletteOpen: false,
   quickLogOpen: false,
   judgeOpen: false,
@@ -105,6 +129,7 @@ export const useApp = create<AppState>((set, get) => ({
       const [bundle, config] = await Promise.all([api.bundle(), api.config()]);
       set({ bundle, config, day: config.demo_day, loadError: null });
       await get().refresh();
+      startOutboxWatch(get);
     } catch (err) {
       set({ loadError: err instanceof Error ? err.message : String(err) });
     }
@@ -114,8 +139,12 @@ export const useApp = create<AppState>((set, get) => ({
     const { member, viewer, day, seed } = get();
     const mine = ++requestId;
     try {
-      const [dash, crew] = await Promise.all([api.dashboard(member, viewer, day, seed), api.crew(viewer, day, seed)]);
-      if (mine === requestId) set({ dash, crew });
+      const [dash, crew, notices] = await Promise.all([
+        api.dashboard(member, viewer, day, seed),
+        api.crew(viewer, day, seed),
+        api.crewNotices(viewer).catch(() => [] as CrewNotice[]), // the dashboard matters more than the inbox
+      ]);
+      if (mine === requestId) set({ dash, crew, notices });
     } catch {
       if (mine === requestId) get().toast(get().t('toast.loadFailed'), 'error');
     }
@@ -147,7 +176,8 @@ export const useApp = create<AppState>((set, get) => ({
   toast: (text, tone = 'ok') => {
     const id = ++toastId;
     set({ toasts: [...get().toasts.slice(-2), { id, text, tone }] });
-    setTimeout(() => get().dismissToast(id), 2600);
+    // Errors stay longer: they need to be read and acted on.
+    setTimeout(() => get().dismissToast(id), tone === 'error' ? 6000 : 2600);
   },
   dismissToast: (id) => set({ toasts: get().toasts.filter((t) => t.id !== id) }),
 
@@ -156,14 +186,70 @@ export const useApp = create<AppState>((set, get) => ({
     persist(get());
   },
 
-  // Optimistic: the confirmation shows at once; the server call follows.
-  log: (kind, extra) => {
+  log: (kind, extra) => get().logMany([{ kind, ...extra }]),
+
+  // One confirmation for the whole batch, and only after the server has accepted it. Anything
+  // the server could not be reached for is kept in the browser and sent again later.
+  logMany: (entries) => {
     const { viewer, day, t } = get();
-    get().toast(t(kind === 'ok' ? 'toast.ok' : 'toast.saved'));
-    api
-      .log(viewer, { kind, day, ...extra })
-      .then(() => get().refresh())
-      .catch(() => get().toast(t('toast.saveFailed'), 'error'));
+    if (entries.length === 0) return;
+    const items: PendingItem[] = entries.map((e) => ({ id: newId(), kind: 'log', member: viewer, body: { ...e, day } }));
+    void (async () => {
+      let sent = 0;
+      let refused = 0;
+      const waiting: PendingItem[] = [];
+      for (const item of items) {
+        // Keep the order: once something is waiting, everything after it waits too.
+        if (outbox.length || waiting.length) {
+          waiting.push(item);
+          continue;
+        }
+        const result = await deliver(item);
+        if (result === 'sent') sent += 1;
+        else if (result === 'retry') waiting.push(item);
+        else refused += 1;
+      }
+      if (waiting.length) get().enqueue(waiting);
+      if (refused) get().toast(t('toast.saveFailed'), 'error');
+      if (sent) {
+        const onlyOk = entries.length === 1 && entries[0]?.kind === 'ok';
+        if (!waiting.length && !refused) get().toast(t(onlyOk ? 'toast.ok' : 'toast.saved'));
+        void get().refresh();
+      }
+    })();
+  },
+
+  enqueue: (items) => {
+    for (const item of Array.isArray(items) ? items : [items]) outbox = addPending(outbox, item);
+    saveOutbox(outbox);
+    set({ pending: outbox.length });
+    get().toast(get().t('toast.queued'), 'error');
+    void get().flushOutbox();
+  },
+
+  flushOutbox: async ({ manual = false } = {}) => {
+    if (flushing || outbox.length === 0) return;
+    flushing = true;
+    let sent = 0;
+    try {
+      for (let next = outbox[0]; next; next = outbox[0]) {
+        const result = await deliver(next);
+        if (result === 'retry') break;
+        outbox = outbox.slice(1);
+        if (result === 'sent') sent += 1;
+        else get().toast(get().t('toast.saveFailed'), 'error');
+      }
+    } finally {
+      flushing = false;
+      saveOutbox(outbox);
+      set({ pending: outbox.length });
+    }
+    if (sent) {
+      get().toast(get().t('toast.sentWaiting', { n: sent }));
+      await get().refresh();
+    } else if (manual && outbox.length) {
+      get().toast(get().t('toast.queued'), 'error');
+    }
   },
 
   run: (command) => {

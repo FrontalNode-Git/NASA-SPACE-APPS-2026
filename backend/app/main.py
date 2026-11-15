@@ -5,6 +5,7 @@ The shapes the frontend depends on are pinned in tests/test_contract.py.
 """
 from __future__ import annotations
 
+import datetime as dt
 import re
 from collections import OrderedDict
 from typing import Literal
@@ -17,7 +18,14 @@ from pydantic import BaseModel, Field
 from . import config, service
 from . import simulator as sim
 from .content import get_content
-from .report import build_report, render_html
+from .report import (
+    CREW_REPORT_RECIPIENT,
+    NotAllowed,
+    build_crew_report,
+    build_report,
+    render_crew_html,
+    render_html,
+)
 
 API = "/api/v1"
 MAX_SESSIONS = 300
@@ -76,7 +84,7 @@ def _seed(seed: str) -> str:
 
 
 def create_app() -> FastAPI:
-    app = FastAPI(title="VITA-L", version="1.0.0", docs_url=f"{API}/docs", openapi_url=f"{API}/openapi.json")
+    app = FastAPI(title="VITAL", version="1.0.0", docs_url=f"{API}/docs", openapi_url=f"{API}/openapi.json")
 
     @app.exception_handler(service.UnknownMember)
     async def _unknown_member(_request: object, exc: service.UnknownMember) -> JSONResponse:
@@ -172,6 +180,66 @@ def create_app() -> FastAPI:
     @app.get(f"{API}/members/{{member}}/report.html", response_class=HTMLResponse, tags=["report"])
     def report_html(member: str, day: int = Day, seed: str = Seed, store: service.Store = Session) -> str:
         return render_html(build_report(get_content(), store, member, day, _seed(seed)))
+
+    # The medical officer's report for the whole crew, and sending it to the Commander.
+    def _crew_report(viewer: str, day: int, seed: str, store: service.Store, reader: str | None = None) -> dict[str, object]:
+        try:
+            return build_crew_report(get_content(), store, viewer, day, _seed(seed), reader)
+        except NotAllowed as exc:
+            raise HTTPException(status_code=403, detail=str(exc)) from exc
+
+    @app.get(f"{API}/crew/report", tags=["report"])
+    def crew_report(viewer: str = "engineer", day: int = Day, seed: str = Seed, store: service.Store = Session) -> dict[str, object]:
+        return _crew_report(viewer, day, seed, store)
+
+    @app.get(f"{API}/crew/report.html", response_class=HTMLResponse, tags=["report"])
+    def crew_report_html(viewer: str = "engineer", day: int = Day, seed: str = Seed, store: service.Store = Session) -> str:
+        return render_crew_html(_crew_report(viewer, day, seed, store))
+
+    def _notice_for(notice: dict[str, object], viewer: str) -> dict[str, object]:
+        """The sender sees that it was sent; only the recipient gets the report itself."""
+        mine = notice["to"]["id"] == viewer  # type: ignore[index]
+        return {**notice, "report": notice["report"] if mine else None}
+
+    def _received(store: service.Store, notice_id: int, viewer: str) -> dict[str, object]:
+        for notice in store.notices:
+            if notice["id"] == notice_id and notice["to"]["id"] == viewer:  # type: ignore[index]
+                return notice
+        raise HTTPException(status_code=404, detail="no such crew report was sent to you")
+
+    @app.post(f"{API}/crew/report/notify", tags=["report"])
+    def notify_commander(viewer: str = "engineer", day: int = Day, seed: str = Seed, store: service.Store = Session) -> dict[str, object]:
+        """Send the day's crew report to the Commander, built as the Commander may see it."""
+        report = _crew_report(viewer, day, seed, store, reader=CREW_REPORT_RECIPIENT)
+        notice = store.add_notice(
+            {
+                "from": report["requested_by"],
+                "to": service._member(get_content(), CREW_REPORT_RECIPIENT),
+                "day": day,
+                "sent_at": dt.datetime.now().strftime("%H:%M"),
+                "overall": report["overall"],
+                "read": False,
+                "report": report,
+            }
+        )
+        return _notice_for(notice, viewer)
+
+    @app.get(f"{API}/crew/report/notices", tags=["report"])
+    def crew_notices(viewer: str = "engineer", store: service.Store = Session) -> list[dict[str, object]]:
+        """Crew reports this viewer sent or received, newest first."""
+        service._member(get_content(), viewer)
+        mine = [n for n in store.notices if viewer in (n["to"]["id"], n["from"]["id"])]  # type: ignore[index]
+        mine.sort(key=lambda n: int(n["id"]), reverse=True)  # type: ignore[call-overload]
+        return [_notice_for(n, viewer) for n in mine]
+
+    @app.post(f"{API}/crew/report/notices/{{notice_id}}/read", tags=["report"])
+    def read_notice(notice_id: int, viewer: str = "engineer", store: service.Store = Session) -> dict[str, bool]:
+        _received(store, notice_id, viewer)["read"] = True
+        return {"ok": True}
+
+    @app.get(f"{API}/crew/report/notices/{{notice_id}}/report.html", response_class=HTMLResponse, tags=["report"])
+    def notice_html(notice_id: int, viewer: str = "engineer", store: service.Store = Session) -> str:
+        return render_crew_html(_received(store, notice_id, viewer)["report"])  # type: ignore[arg-type]
 
     # ------------------------------------------------------------ demo
     @app.post(f"{API}/demo/reset", tags=["meta"])

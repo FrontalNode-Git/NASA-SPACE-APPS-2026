@@ -236,7 +236,7 @@ class Content:
 
     # ------------------------------------------------------------------ coverage
     def coverage(self) -> dict[str, object]:
-        """Risk coverage matrix: every NASA risk against every VITA-L feature, computed from links."""
+        """Risk coverage matrix: every NASA risk against every VITAL feature, computed from links."""
         rows = []
         monitored = partial = 0
         for risk in self.risks:

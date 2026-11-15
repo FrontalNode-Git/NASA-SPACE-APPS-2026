@@ -48,13 +48,23 @@ class Store:
     logs: dict[str, list[dict[str, object]]] = field(default_factory=dict)
     calibration: dict[str, dict[str, list[float | None]]] = field(default_factory=dict)
     readings: dict[str, dict[str, dict[int, float]]] = field(default_factory=dict)  # member -> indicator -> day
+    notices: list[dict[str, object]] = field(default_factory=list)  # crew reports sent to the Commander
     _next_id: int = 1
 
     def reset(self) -> None:
         self.logs.clear()
         self.calibration.clear()
         self.readings.clear()
+        self.notices.clear()
         self._next_id = 1
+
+    def add_notice(self, notice: dict[str, object]) -> dict[str, object]:
+        """Keep one sent crew report per mission day: a newer one replaces the older."""
+        self.notices = [n for n in self.notices if n["day"] != notice["day"]]
+        notice = {"id": self._next_id, **notice}
+        self._next_id += 1
+        self.notices.append(notice)
+        return notice
 
     def set_reading(self, member: str, indicator: str, day: int, value: float | None) -> None:
         """Store what the crew member entered. None withdraws the entry (the sensor value returns)."""

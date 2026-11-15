@@ -6,8 +6,40 @@ import { CommandPalette, Toasts } from './CommandPalette';
 import { Icon } from './Icon';
 import { JudgeDrawer, Presenter } from './Presenter';
 import { QuickBar, QuickLog } from './QuickBar';
-import { StatusBadge } from './StatusGlyph';
+import { StatusBadge, StatusGlyph } from './StatusGlyph';
 import { SimulatedTag } from './ui';
+
+/** Shown to whoever was sent a crew report, on every screen, until they open it. */
+function ReceivedNotice() {
+  const t = useT();
+  const viewer = useApp((s) => s.viewer);
+  const unread = useApp((s) => s.notices.find((n) => n.to.id === s.viewer && !n.read));
+  const navigate = useApp((s) => s.navigate);
+  if (!unread || unread.to.id !== viewer) return null;
+  return (
+    <div
+      role="status"
+      data-testid="crew-notice"
+      className="mb-3 flex flex-wrap items-center gap-x-3 gap-y-2 rounded-xl border border-accent bg-panel p-3 text-sm print:hidden"
+    >
+      <StatusGlyph status={unread.overall} size={14} />
+      <p className="min-w-0 flex-1 basis-56">
+        {t('notice.crewReport', { from: `${unread.from.role} ${unread.from.name}`, n: unread.day })}{' '}
+        <span className="text-muted">
+          {t('report.crewOverall')}: {t(`status.${unread.overall}`)}
+        </span>
+      </p>
+      <button
+        type="button"
+        data-testid="crew-notice-open"
+        className="min-h-[44px] rounded-lg border border-accent bg-accent px-4 font-semibold text-bg hover:brightness-110"
+        onClick={() => navigate('/report?received=1')}
+      >
+        {t('notice.open')}
+      </button>
+    </div>
+  );
+}
 
 function isTyping(target: EventTarget | null): boolean {
   if (!(target instanceof HTMLElement)) return false;
@@ -105,7 +137,7 @@ function Header() {
       <div className="mx-auto flex max-w-[1500px] flex-wrap items-center gap-x-4 gap-y-2 px-3 py-2.5 sm:px-5">
         <NavLink to="/" className="flex items-baseline gap-2">
           <span className="font-display text-xl font-bold tracking-tight">
-            VITA<span className="text-accent">-L</span>
+            VITA<span className="text-accent">L</span>
           </span>
           <span className="hidden text-sm text-muted 2xl:inline">{t('app.tagline')}</span>
         </NavLink>
@@ -212,7 +244,15 @@ export function Layout() {
     useApp.getState().setNavigator((route) => navigate(route));
   }, [navigate]);
   useEffect(() => {
-    void useApp.getState().init();
+    // A link ending in ?tour opens straight into the guided walkthrough, for anyone who is
+    // sent the app without someone there to present it.
+    const tour = new URLSearchParams(window.location.search).has('tour') || /[?&]tour\b/.test(window.location.hash);
+    void useApp
+      .getState()
+      .init()
+      .then(() => {
+        if (tour && useApp.getState().bundle) useApp.setState({ presenter: { active: true, step: 0, auto: false } });
+      });
   }, []);
   useEffect(() => {
     document.documentElement.dataset.theme = night ? 'night' : 'day';
@@ -224,7 +264,7 @@ export function Layout() {
   if (loadError) {
     return (
       <div className="mx-auto max-w-lg p-8" role="alert">
-        <h1 className="font-display text-2xl font-bold">VITA-L</h1>
+        <h1 className="font-display text-2xl font-bold">VITAL</h1>
         <p className="mt-3 text-call">{t('app.loadError')}</p>
         <p className="mt-1 text-sm text-muted">{loadError}</p>
         <button type="button" className="mt-4 min-h-[44px] rounded-lg border border-line px-4" onClick={() => void useApp.getState().init()}>
@@ -250,6 +290,7 @@ export function Layout() {
       <div className="mx-auto max-w-[1500px] lg:flex lg:gap-5 lg:px-5 lg:pt-4">
         <Nav />
         <main id="main" className="min-w-0 flex-1 px-3 pt-1 sm:px-5 lg:px-0 lg:pt-0">
+          <ReceivedNotice />
           <Outlet />
         </main>
       </div>

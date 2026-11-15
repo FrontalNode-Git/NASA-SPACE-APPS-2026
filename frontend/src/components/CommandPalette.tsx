@@ -93,8 +93,11 @@ export function CommandPalette() {
   );
 }
 
+/** Toasts, and below them a notice that stays while entries are waiting to reach the server. */
 export function Toasts() {
+  const t = useT();
   const toasts = useApp((s) => s.toasts);
+  const pending = useApp((s) => s.pending);
   return (
     <div className="pointer-events-none fixed inset-x-0 bottom-20 z-50 flex flex-col items-center gap-2 px-3" role="status" aria-live="polite">
       {toasts.map((toast) => (
@@ -108,6 +111,21 @@ export function Toasts() {
           {toast.text}
         </div>
       ))}
+      {pending > 0 && (
+        <div
+          data-testid="outbox-notice"
+          className="pointer-events-auto flex items-center gap-3 rounded-lg border border-watch bg-panel py-1 pl-3 pr-1 text-sm font-semibold text-watch shadow-lg print:hidden"
+        >
+          <span>{t('outbox.waiting', { n: pending })}</span>
+          <button
+            type="button"
+            className="min-h-[44px] rounded-md border border-line px-3 text-ink hover:border-accent"
+            onClick={() => void useApp.getState().flushOutbox({ manual: true })}
+          >
+            {t('outbox.sendNow')}
+          </button>
+        </div>
+      )}
     </div>
   );
 }

@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { api, ApiError } from '../lib/api';
+import { isRetriable, newId } from '../lib/outbox';
 import { useApp, useT } from '../lib/store';
 import type { Dashboard, IndicatorView } from '../lib/types';
 import { Icon, indicatorIcon } from './Icon';
@@ -58,6 +59,12 @@ export function CheckIn({ dash }: { dash: Dashboard }) {
       setError(null);
       setRefused(null);
     } catch (err) {
+      if (isRetriable(err)) {
+        // Server not reached: keep the check-in on this device and send it when it answers.
+        useApp.getState().enqueue({ id: newId(), kind: 'readings', member: dash.member.id, day: dash.day, values });
+        setError(null);
+        return;
+      }
       // The server starts its sentence with the name of the vital it refused.
       const detail = err instanceof ApiError ? err.detail : null;
       const field = detail ? changed.find((v) => detail.startsWith(`${v.name}:`)) : undefined;

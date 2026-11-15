@@ -1,6 +1,6 @@
 # TODO
 
-Everything that is still open in VITA-L, by team. Tick an item when its "Done when" is true
+Everything that is still open in VITAL, by team. Tick an item when its "Done when" is true
 and the tests pass. How to run the app and the tests: [README.md](README.md).
 
 - **↔** means the item changes the JSON between the two halves. Whoever picks it up updates
@@ -21,7 +21,7 @@ The numbers quoted below were measured on the current code on 14 November.
 ## Backend
 
 Code: [backend/app/](backend/app/) · tests: [backend/tests/](backend/tests/) · run
-`python -m pytest` in `backend/` (56 tests pass today).
+`python -m pytest` in `backend/` (63 tests pass today).
 
 ### Small
 
@@ -151,7 +151,7 @@ Code: [backend/app/](backend/app/) · tests: [backend/tests/](backend/tests/) ·
 ## Frontend
 
 Code: [frontend/src/](frontend/src/) · run `npm run typecheck`, `npm test` and
-`npm run build` in `frontend/` (28 unit tests and 50 end-to-end checks pass today).
+`npm run build` in `frontend/` (34 unit tests and 59 end-to-end checks pass today).
 
 ### Small
 
@@ -192,10 +192,9 @@ Code: [frontend/src/](frontend/src/) · run `npm run typecheck`, `npm test` and
   the browser history. *Where:* `reportHtmlUrl` in
   [frontend/src/lib/api.ts](frontend/src/lib/api.ts) and
   [frontend/src/pages/Report.tsx](frontend/src/pages/Report.tsx).
-- [ ] **Show "Saved" after the server has answered**
-  Quick log and "I'm OK" show their confirmation first and call the server afterwards
-  (`log` in [frontend/src/lib/store.ts](frontend/src/lib/store.ts)). If the call fails, a
-  second message corrects the first.
+- [x] **Show "Saved" after the server has answered**
+  Done on 15 November: `log` in [frontend/src/lib/store.ts](frontend/src/lib/store.ts) confirms only
+  after the server has accepted the entry.
 
 ### Larger
 
@@ -209,10 +208,13 @@ Code: [frontend/src/](frontend/src/) · run `npm run typecheck`, `npm test` and
 - [ ] **Follow the mission clock** ↔
   The day stepper moves to any day from 0 to 1,095, including days that have not happened.
   Once the server has a clock, open on "today" and keep free movement for the demo only.
-- [ ] **Keep entries when the server cannot be reached**
-  A check-in that fails to save is lost; the crew member only sees a message.
-  *Done when:* unsent entries are kept in the browser and sent when the server answers again,
-  and the screen shows that they are waiting.
+- [x] **Keep entries when the server cannot be reached**
+  Done on 15 November: quick logs, "I'm OK" and check-ins that do not reach the server are kept
+  in the browser ([frontend/src/lib/outbox.ts](frontend/src/lib/outbox.ts)), shown as "Waiting to
+  send" above the bottom bar, and sent again in order (every 15 seconds, when the browser comes
+  back online, or with *Send now*). Still open: if the server saved an entry but its answer was
+  lost, the retry saves it twice. Fixing that needs an entry id the server can recognise (a
+  backend change).
 - [ ] **Make the first load lighter**
   The main script is 761 kB (254 kB compressed). The 3D body scan is already loaded
   separately (848 kB, only when shown). The build's size warning was raised to 1,200 kB in
@@ -233,19 +235,18 @@ Code: [frontend/src/](frontend/src/) · run `npm run typecheck`, `npm test` and
 - [ ] **Replace the NASA API key.** The key was committed inside `.gitignore` and is on
   GitHub in the current `develop` and in the history. Request a new key at api.nasa.gov,
   keep it only in `backend/.env` (ignored by git), and treat the old one as public.
-- [ ] **Choose where the app is hosted.** The Docker files and the deploy workflow were
-  removed, so there is no way to deploy yet. Any host that can run
+- [ ] **Choose where the app is hosted.** Needed now: the app is to be sent as a link, not
+  presented live (decided on 15 November). The link to send is the address with `?tour`
+  added. The Docker files and the deploy workflow were removed, so there is no way to deploy yet. Any host that can run
   `pip install -r backend/requirements.txt`, build the frontend and start
   `uvicorn app.main:app` as a single process will do. Until then the demo runs from a laptop.
 - [ ] **Write the missing documents.** `docs/API.md` (mentioned in
   [frontend/src/lib/api.ts](frontend/src/lib/api.ts) and the contract test) and
   `docs/RESEARCH_GUIDE.md` (mentioned in [docs/PENDING.md](docs/PENDING.md)) do not exist.
-  Neither do `backend/README.md`, `frontend/README.md`, `SUBMISSION.md` or `audit/AUDIT.md`
-  (`audit/` is an empty folder, which git does not keep).
-- [ ] **Decide what to do with the coverage table.**
-  [backend/scripts/export_coverage.py](backend/scripts/export_coverage.py) writes a table of
-  NASA risks into the README between two markers. The README has no such markers, so the
-  script fails. Add the block to the README or delete the script.
+  Neither do `backend/README.md`, `frontend/README.md` or `SUBMISSION.md`.
+- [x] **Decide what to do with the coverage table.**
+  Done on 15 November: `backend/scripts/export_coverage.py` was deleted. It wrote a risk table
+  into README markers that do not exist, for a screen that was removed.
 - [ ] **Fill the three *Pending* places** on the Mission screen (communication delay,
   radiation dose rate, pressurized rover). Each needs a sourced fact; see
   [docs/PENDING.md](docs/PENDING.md).
