@@ -45,13 +45,13 @@ builds the interface when it is missing or out of date, starts the server and op
 **http://localhost:7860**. The first run takes a few minutes and needs internet; later runs
 take seconds. `Ctrl+C` stops it.
 
-| Option | What it does |
-|---|---|
-| `--tour` | Opens straight into the guided walkthrough |
-| `--build` | Rebuilds the interface first, even if it looks up to date |
-| `--port 8000` | Uses another port |
-| `--lan` | Also reachable from other devices on the same Wi-Fi |
-| `--no-open` | Does not open the browser |
+| Option          | What it does                                              |
+| --------------- | --------------------------------------------------------- |
+| `--tour`      | Opens straight into the guided walkthrough                |
+| `--build`     | Rebuilds the interface first, even if it looks up to date |
+| `--port 8000` | Uses another port                                         |
+| `--lan`       | Also reachable from other devices on the same Wi-Fi       |
+| `--no-open`   | Does not open the browser                                 |
 
 If Python is installed somewhere unusual, set `VITAL_PYTHON` to the full path of `python`.
 The three steps below do the same by hand.
@@ -99,10 +99,10 @@ Leave the terminal open while you use the app. `Ctrl+C` stops it.
 
 ## View it
 
-| Where | What you see |
-|---|---|
-| http://localhost:7860 | The app |
-| http://localhost:7860/api/v1/docs | Every API route, with a "Try it out" button |
+| Where                               | What you see                                        |
+| ----------------------------------- | --------------------------------------------------- |
+| http://localhost:7860               | The app                                             |
+| http://localhost:7860/api/v1/docs   | Every API route, with a "Try it out" button         |
 | http://localhost:7860/api/v1/health | `{"status":"ok", ...}` when the server is healthy |
 
 ### A two-minute look around
@@ -141,12 +141,12 @@ from a device on the same Wi-Fi. Your firewall may ask for permission the first 
 
 The repository is split so that each person only needs their own half.
 
-| Folder | What lives there | You need |
-|---|---|---|
-| [backend/](backend/) | FastAPI service: baseline and drift maths, check-ins, crew privacy, report | Python |
-| [frontend/](frontend/) | React + TypeScript interface | Node.js |
-| [data/](data/) | The content both halves read (`sources/` and `app/model.json`) | a text editor |
-| [docs/](docs/) | The list of sources behind every health statement | — |
+| Folder                | What lives there                                                           | You need      |
+| --------------------- | -------------------------------------------------------------------------- | ------------- |
+| [backend/](backend/)   | FastAPI service: baseline and drift maths, check-ins, crew privacy, report | Python        |
+| [frontend/](frontend/) | React + TypeScript interface                                               | Node.js       |
+| [data/](data/)         | The content both halves read (`sources/` and `app/model.json`)         | a text editor |
+| [docs/](docs/)         | The list of sources behind every health statement                          | —            |
 
 The two halves meet in one place: the JSON the API returns. Its shape is pinned by
 [backend/tests/test_contract.py](backend/tests/test_contract.py) and mirrored in
@@ -213,19 +213,17 @@ The same checks run on every push, in [.github/workflows/ci.yml](.github/workflo
 
 ## If something looks wrong
 
-| You see | Cause | Fix |
-|---|---|---|
-| `{"detail":"Not Found"}` at http://localhost:7860 | The interface was not built when the server started | `npm run build` in `frontend/`, then restart the server |
-| "VITAL could not reach its data service." | The server is not running | Start it (step 2) and press *Try again* |
-| Old screens after a frontend change | You are looking at the last build | `npm run build` again, or use `npm run dev` |
-| `address already in use` | Something else is on port 7860 | Stop it, or pick another `--port` (for `npm run dev`, set `API_TARGET=http://127.0.0.1:<port>` to match) |
-| Numbers that make no sense after experimenting | Entries you typed earlier are still stored | *Reset demo* |
+| You see                                             | Cause                                               | Fix                                                                                                            |
+| --------------------------------------------------- | --------------------------------------------------- | -------------------------------------------------------------------------------------------------------------- |
+| `{"detail":"Not Found"}` at http://localhost:7860 | The interface was not built when the server started | `npm run build` in `frontend/`, then restart the server                                                    |
+| "VITAL could not reach its data service."           | The server is not running                           | Start it (step 2) and press *Try again*                                                                      |
+| Old screens after a frontend change                 | You are looking at the last build                   | `npm run build` again, or use `npm run dev`                                                                |
+| `address already in use`                          | Something else is on port 7860                      | Stop it, or pick another `--port` (for `npm run dev`, set `API_TARGET=http://127.0.0.1:<port>` to match) |
+| Numbers that make no sense after experimenting      | Entries you typed earlier are still stored          | *Reset demo*                                                                                                 |
 
 ## Use of AI
 
-We used Claude (Anthropic) as an assistant for coding, design and fact-checking. The team chose the
-challenge, the concept, the indicators and the sources, and reviewed every change. All health content
-comes from NASA and Canadian Space Agency pages (see [docs/SOURCES.txt](docs/SOURCES.txt)), not from AI.
+We used Claude (Anthropic) as an assistant for coding, debugging and fact-checking. The team chose the challenge, the concept, the indicators and the sources. Each change was reviewed by our team. All health content comes from NASA and Canadian Space Agency pages (see [docs/SOURCES.txt](docs/SOURCES.txt)), not from AI.
 
 ## Credits
 
