@@ -25,6 +25,17 @@ Code: [backend/app/](backend/app/) · tests: [backend/tests/](backend/tests/) ·
 
 ### Small
 
+- [ ] **Follow the new crew names (15 November)**
+  The four crew roles now carry the team's names in [data/app/model.json](data/app/model.json):
+  S. Sinnis (Commander), R. Falelaki (Chief Medical Officer), P. Kotsomitopoulos (Systems
+  Officer), G. Kiousopoulos (Flight Engineer). Two things in the backend still assume the old ones.
+  *Failing test:* line 77 of [backend/tests/test_crew_report.py](backend/tests/test_crew_report.py)
+  looks for `"M. Ruiz"` in the printable crew report. Change it to `"G. Kiousopoulos"`, or
+  better, read the name from the crew list so it cannot go stale again.
+  *Wording:* the report disclaimers and banner in [backend/app/report.py](backend/app/report.py)
+  say "fictional crew" and "fictional crew member". With real names on screen that is no
+  longer true; "simulated data" is. The README and the presenter guide were already reworded.
+  *Done when:* `python -m pytest` passes again and no report text calls the crew fictional.
 - [ ] **Ask "who is looking?" on every crew-member route** ↔
   The dashboard and crew routes hide mood and notes from everyone but their owner. The report
   and calibration routes never ask: `GET /api/v1/members/engineer/report` returns the
@@ -151,7 +162,7 @@ Code: [backend/app/](backend/app/) · tests: [backend/tests/](backend/tests/) ·
 ## Frontend
 
 Code: [frontend/src/](frontend/src/) · run `npm run typecheck`, `npm test` and
-`npm run build` in `frontend/` (34 unit tests and 59 end-to-end checks pass today).
+`npm run build` in `frontend/` (34 unit tests and 60 end-to-end checks pass today).
 
 ### Small
 
@@ -161,15 +172,22 @@ Code: [frontend/src/](frontend/src/) · run `npm run typecheck`, `npm test` and
   check-in is one row of fields on a laptop and two per row on a phone; the dashboard says
   at the top which reading is off and why; the report shows one block per indicator on a
   phone. What still looks wrong is in the next two items.
-- [ ] **Show that the screen tabs scroll sideways on a phone**
-  At 390 px the tab strip under the header ends in the middle of "Mission timeline". Report,
-  Calibrate and Optional modules are reached by swiping, and nothing on screen says so.
-  *Where:* `Nav` in [frontend/src/components/Layout.tsx](frontend/src/components/Layout.tsx).
-  *Done when:* a phone user can see that there are more tabs, or all six fit.
-- [ ] **Phase names are cut off on the phone mission bar**
-  At 390 px the bar under the mission slider shows "Transi…" and "Return …".
-  *Where:* [frontend/src/components/MissionScrubber.tsx](frontend/src/components/MissionScrubber.tsx).
-  *Done when:* each phase name can be read at phone width.
+- [x] **Show that the screen tabs scroll sideways on a phone**
+  Done on 15 November: on a phone the six tabs are two rows of three with their full names.
+- [x] **Phase names are cut off on the phone mission bar**
+  Done on 15 November: the bar shows the phase lengths to scale and the names sit under it,
+  each with its day range.
+- [x] **UI pass of 15 November**
+  Decided by the team lead, one item at a time: *Planned next* replaces the Optional modules
+  and Pending wording; one legend above the charts; plain words for the drift checks (method
+  names on hover); check-in mood waits for *Save check-in*; a simulated mood is labelled
+  "simulated", not "sensor"; on a phone the vitals are compact rows that open on a tap, ahead
+  of the body scan; "Simulated data" no longer repeats in the member panel; a Mission sentence
+  appears once; the laptop columns end together; the calibration steps read as progress; the
+  night toggle is a moon / sun icon; an animated particle background replaces the grid; the
+  body scan has a fuller skeleton and a vessel tree.
+  Still open from it: the mood source label is decided in the frontend because the server
+  reports a simulated mood as `sensor` (a backend change would be cleaner).
 - [x] **Say which check-in value was refused**
   Done on 14 November: `request()` in [frontend/src/lib/api.ts](frontend/src/lib/api.ts) keeps
   the server's sentence (`ApiError.detail`), and
@@ -183,10 +201,9 @@ Code: [frontend/src/](frontend/src/) · run `npm run typecheck`, `npm test` and
   [frontend/src/lib/types.ts](frontend/src/lib/types.ts) still describes `Study`, `Coverage`,
   `CoverageRow`, `PendingItem` and `Feature`, and the bundle fields `research`, `coverage`,
   `features`, `slots` and `pending`. Do it together with "Send less in the content bundle".
-- [ ] **Decide where Presenter mode and the Judge drawer live**
-  Both are buttons in the main header of a tool meant for a crew.
-  *Done when:* the team has decided whether they stay visible, move behind a key or a link
-  such as `?demo`, or go after judging. Keys `P` and `J` already open them.
+- [x] **Decide where Presenter mode and the Judge drawer live**
+  Done on 15 November: their header buttons show only on a `?tour` or `?demo` link. Keys `P`
+  and `J`, and Find, open them from a plain link.
 - [ ] **Keep the session id out of the address bar**
   The printable report is opened with `?session=...` in its address, so the id ends up in
   the browser history. *Where:* `reportHtmlUrl` in

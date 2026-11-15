@@ -3,10 +3,10 @@ import { Link, useSearchParams } from 'react-router-dom';
 import { Attention } from '../components/Attention';
 import { BodyPanel } from '../components/BodyPanel';
 import { CheckIn } from '../components/CheckIn';
-import { IndicatorCard } from '../components/IndicatorCard';
+import { ChartLegend, IndicatorCard } from '../components/IndicatorCard';
 import { LensBar } from '../components/LensBar';
 import { StatusBadge } from '../components/StatusGlyph';
-import { Button, LockIcon, Panel, ProvisionalTag, SimulatedTag } from '../components/ui';
+import { Button, LockIcon, Panel, ProvisionalTag } from '../components/ui';
 import { useApp, useT } from '../lib/store';
 import type { LogEntry } from '../lib/types';
 
@@ -73,10 +73,12 @@ export function Dashboard() {
                 : t('dash.noCheckin')}
             </p>
           </div>
-          <div className="ml-auto flex flex-wrap items-center gap-2">
-            <SimulatedTag />
-            {dash.method_status === 'provisional' && <ProvisionalTag />}
-          </div>
+          {/* "Simulated data" is already in the header and under every check-in field. */}
+          {dash.method_status === 'provisional' && (
+            <div className="ml-auto">
+              <ProvisionalTag />
+            </div>
+          )}
         </div>
         {dash.day >= 1 && <Attention dash={dash} onJump={jump} />}
         {dash.acknowledged && (
@@ -105,10 +107,12 @@ export function Dashboard() {
 
       <LensBar />
 
+      {/* Stacked (phone, tablet): the vitals come first. Side by side (laptop): body scan on the
+          left, and the notes panel stretches so both columns end together. */}
       <div className="grid gap-4 xl:grid-cols-[minmax(0,5fr)_minmax(0,7fr)]">
-        <div className="space-y-4">
+        <div className="order-2 flex flex-col gap-4 xl:order-1">
           <BodyPanel />
-          <Panel title={t('dash.notes')}>
+          <Panel title={t('dash.notes')} className="xl:flex-1">
             {dash.logs_locked ? (
               <div className="flex items-start gap-2 text-sm text-muted" data-testid="notes-locked">
                 <LockIcon />
@@ -135,7 +139,10 @@ export function Dashboard() {
             )}
           </Panel>
         </div>
-        <div className="grid content-start gap-4 md:grid-cols-2" data-testid="indicator-grid">
+        <div className="order-1 grid content-start gap-4 md:grid-cols-2 xl:order-2" data-testid="indicator-grid">
+          <div className="md:col-span-2">
+            <ChartLegend />
+          </div>
           {dash.indicators.map((view) => (
             <IndicatorCard key={view.id} view={view} highlight={focus === view.id || jumped === view.id} />
           ))}

@@ -275,35 +275,159 @@ function organ(out: Points, structure: string, c: V3, r: V3, slice: number, step
   }
 }
 
-function inside(out: Points) {
-  // Spine: a gentle S from the base of the skull to the pelvis.
-  for (let y = 1.3; y >= 0.02; y -= 0.043) {
+/** A single file of particles along a smooth curve through `points`: a vessel, a rib tip, a finger. */
+function strand(out: Points, structure: string, points: V3[], step = 0.018) {
+  const at = (i: number): V3 => points[Math.max(0, Math.min(points.length - 1, i))]!;
+  for (let seg = 0; seg < points.length - 1; seg++) {
+    const [p0, p1, p2, p3] = [at(seg - 1), at(seg), at(seg + 1), at(seg + 2)];
+    const n = Math.max(1, Math.round(Math.hypot(p2[0] - p1[0], p2[1] - p1[1], p2[2] - p1[2]) / step));
+    for (let i = 0; i < n; i++) {
+      const t = i / n;
+      // Catmull-Rom: passes through every point and bends gently between them.
+      const c = (k: 0 | 1 | 2) =>
+        0.5 * (2 * p1[k] + (p2[k] - p0[k]) * t + (2 * p0[k] - 5 * p1[k] + 4 * p2[k] - p3[k]) * t * t + (3 * p1[k] - p0[k] - 3 * p2[k] + p3[k]) * t * t * t);
+      push(out, INSIDE, structure, c(0), c(1), c(2), 0, 0, 1);
+    }
+  }
+  const last = at(points.length - 1);
+  push(out, INSIDE, structure, last[0], last[1], last[2], 0, 0, 1);
+}
+
+/** The skeleton: spine, ribcage, skull, girdles, the long bones in pairs, hands and feet. */
+function skeleton(out: Points) {
+  // Spine: a gentle S from the base of the skull to the pelvis. Each vertebra is a ring with
+  // a short spur pointing back; the gaps between them are the discs.
+  for (let y = 1.34; y >= 0.02; y -= 0.043) {
     const z = -0.085 + 0.03 * Math.sin((y - 0.1) * 3.4);
-    ring(out, INSIDE, 'bones', [0, y, z], 0.036, 0.03, 0.02);
+    const wide = y > 1.12 ? 0.026 : 0.036; // the neck is slimmer
+    ring(out, INSIDE, 'bones', [0, y, z], wide, wide * 0.85, 0.02);
+    for (let k = 1; k <= 3; k++) push(out, INSIDE, 'bones', 0, y - k * 0.006, z - wide - k * 0.014, 0, 0, -1);
   }
-  // Ribs: open at the front below the breastbone, sloping down from the spine.
-  for (let i = 0; i < 8; i++) {
-    const y = 1.06 - i * 0.068;
-    const width = 0.2 + 0.11 * Math.sin(((i + 1.2) / 8.6) * Math.PI);
-    const gap = i < 5 ? 0.12 : 0.3 + (i - 5) * 0.16; // radians left open at the front
-    ring(out, INSIDE, 'bones', [0, y, -0.005], width, 0.145, 0.019, { from: Math.PI / 2 + gap, to: Math.PI * 2.5 - gap, drop: 0.07 });
+  // Twelve pairs of ribs: open at the front below the breastbone, sloping down from the spine.
+  for (let i = 0; i < 12; i++) {
+    const y = 1.08 - i * 0.047;
+    const width = 0.19 + 0.12 * Math.sin(((i + 1.4) / 12.6) * Math.PI);
+    const gap = i < 7 ? 0.12 : i < 10 ? 0.34 + (i - 7) * 0.2 : 1.25 + (i - 10) * 0.3; // the last two float free
+    ring(out, INSIDE, 'bones', [0, y, -0.005], width, 0.145, 0.018, { from: Math.PI / 2 + gap, to: Math.PI * 2.5 - gap, drop: 0.075 });
   }
-  for (let y = 1.02; y >= 0.72; y -= 0.03) push(out, INSIDE, 'bones', 0, y - 0.07, 0.14, 0, 0, 1); // breastbone
-  // Collarbones, pelvis and the long bones of the limbs.
+  for (let y = 1.03; y >= 0.7; y -= 0.022) {
+    for (const x of [-0.012, 0.012]) push(out, INSIDE, 'bones', x, y - 0.07, 0.14, 0, 0, 1); // breastbone
+  }
+
+  // Skull: the dome in thin slices, the eye sockets, the cheekbones and the jaw.
+  for (let y = 1.6; y <= 1.8; y += 0.05) {
+    const s = Math.sqrt(Math.max(0, 1 - ((y - 1.6) / 0.225) ** 2));
+    ring(out, INSIDE, 'bones', [0, y, -0.005], 0.175 * s, 0.2 * s, 0.03);
+  }
+  ring(out, INSIDE, 'bones', [0, 1.53, 0], 0.172, 0.195, 0.03, { from: Math.PI * 0.72, to: Math.PI * 2.28 }); // back of the head
   for (const s of [1, -1] as const) {
+    // Eye socket: a circle facing forward.
+    const socket = Array.from({ length: 11 }, (_, k): V3 => {
+      const a = (k / 10) * Math.PI * 2;
+      return [s * 0.075 + 0.046 * Math.cos(a), 1.555 + 0.042 * Math.sin(a), 0.172];
+    });
+    strand(out, 'bones', socket, 0.016);
+    strand(out, 'bones', [[s * 0.05, 1.5, 0.19], [s * 0.12, 1.49, 0.16], [s * 0.17, 1.5, 0.07]], 0.02); // cheekbone
+    strand(out, 'bones', [[s * 0.17, 1.5, 0.02], [s * 0.15, 1.39, 0.03], [s * 0.1, 1.345, 0.11], [0, 1.325, 0.16]], 0.019); // jaw
+  }
+  strand(out, 'bones', [[-0.07, 1.4, 0.17], [0, 1.395, 0.185], [0.07, 1.4, 0.17]], 0.014); // teeth line
+
+  for (const s of [1, -1] as const) {
+    // Shoulder girdle: collarbone, and the shoulder blade as a triangle on the back.
     bone(out, [s * 0.04, 1.13, 0.1], [s * 0.42, 1.12, 0.02], 0.014);
-    bone(out, [s * 0.45, 1.06, 0], [s * 0.58, 0.59, -0.01], 0.022);
-    bone(out, [s * 0.59, 0.55, -0.01], [s * 0.67, 0.14, 0.045], 0.016);
-    bone(out, [s * 0.16, -0.03, 0], [s * 0.2, -0.86, 0], 0.03);
-    bone(out, [s * 0.2, -0.94, 0], [s * 0.2, -1.66, -0.01], 0.024);
-    organ(out, 'bones', [s * 0.2, -0.9, 0.03], [0.045, 0.045, 0.045], 0.024, 0.022); // kneecap
+    const blade: V3[] = [[s * 0.42, 1.1, -0.1], [s * 0.15, 1.06, -0.15], [s * 0.2, 0.74, -0.16], [s * 0.42, 1.1, -0.1]];
+    strand(out, 'bones', blade, 0.02);
+    strand(out, 'bones', [[s * 0.4, 1.04, -0.12], [s * 0.2, 0.98, -0.16]], 0.02); // its ridge
+    organ(out, 'bones', [s * 0.45, 1.07, 0], [0.04, 0.04, 0.04], 0.024, 0.022); // ball of the shoulder
+
+    // Arm: one bone above the elbow, two below, then the wrist and the hand.
+    bone(out, [s * 0.45, 1.04, 0], [s * 0.58, 0.6, -0.01], 0.022);
+    organ(out, 'bones', [s * 0.585, 0.57, -0.01], [0.032, 0.03, 0.032], 0.02, 0.02); // elbow
+    bone(out, [s * 0.575, 0.54, 0.005], [s * 0.655, 0.15, 0.06], 0.011);
+    bone(out, [s * 0.6, 0.54, -0.025], [s * 0.69, 0.15, 0.035], 0.011);
+    ring(out, INSIDE, 'bones', [s * 0.682, 0.115, 0.05], 0.034, 0.018, 0.014); // wrist
+    for (let f = 0; f < 4; f++) {
+      const z = 0.035 + f * 0.018;
+      strand(out, 'bones', [[s * 0.688, 0.09, z + 0.01], [s * 0.7, 0.0, z + 0.016], [s * 0.705, -0.075 - (f === 1 ? 0.012 : 0) + (f === 3 ? 0.022 : 0), z + 0.012]], 0.015);
+    }
+    strand(out, 'bones', [[s * 0.672, 0.09, 0.07], [s * 0.655, 0.035, 0.085], [s * 0.648, -0.02, 0.09]], 0.015); // thumb
+
+    // Leg: the hip joint, thigh bone, kneecap, shin and the thinner bone beside it, the foot.
+    organ(out, 'bones', [s * 0.17, -0.02, 0], [0.045, 0.045, 0.045], 0.024, 0.022); // head of the thigh bone
+    bone(out, [s * 0.17, -0.05, 0], [s * 0.2, -0.86, 0], 0.03);
+    organ(out, 'bones', [s * 0.2, -0.9, 0.035], [0.045, 0.045, 0.04], 0.024, 0.022); // kneecap
+    bone(out, [s * 0.19, -0.95, 0.01], [s * 0.19, -1.66, 0], 0.022);
+    bone(out, [s * 0.235, -0.97, -0.02], [s * 0.225, -1.66, -0.02], 0.01);
+    organ(out, 'bones', [s * 0.2, -1.73, -0.03], [0.04, 0.04, 0.045], 0.022, 0.02); // heel
+    for (let f = 0; f < 5; f++) {
+      const x = s * (0.15 + f * 0.024);
+      strand(out, 'bones', [[s * 0.2, -1.715, 0.01], [x, -1.755, 0.1], [x, -1.775, 0.2 - f * 0.012]], 0.016);
+    }
+
+    // Pelvis: the wing on each side, curving round to the back.
+    strand(out, 'bones', [[s * 0.03, 0.02, -0.11], [s * 0.2, 0.17, -0.1], [s * 0.3, 0.2, -0.01], [s * 0.26, 0.12, 0.1], [s * 0.16, 0.02, 0.1], [s * 0.03, -0.07, 0.11]], 0.018);
+    strand(out, 'bones', [[s * 0.06, -0.08, 0.09], [s * 0.13, -0.16, 0.03], [s * 0.08, -0.2, -0.04], [s * 0.03, -0.1, -0.06]], 0.018); // sitting bone
   }
   ring(out, INSIDE, 'bones', [0, 0.16, -0.02], 0.25, 0.13, 0.019, { drop: 0.1 });
   ring(out, INSIDE, 'bones', [0, 0.02, -0.01], 0.17, 0.1, 0.019, { drop: 0.05 });
+  for (let y = 0.0; y >= -0.14; y -= 0.022) ring(out, INSIDE, 'bones', [0, y, -0.1 + (0 - y) * 0.15], 0.05 + y * 0.25, 0.02, 0.02); // sacrum, tapering to the tailbone
+}
 
+/**
+ * The heart and blood vessels: one zone in the app, so they light together. Arteries run from
+ * the arch above the heart; a vein follows each one a little apart. Illustration only.
+ */
+function vessels(out: Points) {
+  organ(out, 'heart', [0.06, 0.93, 0.05], [0.085, 0.1, 0.07], 0.022, 0.018);
+  /** An artery on side `s` and the vein that follows it, `apart` further out. */
+  const both = (s: 1 | -1, artery: V3[], apart: V3 = [0.022, 0, -0.02]) => {
+    strand(out, 'heart', artery);
+    strand(out, 'heart', artery.map(([x, y, z]) => [x + s * apart[0], y + apart[1], z + apart[2]] as V3), 0.024);
+  };
+
+  // The arch over the heart, then the trunk down the front of the spine.
+  strand(out, 'heart', [[0.05, 1.0, 0.04], [0.03, 1.09, 0.02], [-0.03, 1.1, -0.02], [-0.035, 1.0, -0.045], [-0.03, 0.6, -0.04], [-0.025, 0.2, -0.045]]);
+  strand(out, 'heart', [[0.045, 0.2, -0.04], [0.05, 0.6, -0.03], [0.075, 0.86, 0.0], [0.08, 1.0, 0.02], [0.07, 1.12, 0.02]], 0.024); // the great vein beside it
+  // To each lung: a short tree of branches.
+  for (const s of [1, -1] as const) {
+    const root: V3 = [s * 0.06, 0.97, 0.03];
+    for (const [dx, dy, dz] of [[0.19, 0.1, 0.0], [0.23, 0.0, 0.02], [0.2, -0.11, 0.0], [0.13, -0.19, 0.03]] as const) {
+      strand(out, 'heart', [root, [s * (0.06 + dx * 0.55), 0.97 + dy * 0.45, 0.03 + dz], [s * (0.06 + dx), 0.97 + dy, 0.03 + dz]], 0.02);
+    }
+  }
+  // Branches in the belly: to the kidneys and the gut.
+  for (const s of [1, -1] as const) {
+    strand(out, 'heart', [[-0.03, 0.5, -0.04], [s * 0.1, 0.49, -0.06], [s * 0.17, 0.52, -0.07]], 0.02);
+    strand(out, 'heart', [[-0.03, 0.4, -0.04], [s * 0.06, 0.34, 0.03], [s * 0.13, 0.28, 0.06]], 0.02);
+  }
+
+  for (const s of [1, -1] as const) {
+    // Neck and head: up beside the windpipe, then over the temple and across the scalp.
+    both(s, [[s * 0.02, 1.1, 0.0], [s * 0.06, 1.2, 0.02], [s * 0.07, 1.36, 0.03], [s * 0.11, 1.47, 0.07], [s * 0.15, 1.58, 0.09], [s * 0.13, 1.72, 0.06], [s * 0.06, 1.8, 0.0]]);
+    strand(out, 'heart', [[s * 0.11, 1.47, 0.07], [s * 0.09, 1.52, 0.17], [s * 0.04, 1.6, 0.2]], 0.02); // to the face
+    strand(out, 'heart', [[s * 0.15, 1.58, 0.09], [s * 0.17, 1.62, -0.04], [s * 0.12, 1.66, -0.15]], 0.02); // behind the ear
+
+    // Arm: under the collarbone, down the inside of the arm, forking at the elbow, into the palm.
+    both(s, [[s * 0.03, 1.09, 0.0], [s * 0.2, 1.1, 0.03], [s * 0.4, 1.04, 0.03], [s * 0.5, 0.82, 0.03], [s * 0.565, 0.58, 0.035]]);
+    both(s, [[s * 0.565, 0.58, 0.035], [s * 0.6, 0.4, 0.05], [s * 0.645, 0.15, 0.085], [s * 0.675, 0.05, 0.09]], [0.016, 0, -0.012]);
+    strand(out, 'heart', [[s * 0.565, 0.58, 0.035], [s * 0.63, 0.4, 0.02], [s * 0.69, 0.15, 0.03], [s * 0.705, 0.05, 0.05]], 0.02);
+    strand(out, 'heart', [[s * 0.675, 0.05, 0.09], [s * 0.69, 0.01, 0.075], [s * 0.705, 0.05, 0.05]], 0.016); // arch in the palm
+    for (let f = 0; f < 4; f++) strand(out, 'heart', [[s * 0.692, 0.012, 0.05 + f * 0.016], [s * 0.708, -0.07, 0.048 + f * 0.017]], 0.018);
+
+    // Leg: out over the pelvis, down the thigh, behind the knee, forking to the foot.
+    both(s, [[-0.025, 0.2, -0.045], [s * 0.08, 0.1, -0.02], [s * 0.15, -0.04, 0.05], [s * 0.16, -0.4, 0.06], [s * 0.18, -0.75, 0.0], [s * 0.2, -0.93, -0.06]]);
+    both(s, [[s * 0.2, -0.93, -0.06], [s * 0.21, -1.15, -0.05], [s * 0.2, -1.5, -0.03], [s * 0.19, -1.7, -0.02]], [0.016, 0, 0.016]);
+    strand(out, 'heart', [[s * 0.2, -0.98, -0.05], [s * 0.18, -1.2, 0.04], [s * 0.185, -1.55, 0.045], [s * 0.19, -1.72, 0.07], [s * 0.19, -1.76, 0.18]], 0.02);
+    strand(out, 'heart', [[s * 0.16, -0.12, 0.05], [s * 0.26, -0.3, 0.04], [s * 0.27, -0.5, 0.0]], 0.02); // branch round the thigh
+    strand(out, 'heart', [[s * 0.15, -1.75, 0.15], [s * 0.19, -1.74, 0.17], [s * 0.24, -1.755, 0.14]], 0.016); // arch over the foot
+  }
+}
+
+function inside(out: Points) {
+  skeleton(out);
+  vessels(out);
   organ(out, 'brain', [0, 1.63, -0.01], [0.14, 0.125, 0.165], 0.03, 0.022, 0.05);
   for (const s of [1, -1]) organ(out, 'eyes', [s * 0.075, 1.555, 0.165], [0.03, 0.03, 0.03], 0.015, 0.016);
-  organ(out, 'heart', [0.06, 0.93, 0.05], [0.085, 0.1, 0.07], 0.022, 0.018);
   organ(out, 'gut', [0, 0.31, 0.035], [0.17, 0.16, 0.09], 0.036, 0.019, 0.09);
 }
 

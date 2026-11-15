@@ -33,22 +33,12 @@ html {
   background: rgb(var(--bg));
 }
 
-/* The page sits on a faint engineering grid: a fine one, with a stronger line every fifth
-   cell. The lines use the border colour, so night mode follows. Panels stay solid on top. */
+/* The page colour is on <html>. <body> stays transparent so the animated particle field
+   (components/ParticleField.tsx), which is drawn behind everything, shows between the panels.
+   Panels stay solid on top. */
 body {
-  @apply bg-bg font-sans text-ink antialiased;
+  @apply font-sans text-ink antialiased;
   margin: 0;
-  background-image:
-    linear-gradient(rgb(var(--border) / 0.34) 1px, transparent 1px),
-    linear-gradient(90deg, rgb(var(--border) / 0.34) 1px, transparent 1px),
-    linear-gradient(rgb(var(--border) / 0.15) 1px, transparent 1px),
-    linear-gradient(90deg, rgb(var(--border) / 0.15) 1px, transparent 1px);
-  background-size:
-    120px 120px,
-    120px 120px,
-    24px 24px,
-    24px 24px;
-  background-position: -1px -1px;
 }
 
 /* The body scan stands on a finer grid that fades towards the edges. */

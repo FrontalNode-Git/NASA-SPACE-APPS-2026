@@ -111,16 +111,29 @@ export function Calibrate() {
         </div>
       </PageHeader>
 
-      <ol className="mb-4 flex flex-wrap gap-2 text-sm" aria-label={t('cal.steps')}>
-        {[1, 2, 3].map((n) => (
-          <li
-            key={n}
-            aria-current={step === n ? 'step' : undefined}
-            className={`rounded-full border px-3 py-1 ${step === n ? 'border-accent text-accent' : 'border-line text-muted'}`}
-          >
-            {n}. {t(`cal.step${n}`)}
-          </li>
-        ))}
+      {/* Progress, not buttons: done steps are ticked, the current one is filled, the rest wait. */}
+      <ol className="mb-4 flex max-w-2xl items-center gap-2 text-sm" aria-label={t('cal.steps')} data-testid="cal-steps">
+        {[1, 2, 3].map((n) => {
+          const state = n < step ? 'done' : n === step ? 'current' : 'todo';
+          const dot =
+            state === 'done'
+              ? 'border-nominal bg-nominal/15 text-nominal'
+              : state === 'current'
+                ? 'border-accent bg-accent text-bg'
+                : 'border-line text-muted';
+          return (
+            <li key={n} aria-current={state === 'current' ? 'step' : undefined} data-state={state} className="flex min-w-0 flex-1 items-center gap-2 last:flex-none">
+              <span className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full border text-xs font-bold ${dot}`} aria-hidden="true">
+                {state === 'done' ? '✓' : n}
+              </span>
+              <span className={`whitespace-nowrap ${state === 'current' ? 'font-semibold text-ink' : 'hidden text-muted sm:inline'}`}>
+                <span className="sr-only">{n}. </span>
+                {t(`cal.step${n}`)}
+              </span>
+              {n < 3 && <span aria-hidden="true" className={`h-px min-w-[12px] flex-1 ${n < step ? 'bg-nominal' : 'bg-line'}`} />}
+            </li>
+          );
+        })}
       </ol>
 
       {step === 1 && (

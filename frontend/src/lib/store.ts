@@ -39,6 +39,8 @@ function persist(state: Persisted) {
 }
 
 export interface AppState extends Persisted {
+  /** Opened from a link with ?tour or ?demo: the header then offers Presenter mode and the Judge drawer. */
+  demo: boolean;
   bundle: Bundle | null;
   config: AppConfig | null;
   loadError: string | null;
@@ -84,6 +86,23 @@ export interface AppState extends Persisted {
   t: (key: string, params?: Record<string, string | number>) => string;
 }
 
+/** The address the app was opened with decides it once; moving between screens keeps it. */
+function demoLink(): boolean {
+  try {
+    return /[?&](tour|demo)\b/.test(window.location.search + window.location.hash);
+  } catch {
+    return false;
+  }
+}
+
+/** Zone names shown on screen where the team prefers wording other than the server's. */
+const ZONE_NAMES: Record<string, string> = { inner_ear: 'Ear canal' };
+
+/** The bundle as the screens should see it: same data, with the team's zone names. */
+function withZoneNames(bundle: Bundle): Bundle {
+  return { ...bundle, zones: bundle.zones.map((z) => (ZONE_NAMES[z.id] ? { ...z, name: ZONE_NAMES[z.id] as string } : z)) };
+}
+
 let toastId = 0;
 let requestId = 0;
 let outbox: PendingItem[] = loadOutbox();
@@ -102,6 +121,7 @@ let flushing = false;
 
 export const useApp = create<AppState>((set, get) => ({
   ...loadPersisted(),
+  demo: demoLink(),
   bundle: null,
   config: null,
   loadError: null,
@@ -127,7 +147,7 @@ export const useApp = create<AppState>((set, get) => ({
   init: async () => {
     try {
       const [bundle, config] = await Promise.all([api.bundle(), api.config()]);
-      set({ bundle, config, day: config.demo_day, loadError: null });
+      set({ bundle: withZoneNames(bundle), config, day: config.demo_day, loadError: null });
       await get().refresh();
       startOutboxWatch(get);
     } catch (err) {

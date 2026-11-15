@@ -4,6 +4,7 @@ import { SCREENS } from '../lib/commands';
 import { useApp, useT } from '../lib/store';
 import { CommandPalette, Toasts } from './CommandPalette';
 import { Icon } from './Icon';
+import { ParticleField } from './ParticleField';
 import { JudgeDrawer, Presenter } from './Presenter';
 import { QuickBar, QuickLog } from './QuickBar';
 import { StatusBadge, StatusGlyph } from './StatusGlyph';
@@ -121,6 +122,7 @@ function Header() {
   const dash = useApp((s) => s.dash);
   const night = useApp((s) => s.night);
   const set = useApp((s) => s.set);
+  const demo = useApp((s) => s.demo);
   const run = useApp((s) => s.run);
   const chip = 'min-h-[40px] flex-1 whitespace-nowrap rounded-lg border border-line bg-panel px-3 text-sm hover:border-accent sm:flex-none';
   // The full label from 1280 px up and a short one below, so the header stays on one row on
@@ -130,6 +132,34 @@ function Header() {
       <span className="xl:hidden">{t(short)}</span>
       <span className="hidden xl:inline">{t(full)}</span>
     </>
+  );
+
+  // Icon only: a moon while the day theme is on (tap for night), a sun while night is on.
+  const nightButton = (
+    <button
+      type="button"
+      className={`flex min-h-[40px] w-11 shrink-0 items-center justify-center rounded-lg border border-line bg-panel hover:border-accent ${
+        demo ? '' : 'sm:order-last'
+      }`}
+      onClick={() => set({ night: !night })}
+      aria-pressed={night}
+      data-testid="night-toggle"
+      data-icon={night ? 'sun' : 'moon'}
+      aria-keyshortcuts="N"
+      aria-label={t('action.night')}
+      title={t('action.night')}
+    >
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+        {night ? (
+          <>
+            <circle cx="12" cy="12" r="4" />
+            <path d="M12 2.5v2.5M12 19v2.5M2.5 12H5M19 12h2.5M5.3 5.3l1.8 1.8M16.9 16.9l1.8 1.8M5.3 18.7l1.8-1.8M16.9 7.1l1.8-1.8" />
+          </>
+        ) : (
+          <path d="M20 14.5A8.5 8.5 0 0 1 9.5 4a7 7 0 1 0 10.5 10.5Z" />
+        )}
+      </svg>
+    </button>
   );
 
   return (
@@ -147,7 +177,10 @@ function Header() {
             <SimulatedTag />
           </span>
         )}
-        {/* Phone: day and crew member on one row, the three buttons on the next. Wider: one row. */}
+        {/* On a plain link the night toggle sits in the top row on a phone and at the far right on
+            a laptop. On a demo link it joins the two demo buttons instead. */}
+        {!demo && nightButton}
+        {/* Phone: day and crew member on one row (demo buttons on the next). Wider: one row. */}
         <div className="flex w-full flex-wrap items-center gap-2 sm:w-auto sm:flex-1 sm:justify-end" data-testid="header-controls">
           <DayStepper />
           <label className="flex min-w-0 flex-1 items-center gap-1.5 text-sm sm:flex-none">
@@ -165,39 +198,33 @@ function Header() {
               ))}
             </select>
           </label>
-          <div className="flex w-full gap-2 sm:w-auto">
-            <button
-              type="button"
-              className={chip}
-              onClick={() => run({ type: 'presenter' })}
-              data-testid="presenter-toggle"
-              aria-keyshortcuts="P"
-              aria-label={t('action.presenter')}
-            >
-              {label('action.presenter', 'short.presenter')}
-            </button>
-            <button
-              type="button"
-              className={chip}
-              onClick={() => run({ type: 'judge' })}
-              data-testid="judge-toggle"
-              aria-keyshortcuts="J"
-              aria-label={t('action.judge')}
-            >
-              {label('action.judge', 'short.judge')}
-            </button>
-            <button
-              type="button"
-              className={chip}
-              onClick={() => set({ night: !night })}
-              aria-pressed={night}
-              data-testid="night-toggle"
-              aria-keyshortcuts="N"
-              aria-label={t('action.night')}
-            >
-              {label('action.night', 'short.night')}
-            </button>
-          </div>
+          {/* Presenter mode and the Judge drawer are for demos, so their buttons show on a ?tour or
+              ?demo link only. Keys P and J, and Find, still reach them from a plain link. */}
+          {demo && (
+            <div className="flex w-full gap-2 sm:w-auto">
+              <button
+                type="button"
+                className={chip}
+                onClick={() => run({ type: 'presenter' })}
+                data-testid="presenter-toggle"
+                aria-keyshortcuts="P"
+                aria-label={t('action.presenter')}
+              >
+                {label('action.presenter', 'short.presenter')}
+              </button>
+              <button
+                type="button"
+                className={chip}
+                onClick={() => run({ type: 'judge' })}
+                data-testid="judge-toggle"
+                aria-keyshortcuts="J"
+                aria-label={t('action.judge')}
+              >
+                {label('action.judge', 'short.judge')}
+              </button>
+              {nightButton}
+            </div>
+          )}
         </div>
       </div>
     </header>
@@ -208,20 +235,20 @@ function Nav() {
   const t = useT();
   return (
     <nav aria-label={t('nav.title')} className="print:hidden lg:w-52 lg:shrink-0">
-      <ul className="relative flex gap-1 overflow-x-auto px-3 py-2 lg:sticky lg:top-2 lg:flex-col lg:overflow-visible lg:px-0 lg:py-0">
+      <ul className="grid grid-cols-3 gap-1 px-3 py-2 lg:sticky lg:top-2 lg:flex lg:flex-col lg:px-0 lg:py-0">
         {SCREENS.map((s) => (
-          <li key={s.route} className="shrink-0">
+          <li key={s.route}>
             <NavLink
               to={s.route}
               end={s.route === '/'}
               data-nav={s.route}
               className={({ isActive }) =>
-                `flex min-h-[44px] items-center gap-2.5 whitespace-nowrap rounded-lg border px-3 text-sm font-medium transition ${
+                `flex min-h-[44px] items-center gap-2 rounded-lg border px-2 text-[13px] font-medium leading-tight transition lg:gap-2.5 lg:whitespace-nowrap lg:px-3 lg:text-sm ${
                   isActive ? 'border-accent/70 bg-accent/10 text-ink' : 'border-transparent text-muted hover:bg-panel hover:text-ink'
                 }`
               }
             >
-              <Icon name={s.icon} size={18} />
+              <Icon name={s.icon} size={18} className="shrink-0" />
               {t(s.key)}
             </NavLink>
           </li>
@@ -283,6 +310,7 @@ export function Layout() {
 
   return (
     <div className="min-h-screen pb-28">
+      <ParticleField />
       <a href="#main" className="sr-only focus:not-sr-only focus:absolute focus:left-2 focus:top-2 focus:z-50 focus:rounded focus:bg-accent focus:px-3 focus:py-2 focus:text-bg">
         {t('app.skip')}
       </a>

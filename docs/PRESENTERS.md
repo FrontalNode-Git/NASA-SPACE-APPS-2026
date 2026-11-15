@@ -45,7 +45,9 @@ of the page first.
 
 ## The two-minute walkthrough
 
-Press `P` (or the **Presenter mode** button). A caption bar appears at the bottom with
+Press `P`. (The **Presenter mode** and **Judge drawer** buttons are in the header only when
+the address ends in `?tour` or `?demo`; the keys work on any link, and on a phone both are
+under **Find**.) A caption bar appears at the bottom with
 **Next**, **Back**, **Auto-play** and **Reset demo**. Each step moves the app to the right
 screen for you. **Auto-play** advances every 12 seconds, which makes the ten steps exactly
 two minutes. The caption on screen is a safe sentence to say aloud; the right-hand column
@@ -70,10 +72,10 @@ Finish by pressing **Reset demo** so the next run starts clean.
 
 | Crew member | Status | Why |
 |---|---|---|
-| Systems Officer L. Tanaka | **Call ground ■** | Slept 5.6 h; own normal is 7.4 ± 0.5 |
-| Flight Engineer M. Ruiz | **Watch ▲** | Resting heart rate drifting above own normal for 5 days (63 bpm against 58.7 ± 2.5) |
-| Commander A. Vega | Nominal ● | — |
-| Chief Medical Officer N. Okafor | Nominal ● | Temperature reading is missing today, so the card asks for it |
+| Systems Officer P. Kotsomitopoulos | **Call ground ■** | Slept 5.6 h; own normal is 7.4 ± 0.5 |
+| Flight Engineer G. Kiousopoulos | **Watch ▲** | Resting heart rate drifting above own normal for 5 days (63 bpm against 58.7 ± 2.5) |
+| Commander S. Sinnis | Nominal ● | — |
+| Chief Medical Officer R. Falelaki | Nominal ● | Temperature reading is missing today, so the card asks for it |
 
 On the engineer's heart-rate card, the line "Two detectors agree" means two independent
 trend methods both flag the drift. The drift is first flagged on day 16 and has cleared by
@@ -128,8 +130,8 @@ Earth's normal.*
 
 **The demo (90 s).** Run the walkthrough above. If time is short, show steps 2, 4, 5 and 10.
 
-**What it is, honestly (20 s).** The readings are simulated and the crew is fictional; every
-screen says so. The alert rules are plain statistics against a personal baseline and are
+**What it is, honestly (20 s).** The readings are simulated. The four crew roles carry our own
+names, and none of the numbers are ours; every screen marks the data as simulated. The alert rules are plain statistics against a personal baseline and are
 labelled provisional. VITAL flags a change and tells the crew to call ground. It does not
 diagnose.
 
@@ -143,8 +145,8 @@ For the two-minute video, record Presenter mode on **Auto-play** and read the ca
 ## Questions you may get
 
 **Is this real astronaut data?**
-No. All readings are simulated and the crew is invented. The app labels this on every
-screen and in the report.
+No. All readings are simulated. The four crew members carry the names of our team, and none
+of the numbers are real. The app labels the data as simulated on every screen and in the report.
 
 **Where do the health statements come from?**
 From three NASA Human Research Program pages (hazards, risks, ongoing research) and two
@@ -203,7 +205,7 @@ fewer false alerts.
 
 | Say | Do not say |
 |---|---|
-| "simulated data", "fictional crew" | "real astronaut data" |
+| "simulated data", "our names, simulated readings" | "real astronaut data", "our own health data" |
 | "flags a change", "prompts a call to ground" | "diagnoses", "detects illness" |
 | "provisional method" | "clinically validated", "NASA-approved" |
 | "based on NASA and CSA public pages" | "built with NASA", "endorsed by NASA" |

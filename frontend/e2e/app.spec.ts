@@ -40,6 +40,19 @@ async function open(page: Page, route = '/') {
 
 const card = (page: Page, id: string) => page.locator(`[data-indicator="${id}"]`);
 
+/** The address a presenter or judge is sent: it adds Presenter mode and the Judge drawer to the header. */
+async function openDemo(page: Page) {
+  await page.goto('/?demo');
+  await expect(page.locator('#main')).toBeVisible();
+}
+
+/** On a phone a vitals card is a compact row until it is tapped. Make sure its chart is showing. */
+async function expand(page: Page, id: string) {
+  const toggle = card(page, id).getByTestId('indicator-toggle');
+  if ((await toggle.count()) && (await toggle.getAttribute('aria-expanded')) === 'false') await toggle.click();
+  await expect(card(page, id).getByTestId('indicator-details')).toBeVisible();
+}
+
 test('every nav item opens its screen, each with an icon', async ({ page }) => {
   await open(page);
   await expect(page.locator('[data-nav]')).toHaveCount(ROUTES.length);
@@ -104,10 +117,22 @@ test('daily check-in: what the crew member enters drives the dashboard', async (
   await expect(page.locator('[data-field="spo2"]')).toHaveAttribute('data-refused', 'true');
   await expect(card(page, 'spo2').getByTestId('source')).toHaveAttribute('data-source', 'sensor');
 
-  // Mood is entered with one tap and stays private to the crew member.
+  // Mood is chosen with a tap and saved with the check-in, like everything else in it.
+  await page.getByTestId('check-in-spo2').fill('');
+  await page.getByTestId('check-in-spo2').fill('98');
+  await expect(card(page, 'mood').getByTestId('source')).toHaveText('· simulated'); // a mood has no sensor
   await page.getByTestId('check-in-mood-2').click();
-  await expect(card(page, 'mood').getByTestId('latest')).toHaveText('2');
   await expect(page.getByTestId('check-in-mood-2')).toHaveAttribute('aria-pressed', 'true');
+  await expect(page.getByTestId('check-in-mood-unsaved')).toBeVisible();
+  await expect(card(page, 'mood').getByTestId('latest')).not.toHaveText('2'); // nothing saved yet
+  await page.getByTestId('check-in-mood-2').click(); // tapping it again takes it off
+  await expect(page.getByTestId('check-in-mood-2')).toHaveAttribute('aria-pressed', 'false');
+  await page.getByTestId('check-in-mood-2').click();
+  await page.getByTestId('check-in-save').click();
+  await expect(card(page, 'mood').getByTestId('latest')).toHaveText('2');
+  await expect(card(page, 'mood').getByTestId('source')).toHaveAttribute('data-source', 'manual');
+  await expect(page.getByTestId('check-in-mood-2')).toHaveAttribute('aria-pressed', 'true');
+  await expect(page.getByTestId('check-in-mood-unsaved')).toHaveCount(0);
 });
 
 test('check-in fills a reading the sensor missed', async ({ page }) => {
@@ -137,14 +162,56 @@ test('call ground: the dashboard says why at the top and offers "I\'m OK" there'
 });
 
 test('header: every control is on screen, on one row on a laptop', async ({ page, isMobile }) => {
+  const oneRow = async () => {
+    if (isMobile) return;
+    const header = await page.locator('header').first().boundingBox();
+    expect(header?.height ?? 0).toBeLessThan(80); // two rows would be over 100
+  };
+  // A plain link is the crew tool: no demo buttons in the header.
   await open(page);
+  for (const id of ['day-stepper', 'viewer-select', 'night-toggle']) {
+    await expect(page.getByTestId(id)).toBeInViewport({ ratio: 1 });
+  }
+  await expect(page.getByTestId('presenter-toggle')).toHaveCount(0);
+  await expect(page.getByTestId('judge-toggle')).toHaveCount(0);
+  await oneRow();
+  if (isMobile) {
+    // Without the demo row the phone header is two rows, not three.
+    const header = await page.locator('header').first().boundingBox();
+    expect(header?.height ?? 0).toBeLessThan(120);
+  }
+  // A demo link adds Presenter mode and the Judge drawer.
+  await openDemo(page);
   for (const id of ['day-stepper', 'viewer-select', 'presenter-toggle', 'judge-toggle', 'night-toggle']) {
     await expect(page.getByTestId(id)).toBeInViewport({ ratio: 1 });
   }
-  if (!isMobile) {
-    const header = await page.locator('header').first().boundingBox();
-    expect(header?.height ?? 0).toBeLessThan(80); // two rows would be over 100
-  }
+  await oneRow();
+});
+
+test('phone: all six screens are in the tab bar and the dashboard leads with compact vitals', async ({ page, isMobile }) => {
+  test.skip(!isMobile, 'phone layout only');
+  await open(page);
+  // Two rows of three: nothing is off to the side, and the names are not cut.
+  for (const [route] of ROUTES) await expect(page.locator(`[data-nav="${route}"]`)).toBeInViewport({ ratio: 1 });
+  const nav = await page.locator('nav').first().evaluate((el) => el.scrollWidth <= el.clientWidth);
+  expect(nav).toBe(true);
+  // Vitals are compact rows, and they come before the body scan.
+  await expect(page.getByTestId('indicator-card')).toHaveCount(6);
+  await expect(page.getByTestId('indicator-details')).toHaveCount(0);
+  await expect(page.getByTestId('sparkline')).toHaveCount(6);
+  const grid = await page.getByTestId('indicator-grid').boundingBox();
+  const body = await page.getByTestId('body-scan').boundingBox();
+  expect((grid?.y ?? 0) + (grid?.height ?? 0)).toBeLessThanOrEqual(body?.y ?? 0);
+  // What needs attention shows without opening anything.
+  await expect(card(page, 'heart_rate').getByTestId('drift-message')).toBeVisible();
+  // A tap opens the chart; another closes it.
+  await card(page, 'sleep_hours').getByTestId('latest').click();
+  await expect(card(page, 'sleep_hours').getByTestId('indicator-details')).toBeVisible();
+  await expect(card(page, 'sleep_hours').getByRole('button', { name: 'Show as table' })).toBeVisible();
+  await card(page, 'sleep_hours').getByTestId('indicator-toggle').click();
+  await expect(card(page, 'sleep_hours').getByTestId('indicator-details')).toHaveCount(0);
+  // The page was 4,530 px tall with six full charts; the compact rows take over a thousand off.
+  expect(await page.evaluate(() => document.documentElement.scrollHeight)).toBeLessThan(3500);
 });
 
 test('dashboard tells the drift story on the demo day', async ({ page }) => {
@@ -153,13 +220,26 @@ test('dashboard tells the drift story on the demo day', async ({ page }) => {
   await expect(heart.locator('[data-status="watch"]')).toBeVisible();
   await expect(heart.locator('[data-icon="heart"]')).toBeVisible();
   await expect(heart.getByTestId('drift-message')).toContainText('Slowly drifting above your normal for 5 days');
-  await expect(heart.getByTestId('confidence')).toContainText('Based on 7 pre-flight readings');
+  // Plain words on the card; the method names are a hover away, not on screen.
+  await expect(heart.getByTestId('drift-checks')).toHaveText('Two independent checks agree this is a real drift.');
+  await expect(heart.getByTestId('drift-checks')).toHaveAttribute('title', /EWMA.*CUSUM/);
+  await expect(heart).not.toContainText('EWMA');
+  // One legend above the cards says what the marks mean.
+  const legend = page.getByTestId('chart-legend');
+  for (const word of ['Reading', 'Trend', 'Your normal', 'mission days']) await expect(legend).toContainText(word);
+  await expect(page.getByTestId('chart-legend')).toHaveCount(1);
+  // "Simulated data" once in the header, not again in the member panel.
+  await expect(page.getByTestId('dashboard').getByText('Simulated data', { exact: true })).toHaveCount(0);
+  await expect(page.getByTestId('header-status')).toContainText('Simulated data');
+  await expand(page, 'heart_rate');
+  await expect(heart.getByTestId('confidence')).toContainText('Based on 7 pre-flight');
   await expect(page.getByTestId('header-status').locator('[data-status="watch"]')).toBeVisible();
   // The reason is at the top of the dashboard, and it jumps to the card.
   const line = page.locator('[data-attention="heart_rate"]');
   await expect(line).toContainText('Slowly drifting above your normal for 5 days');
   await line.click();
   await expect(heart).toBeInViewport();
+  await expect(heart.getByTestId('indicator-details')).toBeVisible(); // jumping to a card opens it
   await expect(page.getByTestId('body-scan')).toBeVisible();
   await expect(card(page, 'spo2').locator('p').filter({ hasText: /^[A-Z].{120,}/ })).toHaveCount(0); // no reading material on the cards
   // "Show as table" works on a chart
@@ -167,14 +247,20 @@ test('dashboard tells the drift story on the demo day', async ({ page }) => {
   await expect(heart.getByRole('table')).toBeVisible();
 });
 
-test('pending placeholders show where content is awaited', async ({ page }) => {
+test('what is not built yet is shown as planned, in plain words', async ({ page }) => {
   await open(page, '/mission');
-  await expect(page.locator('[data-pending-id="distance-comm-delay"]')).toBeVisible();
-  await expect(page.locator('[data-pending-id="radiation-dose-rate"]')).toBeVisible();
+  for (const id of ['distance-comm-delay', 'radiation-dose-rate']) {
+    await expect(page.locator(`[data-pending-id="${id}"]`)).toHaveText('Planned · Not in this version yet');
+  }
   await page.locator('[data-env="pressurized-rover"]').click();
   await expect(page.locator('[data-pending-id="env-pressurized-rover"]')).toBeVisible();
   await open(page, '/modules');
-  await expect(page.getByTestId('modules').getByTestId('pending')).toHaveCount(4);
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText('Planned next');
+  await expect(page.getByTestId('modules').getByTestId('planned')).toHaveCount(4);
+  // No developer wording on screen.
+  for (const word of ['Feature flag', 'LIVE_SPACE_WEATHER', 'approve live data', 'Scaffolded', 'Pending']) {
+    await expect(page.locator('#main')).not.toContainText(word);
+  }
 });
 
 test('quick actions: log, I am OK, report, palette', async ({ page }) => {
@@ -246,11 +332,21 @@ test('hazard lens filters the dashboard', async ({ page }) => {
 test('mission scrubber changes phase, environment and emphasised hazards', async ({ page }) => {
   await open(page, '/mission');
   await expect(page.getByTestId('phase-name')).toHaveText('Transit to Mars');
+  await expect(page.locator('#main').getByText('140 million miles', { exact: false })).toHaveCount(1); // not under both panels
   await page.getByRole('button', { name: 'Mission day 183' }).click();
   await expect(page.getByTestId('phase-name')).toHaveText('Mars surface');
   await expect(page.locator('[data-env="mars-surface"]')).toHaveAttribute('data-current', 'true');
   await expect(page.getByTestId('emphasised-hazards').locator('[data-hazard="gravity"]')).toBeVisible();
-  await expect(page.getByTestId('environment-facts')).toContainText('three-eighths');
+  await expect(page.locator('#main')).toContainText('three-eighths');
+  // Each sentence is on the screen once, not under both the phase and the environment.
+  await expect(page.locator('#main').getByText('three-eighths', { exact: false })).toHaveCount(1);
+  // Every phase name can be read in full, at any width.
+  for (const name of ['Transit to Mars', 'Mars surface', 'Return to Earth']) {
+    const phase = page.getByTestId('phase-list').getByRole('button', { name });
+    await expect(phase).toBeInViewport({ ratio: 1 });
+    expect(await phase.evaluate((el) => el.scrollWidth <= el.clientWidth + 1)).toBe(true);
+  }
+  await expect(page.locator('[data-phase="mars-surface"]')).toHaveAttribute('aria-current', 'step');
   await page.getByRole('button', { name: 'Show on dashboard' }).click();
   await expect(page.getByTestId('dashboard')).toBeVisible();
   await expect(page.locator('[data-lens-chip="gravity"]')).toHaveAttribute('aria-pressed', 'true');
@@ -266,7 +362,7 @@ test('crew view: urgent first, and privacy holds for the medical officer', async
   await expect(tiles.nth(1)).toHaveAttribute('data-status', 'watch');
   await expect(page.getByTestId('privacy-note')).toBeVisible();
   await tiles.nth(1).click();
-  await expect(page.getByTestId('member-name')).toHaveText('M. Ruiz');
+  await expect(page.getByTestId('member-name')).toHaveText('G. Kiousopoulos');
   await expect(card(page, 'mood').getByTestId('privacy-lock')).toBeVisible();
   await expect(page.getByTestId('notes-locked')).toBeVisible();
   await expect(page.getByTestId('check-in')).toHaveCount(0); // nobody checks in for someone else
@@ -306,7 +402,7 @@ test('keyboard shortcuts', async ({ page, isMobile }) => {
 });
 
 test('presenter mode runs end to end and resets', async ({ page }) => {
-  await open(page);
+  await openDemo(page);
   await page.getByTestId('presenter-toggle').click();
   const expected = ['calibrate', 'check-in', 'dashboard', 'dashboard', 'dashboard', 'dashboard', 'report', 'lens-caption', 'mission-scrubber', 'crew-grid'];
   const total = expected.length;
@@ -323,7 +419,7 @@ test('presenter mode runs end to end and resets', async ({ page }) => {
 });
 
 test('judge drawer: mission day and scenario seeds', async ({ page }) => {
-  await open(page);
+  await openDemo(page);
   await page.getByTestId('judge-toggle').click();
   const drawer = page.getByTestId('judge-drawer');
   await expect(drawer.getByTestId('mission-scrubber')).toBeVisible();
@@ -335,10 +431,18 @@ test('judge drawer: mission day and scenario seeds', async ({ page }) => {
 
 test('night mode and the flat body view', async ({ page }) => {
   await open(page);
-  await page.getByTestId('night-toggle').click();
+  // The toggle is an icon with no text: a moon by day, a sun by night. It keeps its spoken name.
+  const toggle = page.getByTestId('night-toggle');
+  await expect(toggle).toHaveText('');
+  await expect(toggle).toHaveAttribute('data-icon', 'moon');
+  await expect(toggle).toHaveAccessibleName('Night mode');
+  await toggle.click();
   await expect(page.locator('html')).toHaveAttribute('data-theme', 'night');
-  await page.getByTestId('night-toggle').click();
+  await expect(toggle).toHaveAttribute('data-icon', 'sun');
+  await expect(toggle).toHaveAttribute('aria-pressed', 'true');
+  await toggle.click();
   await expect(page.locator('html')).toHaveAttribute('data-theme', 'day');
+  await expect(toggle).toHaveAttribute('data-icon', 'moon');
   await page.getByRole('button', { name: 'Flat view' }).click();
   await expect(page.getByTestId('body-scan')).toHaveAttribute('data-mode', '2d');
   await expect(page.getByTestId('flat-figure').locator('[data-outline]')).toBeVisible(); // a traced human outline
@@ -405,7 +509,7 @@ test('the medical officer gets the crew report and can send it to the Commander'
   const text = page.getByTestId('report-text');
   await expect(text).toContainText('VITAL CREW REPORT FOR GROUND');
   await expect(text).toContainText('SIMULATED DATA');
-  for (const name of ['A. Vega', 'N. Okafor', 'L. Tanaka', 'M. Ruiz']) await expect(text).toContainText(name);
+  for (const name of ['S. Sinnis', 'R. Falelaki', 'P. Kotsomitopoulos', 'G. Kiousopoulos']) await expect(text).toContainText(name);
   await expect(page.getByTestId('report')).not.toContainText('engineer private note');
   const engineer = page.locator('[data-member="engineer"]');
   await expect(engineer).toContainText('Slowly drifting above their normal');
@@ -431,10 +535,10 @@ test('the medical officer gets the crew report and can send it to the Commander'
   await page.keyboard.press('Enter');
   await expect(page.getByTestId('crew-grid')).toBeVisible();
   const notice = page.getByTestId('crew-notice');
-  await expect(notice).toContainText('Chief Medical Officer N. Okafor sent you the crew report for mission day 20');
+  await expect(notice).toContainText('Chief Medical Officer R. Falelaki sent you the crew report for mission day 20');
   await page.getByTestId('crew-notice-open').click();
   await expect(page.getByTestId('report')).toHaveAttribute('data-scope', 'received');
-  await expect(page.getByTestId('report-received')).toContainText('Sent by Chief Medical Officer N. Okafor');
+  await expect(page.getByTestId('report-received')).toContainText('Sent by Chief Medical Officer R. Falelaki');
   await expect(page.getByTestId('report-crew').locator('[data-member]')).toHaveCount(4);
   // Built for the Commander: nobody else's notes, not even the sender's.
   await expect(page.getByTestId('report')).not.toContainText('engineer private note');
@@ -445,10 +549,10 @@ test('the medical officer gets the crew report and can send it to the Commander'
   // Once opened, the notice is gone; the report stays one tap away.
   await expect(page.getByTestId('crew-notice')).toHaveCount(0);
   await page.locator('[data-scope-choice="own"]').click();
-  await expect(page.getByTestId('report-text')).toContainText('Commander A. Vega');
-  await expect(page.getByTestId('report-text')).not.toContainText('M. Ruiz');
+  await expect(page.getByTestId('report-text')).toContainText('Commander S. Sinnis');
+  await expect(page.getByTestId('report-text')).not.toContainText('G. Kiousopoulos');
   await page.locator('[data-scope-choice="received"]').click();
-  await expect(page.getByTestId('report-text')).toContainText('M. Ruiz');
+  await expect(page.getByTestId('report-text')).toContainText('G. Kiousopoulos');
 });
 
 test('a link ending in ?tour opens straight into the guided walkthrough', async ({ page }) => {
@@ -464,4 +568,19 @@ test('a link ending in ?tour opens straight into the guided walkthrough', async 
   await page.goto('/');
   await expect(page.locator('#main')).toBeVisible();
   await expect(page.getByTestId('presenter')).toHaveCount(0);
+});
+
+test('the ear zone is called "Ear canal" everywhere', async ({ page }) => {
+  await open(page);
+  const zone = page.locator('[data-zone="inner_ear"]').first();
+  await expect(page.getByRole('button', { name: /^Ear canal/ }).first()).toBeVisible();
+  await expect(page.locator('#main')).not.toContainText('Inner ear');
+  await page.getByRole('button', { name: /^Ear canal/ }).first().click();
+  await expect(page.getByRole('heading', { name: 'Ear canal' })).toBeVisible();
+  // Find knows it by the new name too.
+  await page.locator('[data-quick="palette"]').click();
+  await page.getByTestId('command-palette').getByRole('combobox').fill('ear canal');
+  await expect(page.getByTestId('command-palette')).toContainText('Ear canal');
+  await expect(page.getByTestId('command-palette')).not.toContainText('Inner ear');
+  void zone;
 });

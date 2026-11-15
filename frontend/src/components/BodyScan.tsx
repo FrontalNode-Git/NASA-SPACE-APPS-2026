@@ -62,10 +62,10 @@ const VERTEX = /* glsl */ `
       float facing = dot(normalize(normalMatrix * normal), normalize(-mv.xyz));
       float front = smoothstep(-0.2, 0.3, facing);
       float rim = pow(1.0 - abs(facing), 3.0);
-      alpha = mix(0.06, 0.6, front) + rim * 0.3;
+      alpha = mix(0.05, 0.4, front) + rim * 0.3; // thin enough for the bones and vessels to read through
       size = 0.022;
     } else if (aKind < 1.5) {
-      alpha = 0.6;
+      alpha = 0.78;
       size = 0.019;
     } else {
       alpha = 0.32;

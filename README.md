@@ -7,7 +7,8 @@ that person's own pre-flight baseline instead of a population range.
 Team ACG DSA · NASA Space Apps Challenge 2026 · *Create Health Monitoring Software for
 Astronauts on Space Missions*.
 
-> All readings in the app are **simulated** and the crew is fictional. The alert method is
+> All readings in the app are **simulated**. The four crew roles carry the names of our team
+> members; none of the readings are theirs. The alert method is
 > labelled **provisional**. VITAL is not a medical device and gives no diagnosis.
 
 - What is still open: [TODO.md](TODO.md)
@@ -19,6 +20,30 @@ Astronauts on Space Missions*.
 
 You need **Python 3.11 or newer** and **Node.js 22** (with npm). Nothing else: no database,
 no Docker, no accounts, no internet connection once the packages are installed.
+
+### The short way: one script
+
+From the top folder of the project:
+
+```bash
+node start.mjs
+```
+
+On Windows you can double-click **start.cmd** instead. The script installs what is missing,
+builds the interface when it is missing or out of date, starts the server and opens
+**http://localhost:7860**. The first run takes a few minutes and needs internet; later runs
+take seconds. `Ctrl+C` stops it.
+
+| Option | What it does |
+|---|---|
+| `--tour` | Opens straight into the guided walkthrough |
+| `--build` | Rebuilds the interface first, even if it looks up to date |
+| `--port 8000` | Uses another port |
+| `--lan` | Also reachable from other devices on the same Wi-Fi |
+| `--no-open` | Does not open the browser |
+
+If Python is installed somewhere unusual, set `VITAL_PYTHON` to the full path of `python`.
+The three steps below do the same by hand.
 
 ### 1. Build the interface (once, and again after any frontend change)
 
@@ -84,8 +109,9 @@ demo scenario.
 4. **Report for ground** is the day's summary, ready to copy or print. Signed in as the
    Chief Medical Officer it covers the whole crew in one report, without the other members'
    mood values and notes, and **Notify the Commander** sends it to the Commander.
-5. **Presenter mode** (button in the header, or press `P`) walks through the whole story in
-   ten steps. **Judge drawer** (`J`) jumps to any day and switches scenario.
+5. **Presenter mode** (press `P`) walks through the whole story in ten steps. **Judge
+   drawer** (`J`) jumps to any day and switches scenario. Their two header buttons show only
+   when the address ends in `?tour` or `?demo`, so a plain link is the crew tool by itself.
 6. *Reset demo* (in Presenter mode or the Judge drawer) puts everything back.
 
 Statuses always use a colour, a shape and a word: Nominal ●, Watch ▲, Call ground ■.
@@ -163,10 +189,11 @@ The same checks run on every push, in [.github/workflows/ci.yml](.github/workflo
 - **Health statements come from data, never from code.** Every statement the app shows is in
   [data/sources/](data/sources/) and traces to a NASA or Canadian Space Agency page. The app
   does not show the sources; the full list is [docs/SOURCES.txt](docs/SOURCES.txt). Places
-  still waiting for a sourced fact show *Pending* and are listed in
+  still waiting for a sourced fact show *Planned · Not in this version yet* and are listed in
   [docs/PENDING.md](docs/PENDING.md).
 - **Optional modules are off.** The four flags in [backend/.env.example](backend/.env.example)
-  stay `false` until the team approves live data.
+  stay `false` until the team approves live data. In the app they are listed on the *Planned
+  next* screen, without the flag names.
 
 ## If something looks wrong
 

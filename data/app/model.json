@@ -1,10 +1,10 @@
 {
   "method_status": "provisional",
   "crew": [
-    { "id": "commander", "name": "A. Vega", "role": "Commander" },
-    { "id": "cmo", "name": "N. Okafor", "role": "Chief Medical Officer" },
-    { "id": "systems", "name": "L. Tanaka", "role": "Systems Officer" },
-    { "id": "engineer", "name": "M. Ruiz", "role": "Flight Engineer" }
+    { "id": "commander", "name": "S. Sinnis", "role": "Commander" },
+    { "id": "cmo", "name": "R. Falelaki", "role": "Chief Medical Officer" },
+    { "id": "systems", "name": "P. Kotsomitopoulos", "role": "Systems Officer" },
+    { "id": "engineer", "name": "G. Kiousopoulos", "role": "Flight Engineer" }
   ],
   "indicators": [
     { "id": "heart_rate", "name": "Resting heart rate", "unit": "bpm", "decimals": 0, "resolution": 1.0, "zones": ["heart"], "risks": ["cardiovascular", "fitness"], "private": false },

@@ -23,6 +23,9 @@ export function Mission() {
   const emphasised = emphasisedHazards(bundle, day);
   const env = bundle.environments.find((e) => e.id === envId);
   const basis = [...new Set([...bundle.mission.basis_fact_ids, ...(phase?.basis_fact_ids ?? [])])];
+  // A sentence already shown for the current phase is not repeated under Environments.
+  const fresh = env ? env.fact_ids.filter((id) => !basis.includes(id)) : [];
+  const envFacts = fresh.length > 0 ? fresh : (env?.fact_ids ?? []);
 
   return (
     <div>
@@ -89,7 +92,7 @@ export function Mission() {
             })}
           </div>
           <div className="mt-4" data-testid="environment-facts">
-            {env ? <FactList ids={env.fact_ids} /> : <p className="text-sm text-muted">{t('mission.pickEnv')}</p>}
+            {env ? <FactList ids={envFacts} /> : <p className="text-sm text-muted">{t('mission.pickEnv')}</p>}
           </div>
         </Panel>
 

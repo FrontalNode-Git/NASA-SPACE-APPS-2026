@@ -22,24 +22,33 @@ function onRecord(view: IndicatorView): string {
  */
 export function CheckIn({ dash }: { dash: Dashboard }) {
   const t = useT();
-  const log = useApp((s) => s.log);
   const fields = dash.indicators.filter((v) => !v.locked && v.id !== MOOD);
   const mood = dash.indicators.find((v) => v.id === MOOD && !v.locked);
   const [draft, setDraft] = useState<Record<string, string>>({});
+  const [moodDraft, setMoodDraft] = useState<number | null>(null); // chosen, not saved yet
   const [error, setError] = useState<string | null>(null);
   const [refused, setRefused] = useState<string | null>(null); // the field the server would not take
   const [saving, setSaving] = useState(false);
 
   // Start again from what is on record whenever the day, the person or the saved values change.
-  const record = `${dash.member.id}@${dash.day}|` + fields.map((v) => `${v.id}:${onRecord(v)}:${v.latest_source ?? ''}`).join('|');
+  const record =
+    `${dash.member.id}@${dash.day}|` +
+    fields.map((v) => `${v.id}:${onRecord(v)}:${v.latest_source ?? ''}`).join('|') +
+    `|${MOOD}:${mood?.latest ?? ''}:${mood?.latest_source ?? ''}`;
   useEffect(() => {
     setDraft(Object.fromEntries(fields.map((v) => [v.id, onRecord(v)])));
+    setMoodDraft(null);
     setError(null);
     setRefused(null);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [record]);
 
   const changed = fields.filter((v) => (draft[v.id] ?? '').trim() !== onRecord(v));
+  // A mood the crew member logged is on record; a simulated one is not theirs.
+  const moodOnRecord = mood && mood.latest_source === 'manual' ? (mood.latest ?? null) : null;
+  const moodChosen = moodDraft ?? moodOnRecord;
+  const moodChanged = moodDraft !== null && moodDraft !== moodOnRecord;
+  const dirty = changed.length > 0 || moodChanged;
   const unreadable = changed.some((v) => {
     const raw = (draft[v.id] ?? '').trim();
     return raw !== '' && !Number.isFinite(Number(raw));
@@ -51,6 +60,7 @@ export function CheckIn({ dash }: { dash: Dashboard }) {
       const raw = (draft[v.id] ?? '').trim();
       values[v.id] = raw === '' ? null : Number(raw);
     }
+    if (moodChanged && moodDraft !== null) values[MOOD] = moodDraft; // the mood goes in with the readings
     setSaving(true);
     try {
       await api.saveReadings(dash.member.id, dash.day, values);
@@ -89,7 +99,7 @@ export function CheckIn({ dash }: { dash: Dashboard }) {
         data-testid="check-in"
         onSubmit={(e) => {
           e.preventDefault();
-          if (changed.length && !unreadable && !saving) void save();
+          if (dirty && !unreadable && !saving) void save();
         }}
       >
         <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 sm:gap-3 lg:grid-cols-5">
@@ -154,10 +164,15 @@ export function CheckIn({ dash }: { dash: Dashboard }) {
                 <span className="ml-2 whitespace-nowrap text-xs font-normal text-muted">
                   {t('quicklog.low')} → {t('quicklog.high')}
                 </span>
+                {moodChanged && (
+                  <span className="ml-2 whitespace-nowrap text-xs font-normal text-accent" data-testid="check-in-mood-unsaved">
+                    {t('checkin.unsaved')}
+                  </span>
+                )}
               </p>
               <div className="mt-2 flex gap-2" role="group" aria-label={t('quicklog.mood')}>
                 {[1, 2, 3, 4, 5].map((value) => {
-                  const on = mood.latest === value && mood.latest_source === 'manual';
+                  const on = moodChosen === value;
                   return (
                     <button
                       key={value}
@@ -165,7 +180,7 @@ export function CheckIn({ dash }: { dash: Dashboard }) {
                       aria-pressed={on}
                       aria-label={t('quicklog.moodValue', { n: value })}
                       data-testid={`check-in-mood-${value}`}
-                      onClick={() => log('mood', { value })}
+                      onClick={() => setMoodDraft(moodDraft === value ? null : value)}
                       className={`h-12 w-12 rounded-lg border font-display text-xl font-bold ${
                         on ? 'border-accent bg-accent text-bg' : 'border-line bg-bg/50 hover:border-accent hover:text-accent'
                       }`}
@@ -181,7 +196,7 @@ export function CheckIn({ dash }: { dash: Dashboard }) {
             <Button
               primary
               className="h-12"
-              disabled={changed.length === 0 || unreadable || saving}
+              disabled={!dirty || unreadable || saving}
               onClick={() => void save()}
               data-testid="check-in-save"
             >
