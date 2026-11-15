@@ -1,11 +1,17 @@
 import { useEffect, useState } from 'react';
-import { Fact, FactList } from '../components/Fact';
+import { Fact, FactList, useFacts } from '../components/Fact';
 import { MissionScrubber } from '../components/MissionScrubber';
 import { PageHeader, Panel, Tag } from '../components/ui';
 import { emphasisedHazards } from '../lib/lens';
 import { useApp, useT } from '../lib/store';
 
-/** Mission timeline and environments. Its shape uses sourced facts only; the rest is Pending. */
+/** What the mission screen will show once a sourced fact exists for it. */
+const ahead = [
+  { id: 'distance-comm-delay', title: 'mission.delay' },
+  { id: 'radiation-dose-rate', title: 'mission.dose' },
+];
+
+/** Mission timeline and environments. Its shape uses sourced facts only; the rest is planned. */
 export function Mission() {
   const t = useT();
   const bundle = useApp((s) => s.bundle);
@@ -14,6 +20,7 @@ export function Mission() {
   const navigate = useApp((s) => s.navigate);
   const phase = bundle?.mission.phases.find((p) => day >= p.start && day <= p.end);
   const [envId, setEnvId] = useState<string | null>(phase?.environment ?? null);
+  const facts = useFacts();
 
   useEffect(() => {
     setEnvId(phase?.environment ?? null);
@@ -96,12 +103,25 @@ export function Mission() {
           </div>
         </Panel>
 
-        <Panel title={t('mission.delay')}>
-          <Fact id="distance-comm-delay" />
-        </Panel>
-        <Panel title={t('mission.dose')}>
-          <Fact id="radiation-dose-rate" />
-        </Panel>
+        {/* Anything with a sourced fact is shown as a panel. What is still missing is listed once, quietly. */}
+        {ahead.filter((x) => facts.has(x.id)).map((x) => (
+          <Panel key={x.id} title={t(x.title)}>
+            <Fact id={x.id} />
+          </Panel>
+        ))}
+        {ahead.some((x) => !facts.has(x.id)) && (
+          <Panel title={t('mission.planned')} className="lg:col-span-2">
+            <ul className="flex flex-wrap gap-x-8 gap-y-1 text-sm text-muted" data-testid="mission-planned">
+              {ahead
+                .filter((x) => !facts.has(x.id))
+                .map((x) => (
+                  <li key={x.id} data-pending-id={x.id}>
+                    {t(x.title)}
+                  </li>
+                ))}
+            </ul>
+          </Panel>
+        )}
       </div>
     </div>
   );

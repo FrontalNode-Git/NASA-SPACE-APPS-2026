@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { SCREENS } from '../lib/commands';
 import { useApp, useT } from '../lib/store';
@@ -8,6 +8,7 @@ import { ParticleField } from './ParticleField';
 import { JudgeDrawer, Presenter } from './Presenter';
 import { QuickBar, QuickLog } from './QuickBar';
 import { StatusBadge, StatusGlyph } from './StatusGlyph';
+import { markTourHintSeen, tourHintSeen } from '../lib/tourHint';
 import { SimulatedTag } from './ui';
 
 /** Shown to whoever was sent a crew report, on every screen, until they open it. */
@@ -43,10 +44,10 @@ function ReceivedNotice() {
 }
 
 /**
- * A hairline across the top of the page: how far through the mission the viewed day is, with the
- * phases drawn to scale. It moves as the timeline plays and is the only graphic playback adds.
+ * How far through the mission the viewed day is, as a thin line under the day label, with the
+ * phases drawn to scale. It moves as the mission timeline plays.
  */
-function MissionProgress() {
+function MissionTrack() {
   const t = useT();
   const day = useApp((s) => s.day);
   const playing = useApp((s) => s.playing);
@@ -55,7 +56,7 @@ function MissionProgress() {
   const percent = Math.min(100, Math.max(0, (day / total) * 100));
   const edges = (mission?.phases ?? []).filter((p) => p.end > 0 && p.end < total).map((p) => (p.end / total) * 100);
   return (
-    <div
+    <span
       role="progressbar"
       aria-label={t('progress.mission')}
       aria-valuemin={0}
@@ -63,16 +64,93 @@ function MissionProgress() {
       aria-valuenow={day}
       aria-valuetext={t('common.day', { n: day })}
       data-testid="mission-progress"
-      className="pointer-events-none fixed inset-x-0 top-0 z-50 h-[3px] bg-line/40 print:hidden"
+      className="pointer-events-none absolute inset-x-0.5 -bottom-1.5 block h-[3px] overflow-hidden rounded-full bg-line/60 print:hidden"
     >
-      <div
-        className="h-full bg-accent ease-linear motion-reduce:transition-none"
+      <span
+        className="block h-full rounded-full bg-accent ease-linear motion-reduce:transition-none"
         style={{ width: `${percent}%`, transitionProperty: 'width', transitionDuration: playing ? '500ms' : '160ms' }}
       />
       {edges.map((edge) => (
         <span key={edge} className="absolute top-0 h-full w-px bg-bg" style={{ left: `${edge}%` }} />
       ))}
-    </div>
+    </span>
+  );
+}
+
+/**
+ * Shown once to someone opening the plain link for the first time: there is a guided tour, and
+ * one tap starts it. It never shows on a ?tour or ?demo link, or after the tour has been started
+ * or turned away.
+ */
+function TourHint() {
+  const t = useT();
+  const demo = useApp((s) => s.demo);
+  const touring = useApp((s) => s.presenter.active);
+  const [seen, setSeen] = useState(tourHintSeen);
+
+  // However the tour starts (this card, the P key, a ?tour link), the hint has done its job.
+  useEffect(() => {
+    if (touring && !seen) {
+      markTourHintSeen();
+      setSeen(true);
+    }
+  }, [touring, seen]);
+
+  if (seen || demo || touring) return null;
+  const close = () => {
+    markTourHintSeen();
+    setSeen(true);
+  };
+  return (
+    <section
+      aria-label={t('tour.title')}
+      data-testid="tour-hint"
+      className="glass mb-3 flex flex-wrap items-center gap-x-4 gap-y-3 rounded-xl border border-accent/60 p-3 sm:p-4 print:hidden"
+    >
+      <p className="min-w-0 flex-1 basis-64 text-sm">
+        <span className="font-display font-semibold">{t('tour.title')}</span> <span className="text-muted">{t('tour.body')}</span>
+      </p>
+      <div className="flex gap-2">
+        <button
+          type="button"
+          data-testid="tour-start"
+          className="min-h-[44px] rounded-lg border border-accent bg-accent px-4 text-sm font-semibold text-bg hover:brightness-110"
+          onClick={() => {
+            close();
+            useApp.setState({ presenter: { active: true, step: 0, auto: false } });
+          }}
+        >
+          {t('tour.start')}
+        </button>
+        <button
+          type="button"
+          data-testid="tour-dismiss"
+          className="min-h-[44px] rounded-lg border border-line px-4 text-sm hover:border-accent"
+          onClick={close}
+        >
+          {t('tour.dismiss')}
+        </button>
+      </div>
+    </section>
+  );
+}
+
+/** The foot of every screen: what the data is, and the way back to a clean start. */
+function PageFooter() {
+  const t = useT();
+  const link = 'min-h-[44px] px-2 text-sm underline decoration-line underline-offset-4 hover:text-ink hover:decoration-accent';
+  return (
+    <footer className="mt-8 flex flex-wrap items-center justify-between gap-x-6 gap-y-1 border-t border-line/60 pt-3 text-xs text-muted print:hidden" data-testid="page-footer">
+      <p>{t('footer.simulated')}</p>
+      <p className="flex flex-wrap items-center">
+        <button type="button" className={link} data-testid="footer-replay" onClick={() => useApp.setState({ presenter: { active: true, step: 0, auto: false } })}>
+          {t('footer.replay')}
+        </button>
+        <button type="button" className={link} data-testid="footer-reset" onClick={() => void useApp.getState().resetDemo()}>
+          {t('footer.reset')}
+        </button>
+      </p>
+    </footer>
   );
 }
 
@@ -143,8 +221,9 @@ function DayStepper() {
       <button type="button" className={step} onClick={() => setDay(day - 1)} disabled={day <= 0} aria-label={t('header.prevDay')} data-testid="day-prev">
         <span aria-hidden="true">‹</span>
       </button>
-      <span className="min-w-[5.25rem] text-center text-sm font-medium tabular-nums sm:min-w-[7.5rem]" data-testid="day-label">
+      <span className="relative block min-w-[5.25rem] text-center text-sm font-medium tabular-nums sm:min-w-[7.5rem]" data-testid="day-label">
         {t('common.day', { n: day })}
+        <MissionTrack />
       </span>
       <button type="button" className={step} onClick={() => setDay(day + 1)} disabled={day >= max} aria-label={t('header.nextDay')} data-testid="day-next">
         <span aria-hidden="true">›</span>
@@ -262,7 +341,7 @@ function Header() {
             <select
               value={viewer}
               onChange={(e) => setViewer(e.target.value)}
-              className="min-h-[40px] w-full min-w-0 rounded-lg border border-line bg-panel px-2 text-sm sm:w-auto"
+              className="min-h-[40px] w-full min-w-0 rounded-lg border border-line bg-panel px-1.5 text-[13px] sm:w-auto sm:px-2 sm:text-sm"
               data-testid="viewer-select"
             >
               {bundle?.crew.map((m) => (
@@ -385,7 +464,6 @@ export function Layout() {
   return (
     <div className="min-h-screen pb-28">
       <ParticleField />
-      <MissionProgress />
       <a href="#main" className="sr-only focus:not-sr-only focus:absolute focus:left-2 focus:top-2 focus:z-50 focus:rounded focus:bg-accent focus:px-3 focus:py-2 focus:text-bg">
         {t('app.skip')}
       </a>
@@ -393,8 +471,10 @@ export function Layout() {
       <div className="mx-auto max-w-[1500px] lg:flex lg:gap-5 lg:px-5 lg:pt-4">
         <Nav />
         <main id="main" className="min-w-0 flex-1 px-3 pt-1 sm:px-5 lg:px-0 lg:pt-0">
+          <TourHint />
           <ReceivedNotice />
           <Outlet />
+          <PageFooter />
         </main>
       </div>
       <QuickBar />

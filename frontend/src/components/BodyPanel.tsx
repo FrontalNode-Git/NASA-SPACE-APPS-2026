@@ -4,6 +4,7 @@ import { beatRate } from '../lib/heartbeat';
 import { litIds } from '../lib/lens';
 import { useApp, useT } from '../lib/store';
 import { prefersReducedMotion } from './Chart';
+import { Fact } from './Fact';
 import type { Status, Zone } from '../lib/types';
 import type { ScanCard } from './BodyScan';
 import { STATUS_META, StatusBadge, StatusGlyph } from './StatusGlyph';
@@ -177,9 +178,12 @@ function ZoneDetail({ zone, status }: { zone: Zone; status: Status }) {
       {risks.length > 0 && (
         <div className="mt-3">
           <h4 className="text-xs font-semibold uppercase tracking-wider text-muted">{t('scan.risks')}</h4>
-          <ul className="mt-1 list-disc space-y-0.5 pl-5 text-sm">
+          <ul className="mt-1 space-y-2 text-sm" data-testid="zone-risks">
             {risks.map((r) => (
-              <li key={r.id}>{r.name}</li>
+              <li key={r.id}>
+                <span className="font-semibold">{r.name}</span>
+                <Fact id={r.fact_id} className="text-muted" />
+              </li>
             ))}
           </ul>
         </div>

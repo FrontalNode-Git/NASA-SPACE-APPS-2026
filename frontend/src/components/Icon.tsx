@@ -13,8 +13,8 @@ import running from '../assets/icons/running.svg';
 import search from '../assets/icons/search.svg';
 import sight from '../assets/icons/sight.svg';
 import sleep from '../assets/icons/sleep.svg';
-import smartwatch from '../assets/icons/smartwatch.svg';
 import thermometer from '../assets/icons/thermometer.svg';
+import timeline from '../assets/icons/timeline.svg';
 
 const ICONS = {
   cardiogram,
@@ -32,8 +32,8 @@ const ICONS = {
   search,
   sight,
   sleep,
-  smartwatch,
   thermometer,
+  timeline,
 } as const;
 
 export type IconName = keyof typeof ICONS;

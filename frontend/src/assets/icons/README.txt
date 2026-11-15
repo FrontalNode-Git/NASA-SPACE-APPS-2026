@@ -3,10 +3,10 @@ Icons used by the VITAL interface.
 From the "Health and Wellness Icons" pack by Mycogen, licensed from Envato Elements (only the
 ones the app uses were copied in):
   cardiogram, chat, doctor, first-aid-kit, heart, lungs, measuring-tape, medical-record,
-  medical-report, mental-health, running, sight, sleep, smartwatch, thermometer
+  medical-report, mental-health, running, sight, sleep, thermometer
 
 Drawn for VITAL to fill the gaps in that pack:
-  search, mic
+  search, mic, timeline
 
 All are single-colour glyphs. The app paints them with the current text colour through a
 CSS mask (see src/components/Icon.tsx), so they follow the day and night themes.
