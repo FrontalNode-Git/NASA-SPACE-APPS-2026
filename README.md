@@ -230,7 +230,7 @@ We used Claude (Anthropic) as an assistant for coding, debugging and fact-checki
 Health content: NASA Human Research Program and Canadian Space Agency public pages, listed in
 [docs/SOURCES.txt](docs/SOURCES.txt). VITAL is not affiliated with or endorsed by NASA or the CSA.
 
-Interface icons: "Health and Wellness Icons" by Mycogen, used under an Envato Elements licence held by FrontalNode (details in [frontend/src/assets/icons/README.txt](frontend/src/assets/icons/README.txt)). The search and microphone icons were drawn for VITAL.
+Interface icons: "Health and Wellness Icons" by Mycogen, used under an Envato Elements licence held by FrontalNode (details in [frontend/src/assets/icons/README.txt](frontend/src/assets/icons/README.txt)). The search, microphone and timeline icons were drawn for VITAL.
 
 ## Licence
 

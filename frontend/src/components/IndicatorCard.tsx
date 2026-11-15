@@ -5,6 +5,7 @@ import { useApp, useT } from '../lib/store';
 import type { IndicatorView } from '../lib/types';
 import { usePhone } from '../lib/usePhone';
 import { Chart, type ThemeColors } from './Chart';
+import { Fact } from './Fact';
 import { Icon, indicatorIcon } from './Icon';
 import { StatusBadge } from './StatusGlyph';
 import { LockIcon, Tag } from './ui';
@@ -162,6 +163,10 @@ export function IndicatorCard({ view, highlight = false }: { view: IndicatorView
 
   // A mood is never read by a sensor: until the crew member logs one it is a simulated value.
   const sourceKey = view.latest_source === 'manual' ? 'ind.entered' : view.id === 'mood' ? 'ind.simulated' : 'ind.sensor';
+  // A reading that is off comes with NASA's own statement for each risk linked to it (sourced facts only).
+  const bundle = useApp((s) => s.bundle);
+  const riskIds = bundle?.indicators.find((d) => d.id === view.id)?.risks ?? [];
+  const nasaRisks = view.status === 'nominal' ? [] : (bundle?.risks ?? []).filter((r) => riskIds.includes(r.id));
 
   return (
     <article
@@ -250,6 +255,19 @@ export function IndicatorCard({ view, highlight = false }: { view: IndicatorView
             <p className="mt-2 rounded-lg border border-line bg-bg/40 px-2.5 py-1.5 text-sm" data-testid="missing-reminder">
               {t('ind.missingToday')}
             </p>
+          )}
+          {nasaRisks.length > 0 && (
+            <details className="mt-2 rounded-lg border border-line bg-bg/40 px-2.5 py-1.5 text-sm" data-testid="nasa-says">
+              <summary className="cursor-pointer font-medium">{t('ind.nasaSays')}</summary>
+              <ul className="mt-1.5 space-y-2">
+                {nasaRisks.map((r) => (
+                  <li key={r.id}>
+                    <span className="font-semibold">{r.name}</span>
+                    <Fact id={r.fact_id} className="text-muted" />
+                  </li>
+                ))}
+              </ul>
+            </details>
           )}
 
           {open && (

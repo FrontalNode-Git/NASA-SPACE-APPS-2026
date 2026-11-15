@@ -229,6 +229,11 @@ test('dashboard tells the drift story on the demo day', async ({ page }) => {
   await expect(heart.locator('[data-status="watch"]')).toBeVisible();
   await expect(heart.locator('[data-icon="heart"]')).toBeVisible();
   await expect(heart.getByTestId('drift-message')).toContainText('Slowly drifting above your normal for 5 days');
+  const nasa = heart.getByTestId('nasa-says'); // an off reading comes with NASA's statement for its risks
+  await nasa.locator('summary').click();
+  await expect(nasa).toContainText('Risk of Cardiovascular Adaptations');
+  await expect(nasa).toContainText('Weightlessness alters blood circulation');
+  await expect(card(page, 'temperature').getByTestId('nasa-says')).toHaveCount(0); // nominal: nothing added
   // Plain words on the card; the method names are a hover away, not on screen.
   await expect(heart.getByTestId('drift-checks')).toHaveText('Two independent checks agree this is a real drift.');
   await expect(heart.getByTestId('drift-checks')).toHaveAttribute('title', /EWMA.*CUSUM/);

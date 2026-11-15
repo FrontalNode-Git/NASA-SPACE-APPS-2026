@@ -137,6 +137,7 @@ export const STRINGS: Record<string, string> = {
   'ind.normal': 'Your normal:',
   'ind.noBaseline': 'No baseline yet. Complete the pre-flight calibration.',
   'ind.missingToday': 'No reading today. Take this measurement when you can.',
+  'ind.nasaSays': 'What NASA says about this',
   'ind.basedOn': 'Based on {n} pre-flight · {m} mission readings',
   'ind.calibrated': 'calibrated by you',
   'ind.chartLabel': '{name}: readings against your normal band, with the trend line',
