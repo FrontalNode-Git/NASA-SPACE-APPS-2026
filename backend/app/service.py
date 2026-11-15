@@ -1,7 +1,9 @@
 """Crew state and dashboards: joins readings, the baseline engine and crew logs.
 
-Readings come from two places. The simulated sensor feed supplies a value for every day;
-whatever a crew member enters in their daily check-in replaces the feed for that day.
+Readings come from two places. The simulator supplies a value for every day; whatever a
+crew member enters in their daily check-in replaces the simulated value for that day.
+In the API, `latest_source: "sensor"` means the simulated value (the name is kept so the
+frontend contract does not change); `"manual"` means the crew member typed it.
 
 Privacy rule (tested): mood and personal notes are visible only to the crew member they
 belong to. Anyone else, including the Chief Medical Officer, sees the status level only.
@@ -31,7 +33,7 @@ MAX_MAGNITUDE = 1_000_000.0
 SIM_CHECKINS = {"commander": (0, "07:10"), "cmo": (0, "06:55"), "systems": (1, "22:40"), "engineer": (0, "07:25")}
 SIM_NOTES = {
     "commander": "Simulated note: good session on the bike, feeling steady.",
-    "cmo": "Simulated note: skipped the temperature reading, sensor was charging.",
+    "cmo": "Simulated note: skipped the temperature reading this morning.",
     "systems": "Simulated note: late shift on the water loop, short night.",
     "engineer": "Simulated note: busy week, a little wound up before sleep.",
 }
@@ -67,7 +69,7 @@ class Store:
         return notice
 
     def set_reading(self, member: str, indicator: str, day: int, value: float | None) -> None:
-        """Store what the crew member entered. None withdraws the entry (the sensor value returns)."""
+        """Store what the crew member entered. None withdraws the entry (the simulated value returns)."""
         days = self.readings.setdefault(member, {}).setdefault(indicator, {})
         if value is None:
             days.pop(day, None)
@@ -131,7 +133,7 @@ def indicator_view(content: Content, store: Store, member: str, ind: Indicator, 
     entered = store.entered(member, ind.id)
     for entered_day, value in entered.items():
         if first <= entered_day <= day:
-            values[entered_day - first] = value  # the check-in wins over the sensor feed
+            values[entered_day - first] = value  # the check-in wins over the simulated value
     latest_source = None
     if values and values[-1] is not None:
         latest_source = "manual" if day in entered else "sensor"
