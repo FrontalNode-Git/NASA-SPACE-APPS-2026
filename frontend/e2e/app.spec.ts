@@ -470,6 +470,7 @@ test('night mode and the flat body view', async ({ page }) => {
   await expect(detail).toContainText('Resting heart rate');
   await expect(detail).toContainText('bpm');
   await expect(detail).toContainText('Risk of Cardiovascular Adaptations');
+  await expect(detail).toContainText('Weightlessness alters blood circulation'); // what NASA says, not just the name
 });
 
 test('an entry made while the server cannot be reached is kept and sent later', async ({ page }) => {

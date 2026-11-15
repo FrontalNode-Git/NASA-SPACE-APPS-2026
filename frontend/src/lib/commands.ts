@@ -29,7 +29,7 @@ export interface PaletteItem {
 export const SCREENS: { route: string; key: string; icon: IconName; words: string }[] = [
   { route: '/', key: 'nav.dashboard', icon: 'cardiogram', words: 'dashboard home check-in vitals body scan' },
   { route: '/crew', key: 'nav.crew', icon: 'doctor', words: 'crew team medical officer' },
-  { route: '/mission', key: 'nav.mission', icon: 'smartwatch', words: 'mission timeline environments mars' },
+  { route: '/mission', key: 'nav.mission', icon: 'timeline', words: 'mission timeline environments mars' },
   { route: '/report', key: 'nav.report', icon: 'medical-report', words: 'report ground summary' },
   { route: '/calibrate', key: 'nav.calibrate', icon: 'measuring-tape', words: 'calibrate baseline pre-flight wizard' },
   { route: '/modules', key: 'nav.modules', icon: 'first-aid-kit', words: 'modules optional live data' },
