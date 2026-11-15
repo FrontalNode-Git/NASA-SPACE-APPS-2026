@@ -7,7 +7,7 @@ import { defineConfig } from '@playwright/test';
  *     (backend)   python -m uvicorn app.main:app --port 7860
  *     (frontend)  npm run e2e
  *
- * To test the deployed Space in a fresh context, set BASE_URL to its full https URL.
+ * To test a server somewhere else, set BASE_URL to its full address (for example https://...).
  * PW_CHANNEL picks an installed browser (msedge, chrome) instead of a Playwright download.
  */
 const channel = process.env.PW_CHANNEL;

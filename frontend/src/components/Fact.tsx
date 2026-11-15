@@ -1,15 +1,10 @@
 import { useMemo } from 'react';
 import { useApp, useT } from '../lib/store';
-import type { Fact as FactT, LinkKind } from '../lib/types';
+import type { Fact as FactT } from '../lib/types';
 
 export function useFacts(): Map<string, FactT> {
   const facts = useApp((s) => s.bundle?.facts);
   return useMemo(() => new Map((facts ?? []).map((f) => [f.id, f])), [facts]);
-}
-
-export function useFactsFor(kind: LinkKind, id: string): FactT[] {
-  const facts = useApp((s) => s.bundle?.facts);
-  return useMemo(() => (facts ?? []).filter((f) => f.links[kind].includes(id)), [facts, kind, id]);
 }
 
 /** Placeholder shown wherever the app is still waiting for approved content. */

@@ -10,7 +10,6 @@ export const STRINGS: Record<string, string> = {
 
   'common.day': 'Mission day {n}',
   'common.dayRange': 'days {a} to {b}',
-  'common.save': 'Save',
   'common.close': 'Close',
   'common.retry': 'Try again',
 

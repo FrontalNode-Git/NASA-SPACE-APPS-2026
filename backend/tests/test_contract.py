@@ -1,8 +1,8 @@
 """The API contract the frontend relies on.
 
 These tests pin the shape of every response the UI reads. If one fails because you changed
-a response on purpose, update frontend/src/lib/types.ts and docs/API.md in the same change
-and tell whoever owns the frontend. That is the whole hand-off between the two halves.
+a response on purpose, update frontend/src/lib/types.ts in the same change. That is the
+whole hand-off between the two halves.
 """
 from app import simulator as sim
 

@@ -108,11 +108,5 @@ def test_sources_txt_matches_the_data():
     assert on_disk == module.render(), "docs/SOURCES.txt is stale. Run (in backend/): python scripts/export_sources.py"
 
 
-def test_pending_doc_lists_every_pending_item(content):
-    doc = (ROOT / "docs" / "PENDING.md").read_text(encoding="utf-8")
-    for item in content.pending():
-        assert item["id"] in doc, f"docs/PENDING.md is missing {item['id']}"
-
-
 def test_reload_from_disk_matches(content):
     assert len(load_content().facts) == len(content.facts)

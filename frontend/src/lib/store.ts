@@ -84,8 +84,9 @@ export interface AppState extends Persisted {
   dismissToast: (id: number) => void;
   set: (patch: Partial<AppState>) => void;
   log: (kind: LogEntry['kind'], extra?: { value?: number; text?: string }) => void;
+  logQuick: (quick: { mood: number | null; entries: string[]; note: string }) => void;
   /** Several entries saved together (the quick log): one confirmation for the whole batch. */
-  logMany: (entries: { kind: LogEntry['kind']; value?: number; text?: string }[]) => void;
+  logMany: (entries: { kind: LogEntry['kind']; value?: number; text?: string; entries?: string[] }[]) => void;
   enqueue: (items: PendingItem | PendingItem[]) => void;
   flushOutbox: (opts?: { manual?: boolean }) => Promise<void>;
   run: (command: Command) => void;
@@ -254,6 +255,9 @@ export const useApp = create<AppState>((set, get) => ({
   },
 
   log: (kind, extra) => get().logMany([{ kind, ...extra }]),
+
+  /** The quick log: a mood, chosen entries and a note, saved as ONE entry on the record. */
+  logQuick: ({ mood, entries, note }) => get().logMany([{ kind: 'quick', value: mood ?? undefined, entries, text: note || undefined }]),
 
   // One confirmation for the whole batch, and only after the server has accepted it. Anything
   // the server could not be reached for is kept in the browser and sent again later.

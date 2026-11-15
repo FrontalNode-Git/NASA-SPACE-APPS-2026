@@ -178,7 +178,7 @@ export function ReportPage() {
           </Button>
         </div>
         {scope === 'crew' && (
-          <div className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-2 rounded-lg border border-line bg-panel p-3 print:hidden" data-testid="report-notify">
+          <div className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-2 glass rounded-lg border border-line p-3 print:hidden" data-testid="report-notify">
             <Button primary={!sent} disabled={sending} onClick={() => void notify()} data-testid="report-notify-button">
               {t(sent ? 'report.notifyAgain' : 'report.notify')}
             </Button>

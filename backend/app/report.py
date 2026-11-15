@@ -1,4 +1,4 @@
-"""Report for ground: a readable daily summary for one (fictional) crew member, or for the
+"""Report for ground: a readable daily summary for one crew member, or for the
 whole crew when the Chief Medical Officer asks for it. The medical officer can send the crew
 report to the Commander.
 
@@ -84,7 +84,7 @@ def build_report(
     report: dict[str, object] = {
         "title": "VITAL report for ground",
         "simulated": True,
-        "disclaimer": "Simulated data for a fictional crew member. Statistics against a personal baseline; not a medical assessment.",
+        "disclaimer": "Simulated readings for a crew member. Statistics against a personal baseline; not a medical assessment.",
         "method_status": content.model.method_status,
         "generated_at": _now(),
         "member": dash["member"],
@@ -123,7 +123,7 @@ def build_crew_report(
     report: dict[str, object] = {
         "title": "VITAL crew report for ground",
         "simulated": True,
-        "disclaimer": "Simulated data for a fictional crew. Statistics against each personal baseline; not a medical assessment.",
+        "disclaimer": "Simulated readings for the crew. Statistics against each personal baseline; not a medical assessment.",
         "privacy": PRIVATE_NOTE,
         "method_status": content.model.method_status,
         "generated_at": _now(),
@@ -255,7 +255,7 @@ section{{break-inside:avoid;border-top:2px solid #111;margin-top:24px}}
 def render_html(r: dict[str, object]) -> str:
     """Self-contained printable page (use the browser's Print → Save as PDF)."""
     body = f"""<div class="muted">{escape(_who(r))} · mission day {r['mission_day']} · {escape(r['phase']['name'])} · generated {escape(str(r['generated_at']))}</div>
-<div class="banner">SIMULATED DATA — fictional crew member. {escape(str(r['method_status']).capitalize())} method. Not a medical assessment.</div>
+<div class="banner">SIMULATED DATA — the readings are not real. {escape(str(r['method_status']).capitalize())} method. Not a medical assessment.</div>
 {_member_html(r)}
 <p class="muted">{escape(str(r['disclaimer']))}</p>"""
     return _page(str(r["title"]), body)
@@ -270,7 +270,7 @@ def render_crew_html(c: dict[str, object]) -> str:
     )
     sections = "".join(f"<section><h2>{escape(_who(m))}</h2>{_member_html(m)}</section>" for m in members)
     body = f"""<div class="muted">Mission day {c['mission_day']} · {escape(c['phase']['name'])} · requested by {escape(by['role'])} {escape(by['name'])} · generated {escape(str(c['generated_at']))}</div>
-<div class="banner">SIMULATED DATA — fictional crew. {escape(str(c['method_status']).capitalize())} method. Not a medical assessment.</div>
+<div class="banner">SIMULATED DATA — the readings are not real. {escape(str(c['method_status']).capitalize())} method. Not a medical assessment.</div>
 <p><strong>Crew overall: {STATUS_SHAPE[str(c['overall'])]} {escape(str(c['overall_label']))}</strong></p>
 <ul>{summary}</ul>
 {sections}

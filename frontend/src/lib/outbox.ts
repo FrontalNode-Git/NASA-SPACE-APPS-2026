@@ -6,7 +6,7 @@ import { api, ApiError } from './api';
 import type { LogEntry } from './types';
 
 export type PendingItem =
-  | { id: string; kind: 'log'; member: string; body: { kind: LogEntry['kind']; day: number; value?: number; text?: string } }
+  | { id: string; kind: 'log'; member: string; body: { kind: LogEntry['kind']; day: number; value?: number; text?: string; entries?: string[] } }
   | { id: string; kind: 'readings'; member: string; day: number; values: Record<string, number | null> };
 
 export type Delivery = 'sent' | 'retry' | 'refused';

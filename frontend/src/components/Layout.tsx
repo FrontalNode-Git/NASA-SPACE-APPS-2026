@@ -21,7 +21,7 @@ function ReceivedNotice() {
     <div
       role="status"
       data-testid="crew-notice"
-      className="mb-3 flex flex-wrap items-center gap-x-3 gap-y-2 rounded-xl border border-accent bg-panel p-3 text-sm print:hidden"
+      className="mb-3 flex flex-wrap items-center gap-x-3 gap-y-2 glass rounded-xl border border-accent p-3 text-sm print:hidden"
     >
       <StatusGlyph status={unread.overall} size={14} />
       <p className="min-w-0 flex-1 basis-56">

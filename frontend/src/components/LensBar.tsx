@@ -19,7 +19,7 @@ export function LensBar() {
   const selected = bundle.hazards.filter((h) => lens.includes(h.id));
 
   return (
-    <div className="rounded-xl border border-line bg-panel/60 px-3 py-2" data-testid="lens">
+    <div className="glass rounded-xl border border-line px-3 py-2" data-testid="lens">
       <div className="flex flex-wrap items-center gap-2" role="group" aria-label={t('lens.title')}>
         <span className="mr-1 text-xs font-semibold uppercase tracking-wider text-muted">{t('lens.title')}</span>
         {bundle.hazards.map((h, i) => {

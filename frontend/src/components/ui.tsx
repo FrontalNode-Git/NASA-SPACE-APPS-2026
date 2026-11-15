@@ -16,7 +16,7 @@ export function Panel({
 }) {
   return (
     <section
-      className={`rounded-xl border border-line bg-panel p-4 transition-opacity duration-300 ${dim ? 'opacity-25' : ''} ${className}`}
+      className={`glass rounded-xl border border-line p-4 transition-opacity duration-300 ${dim ? 'opacity-25' : ''} ${className}`}
       data-dim={dim || undefined}
     >
       {(title || action) && (

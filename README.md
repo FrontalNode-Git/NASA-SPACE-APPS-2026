@@ -20,12 +20,10 @@ Astronauts on Space Missions*.
 - **Clear status.** Nominal ●, Watch ▲ or Call ground ■, always with a colour, a shape, a word and a reason.
 - **Body scan and Hazard Lens.** An interactive figure whose body zones follow the statuses, and a lens
   that shows how NASA's five spaceflight hazards relate to the body.
-- **Crew view and reports.** The medical officer sees everyone's status, most urgent first; each crew
-  member has a daily report for ground, and the medical officer can send a crew report to the Commander.
+- **Crew view and reports.** The crew view lists everyone's status, most urgent first; each crew
+  member has a daily report for ground, and the medical officer gets one report for the whole crew
+  and can send it to the Commander.
 - **Mission timeline.** A simulated 1,095-day Mars mission across its phases and environments.
-
-- What is still open: [TODO.md](TODO.md)
-- Presenting it: [docs/PRESENTERS.md](docs/PRESENTERS.md)
 
 ---
 
@@ -148,7 +146,7 @@ The repository is split so that each person only needs their own half.
 | [backend/](backend/) | FastAPI service: baseline and drift maths, check-ins, crew privacy, report | Python |
 | [frontend/](frontend/) | React + TypeScript interface | Node.js |
 | [data/](data/) | The content both halves read (`sources/` and `app/model.json`) | a text editor |
-| [docs/](docs/) | Presenter guide, pending content, list of sources | — |
+| [docs/](docs/) | The list of sources behind every health statement | — |
 
 The two halves meet in one place: the JSON the API returns. Its shape is pinned by
 [backend/tests/test_contract.py](backend/tests/test_contract.py) and mirrored in
@@ -202,10 +200,10 @@ The same checks run on every push, in [.github/workflows/ci.yml](.github/workflo
 - **Health statements come from data, never from code.** Every statement the app shows is in
   [data/sources/](data/sources/) and traces to a NASA or Canadian Space Agency page. The app
   does not show the sources; the full list is [docs/SOURCES.txt](docs/SOURCES.txt). Places
-  still waiting for a sourced fact show *Planned · Not in this version yet* and are listed in
-  [docs/PENDING.md](docs/PENDING.md).
+  still waiting for a sourced fact show *Planned · Not in this version yet*.
 - **Privacy.** Mood values, notes, personal reports and pre-flight calibration are visible only to the
-  crew member they belong to. Everyone else, including the medical officer, sees status levels only.
+  crew member they belong to. For mood, everyone else, including the medical officer, sees only a
+  status level; the other readings are shown in the crew view.
 - **NASA API key.** Not needed today: it is only for the live space-weather module, which is off. When
   that module is approved, copy `backend/.env.example` to `backend/.env` and put the key after
   `NASA_API_KEY=`. Never commit `.env`.
@@ -234,4 +232,4 @@ comes from NASA and Canadian Space Agency pages (see [docs/SOURCES.txt](docs/SOU
 Health content: NASA Human Research Program and Canadian Space Agency public pages, listed in
 [docs/SOURCES.txt](docs/SOURCES.txt). VITAL is not affiliated with or endorsed by NASA or the CSA.
 
-Interface icons: from a "health and wellness" icon pack (see [frontend/src/assets/icons/README.txt](frontend/src/assets/icons/README.txt)); licence being confirmed.
+Interface icons: "Health and Wellness Icons" by Mycogen, used under an Envato Elements licence held by FrontalNode (details in [frontend/src/assets/icons/README.txt](frontend/src/assets/icons/README.txt)). The search and microphone icons were drawn for VITAL.

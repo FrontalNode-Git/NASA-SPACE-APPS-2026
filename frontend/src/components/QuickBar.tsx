@@ -144,12 +144,12 @@ export function QuickLog() {
   const count = (mood === null ? 0 : 1) + picked.length + (note.trim() ? 1 : 0);
   const save = () => {
     if (count === 0) return;
-    useApp.getState().logMany([
-      ...(mood === null ? [] : [{ kind: 'mood' as const, value: mood }]),
-      // In the order they are shown, not the order they were tapped.
-      ...ENTRY_KEYS.filter((key) => picked.includes(key)).map((key) => ({ kind: 'entry' as const, text: t(key) })),
-      ...(note.trim() ? [{ kind: 'note' as const, text: note.trim() }] : []),
-    ]);
+    // One entry on the record: the entries in the order they are shown, not the order they were tapped.
+    useApp.getState().logQuick({
+      mood,
+      entries: ENTRY_KEYS.filter((key) => picked.includes(key)).map((key) => t(key)),
+      note: note.trim(),
+    });
     close();
   };
   const me = crew?.find((m) => m.id === viewer);

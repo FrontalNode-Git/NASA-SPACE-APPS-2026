@@ -33,7 +33,7 @@
     { "id": "pressurized-rover", "name": "Pressurized rover", "fact_ids": ["env-pressurized-rover"] }
   ],
   "mission": {
-    "name": "Fictional crewed Mars mission",
+    "name": "Simulated crewed Mars mission",
     "note": "Simulated mission plan. The split between phases is illustrative.",
     "total_days": 1095,
     "basis_fact_ids": ["hz-distance-three-years"],

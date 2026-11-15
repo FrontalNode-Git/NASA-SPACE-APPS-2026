@@ -35,7 +35,7 @@ export function Crew() {
               setMember(tile.id);
               navigate('/');
             }}
-            className={`flex flex-col items-stretch justify-start rounded-xl border bg-panel p-4 text-left transition hover:border-accent ${
+            className={`glass flex flex-col items-stretch justify-start rounded-xl border p-4 text-left transition hover:border-accent ${
               tile.needs_attention ? STATUS_META[tile.overall].ring : 'border-line'
             }`}
           >

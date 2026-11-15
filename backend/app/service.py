@@ -91,7 +91,7 @@ class Store:
         }
         self._next_id += 1
         self.logs.setdefault(member, []).append(entry)
-        if kind == "mood" and value is not None:
+        if kind in {"mood", "quick"} and value is not None:
             self.set_reading(member, "mood", day, float(value))  # a logged mood is today's mood reading
         return entry
 
@@ -108,6 +108,32 @@ class Store:
             "simulated": True,
         }
         return sorted(real, key=lambda e: (e["day"], e["id"]), reverse=True) + ([note] if day >= 1 else [])
+
+
+QUICK_ENTRY_LIMIT = 8  # chosen entries in one quick log
+QUICK_ENTRY_LENGTH = 60
+
+
+def quick_log_text(value: int | None, entries: list[str] | None, note: str | None) -> str:
+    """One line for a quick log: the mood, each chosen entry, then the note, joined with " · ".
+
+    Raises ValueError, in words the crew member can read, when there is nothing to log or an
+    entry is not a short line of text.
+    """
+    parts: list[str] = []
+    if value is not None:
+        parts.append(f"Mood {value} of five")
+    for entry in entries or []:
+        line = " ".join(entry.split())
+        if len(line) > QUICK_ENTRY_LENGTH:
+            raise ValueError(f"an entry can be at most {QUICK_ENTRY_LENGTH} characters")
+        if line and line not in parts:  # tapping the same choice twice is still one choice
+            parts.append(line)
+    if note and note.strip():
+        parts.append(" ".join(note.split()))
+    if not parts:
+        raise ValueError("a quick log needs a mood, an entry or a note")
+    return " · ".join(parts)
 
 
 def _member(content: Content, member_id: str) -> dict[str, str]:

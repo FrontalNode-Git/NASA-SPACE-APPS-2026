@@ -1,5 +1,4 @@
 export type Status = 'nominal' | 'watch' | 'call_ground';
-export type CoverageLevel = 'monitored' | 'partial' | 'pending';
 export type LinkKind = 'indicators' | 'zones' | 'hazards' | 'risks';
 
 export interface Fact {
@@ -29,20 +28,6 @@ export interface Risk {
   fact_id: string;
   hazards: string[];
   zones: string[];
-}
-
-export type StudyGroup = 'artemis-ii' | 'leo' | 'past';
-
-export interface Study {
-  id: string;
-  name: string;
-  group: StudyGroup;
-  url: string;
-  fact_id: string;
-  hazards: string[];
-  zones: string[];
-  risks: string[];
-  indicators: string[];
 }
 
 export interface IndicatorDef {
@@ -85,38 +70,10 @@ export interface Mission {
   phases: Phase[];
 }
 
-export interface Feature {
-  id: string;
-  name: string;
-  kind: 'measure' | 'zones' | 'hazards';
-}
-
 export interface CrewMember {
   id: string;
   name: string;
   role: string;
-}
-
-export interface PendingItem {
-  id: string;
-  where: string;
-  reason: string;
-  resolve: string;
-}
-
-export interface CoverageRow {
-  risk_id: string;
-  level: CoverageLevel;
-  indicators: string[];
-  cells: Record<string, CoverageLevel>;
-}
-
-export interface Coverage {
-  total: number;
-  monitored: number;
-  partial: number;
-  pending: number;
-  rows: CoverageRow[];
 }
 
 export type HazardLinkKind = 'risks' | 'studies' | 'indicators' | 'zones' | 'environments';
@@ -125,18 +82,13 @@ export interface Bundle {
   facts: Fact[];
   hazards: Hazard[];
   risks: Risk[];
-  research: Study[];
   method_status: 'provisional' | 'approved';
   crew: CrewMember[];
   indicators: IndicatorDef[];
   zones: Zone[];
   environments: Environment[];
   mission: Mission;
-  features: Feature[];
-  slots: { id: string; where: string; reason: string }[];
   hazard_links: Record<HazardLinkKind, Record<string, string[]>>;
-  pending: PendingItem[];
-  coverage: Coverage;
 }
 
 export interface SeriesPoint {
@@ -181,7 +133,7 @@ export interface IndicatorView {
 
 export interface LogEntry {
   id: number;
-  kind: 'mood' | 'entry' | 'ok' | 'note';
+  kind: 'mood' | 'entry' | 'ok' | 'note' | 'quick';
   day: number;
   at: string;
   value: number | null;

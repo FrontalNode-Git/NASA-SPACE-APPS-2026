@@ -282,11 +282,18 @@ test('quick actions: log, I am OK, report, palette', async ({ page }) => {
   await expect(page.locator('[data-entry="sleptPoorly"]')).toHaveAttribute('aria-pressed', 'false');
   await expect(page.getByTestId('quick-log')).toBeVisible(); // choosing does not close it
   await expect(page.getByTestId('quick-log-save')).toHaveText('Save (4)');
+  const rowsBefore = await page.getByTestId('notes').locator('li').count();
   await page.getByTestId('quick-log-save').click();
   await expect(page.getByTestId('toast')).toHaveCount(1); // one confirmation for the batch
   await expect(page.getByTestId('toast').first()).toContainText('Saved');
   await expect(page.getByTestId('quick-log')).toBeHidden();
-  for (const text of ['Exercise done', 'Ate well', 'Slept well']) await expect(page.getByTestId('notes')).toContainText(text);
+  // The whole quick log is ONE entry on the record: a single row, with every part in it.
+  const rows = page.getByTestId('notes').locator('li');
+  await expect(rows).toHaveCount(rowsBefore + 1);
+  const entry = rows.filter({ hasText: 'Exercise done' });
+  await expect(entry).toHaveCount(1);
+  for (const text of ['Mood 4 of five', 'Exercise done', 'Ate well', 'Slept well']) await expect(entry).toContainText(text);
+  await expect(entry).toContainText('Mood 4 of five · Exercise done · Slept well · Ate well'); // in the order the quick log lists them
   await expect(page.getByTestId('notes')).not.toContainText('Feeling tired');
 
   await page.locator('[data-quick="ok"]').click();
@@ -572,7 +579,6 @@ test('a link ending in ?tour opens straight into the guided walkthrough', async 
 
 test('the ear zone is called "Ear canal" everywhere', async ({ page }) => {
   await open(page);
-  const zone = page.locator('[data-zone="inner_ear"]').first();
   await expect(page.getByRole('button', { name: /^Ear canal/ }).first()).toBeVisible();
   await expect(page.locator('#main')).not.toContainText('Inner ear');
   await page.getByRole('button', { name: /^Ear canal/ }).first().click();
@@ -582,7 +588,6 @@ test('the ear zone is called "Ear canal" everywhere', async ({ page }) => {
   await page.getByTestId('command-palette').getByRole('combobox').fill('ear canal');
   await expect(page.getByTestId('command-palette')).toContainText('Ear canal');
   await expect(page.getByTestId('command-palette')).not.toContainText('Inner ear');
-  void zone;
 });
 
 test('the heart beats at the resting heart rate on screen', async ({ page }) => {

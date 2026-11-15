@@ -13,6 +13,7 @@ import type { LogEntry } from '../lib/types';
 function logText(t: ReturnType<typeof useT>, entry: LogEntry): string {
   if (entry.kind === 'mood') return t('log.mood', { n: entry.value ?? 0 });
   if (entry.kind === 'ok') return t('log.ok');
+  // A quick log is one line: the mood, the chosen entries and the note, joined by the server.
   return entry.text ?? '';
 }
 

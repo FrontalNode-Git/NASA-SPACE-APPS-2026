@@ -60,10 +60,14 @@ Session = Depends(get_store)
 
 
 class LogIn(BaseModel):
-    kind: Literal["mood", "entry", "ok", "note"]
+    """One thing the crew member logs. A "quick" log is one entry made of a mood (`value`), chosen
+    `entries` and a note (`text`); the server joins them into a single line."""
+
+    kind: Literal["mood", "entry", "ok", "note", "quick"]
     day: int = Field(ge=0, le=sim.MAX_DAY)
     value: int | None = Field(default=None, ge=1, le=5)
     text: str | None = Field(default=None, max_length=280)
+    entries: list[str] | None = Field(default=None, max_length=service.QUICK_ENTRY_LIMIT)
 
 
 class ReadingsIn(BaseModel):
@@ -145,6 +149,12 @@ def create_app() -> FastAPI:
             raise service.UnknownMember(member)
         if body.kind == "mood" and body.value is None:
             raise HTTPException(status_code=422, detail="mood needs a value from one to five")
+        if body.kind == "quick":
+            try:
+                text = service.quick_log_text(body.value, body.entries, body.text)
+            except ValueError as exc:
+                raise HTTPException(status_code=422, detail=str(exc)) from exc
+            return store.add_log(member, "quick", body.day, body.value, text)
         return store.add_log(member, body.kind, body.day, body.value, body.text)
 
     @app.put(f"{API}/members/{{member}}/readings", tags=["crew"])

@@ -1,7 +1,7 @@
-"""Deterministic simulated readings for the fictional crew.
+"""Deterministic simulated readings for the crew.
 
 Every value produced here is SIMULATED. The personal means below are made-up starting
-points for four fictional people; they are not reference ranges and are never shown as
+points for the four crew roles; they are not reference ranges and are never shown as
 "normal for humans". The same (member, indicator, seed) always yields the same series.
 """
 from __future__ import annotations
@@ -17,7 +17,7 @@ FIRST_DAY = -PREFLIGHT_DAYS
 MAX_DAY = 1095
 DEMO_DAY = 20
 
-# member -> indicator -> (personal mean, day-to-day SD). Fictional.
+# member -> indicator -> (personal mean, day-to-day SD). Made up.
 PROFILES: dict[str, dict[str, tuple[float, float]]] = {
     "commander": {
         "heart_rate": (56.0, 2.2), "spo2": (97.6, 0.6), "temperature": (36.6, 0.14),

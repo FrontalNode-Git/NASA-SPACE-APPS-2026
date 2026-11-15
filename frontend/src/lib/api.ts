@@ -1,6 +1,6 @@
 /**
  * The only place the frontend talks to the backend. Response shapes live in ./types.ts and
- * are pinned on the backend side by backend/tests/test_contract.py. See docs/API.md.
+ * are pinned on the backend side by backend/tests/test_contract.py.
  */
 import type { AppConfig, Bundle, CalibrationValues, CrewNotice, CrewReport, CrewTile, Dashboard, LogEntry, Report } from './types';
 
@@ -57,7 +57,7 @@ export const api = {
   dashboard: (member: string, viewer: string, day: number, seed: string) =>
     request<Dashboard>(`/members/${member}/dashboard${qs({ viewer, day, seed })}`),
   crew: (viewer: string, day: number, seed: string) => request<CrewTile[]>(`/crew${qs({ viewer, day, seed })}`),
-  log: (member: string, body: { kind: LogEntry['kind']; day: number; value?: number; text?: string }) =>
+  log: (member: string, body: { kind: LogEntry['kind']; day: number; value?: number; text?: string; entries?: string[] }) =>
     request<LogEntry>(`/members/${member}/logs${qs({ viewer: member })}`, {
       method: 'POST',
       body: JSON.stringify(body),

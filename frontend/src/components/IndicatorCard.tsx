@@ -85,7 +85,7 @@ export function ChartLegend() {
   const t = useT();
   return (
     <ul
-      className="flex flex-wrap items-center gap-x-5 gap-y-1.5 rounded-lg border border-line bg-panel px-3 py-2 text-xs text-muted"
+      className="flex flex-wrap items-center gap-x-5 gap-y-1.5 glass rounded-lg border border-line px-3 py-2 text-xs text-muted"
       aria-label={t('legend.title')}
       data-testid="chart-legend"
     >
@@ -166,7 +166,7 @@ export function IndicatorCard({ view, highlight = false }: { view: IndicatorView
   return (
     <article
       id={`indicator-${view.id}`}
-      className={`rounded-xl border bg-panel p-4 transition-opacity duration-300 ${dim ? 'opacity-25' : ''} ${
+      className={`glass rounded-xl border p-4 transition-opacity duration-300 ${dim ? 'opacity-25' : ''} ${
         highlight ? 'border-accent shadow-[0_0_0_1px_rgb(var(--accent))]' : 'border-line'
       }`}
       data-testid="indicator-card"
