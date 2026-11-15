@@ -215,3 +215,27 @@ def test_entered_vitals_reach_the_medical_officer_but_mood_stays_private(client)
     mood = next(i for i in seen_by_cmo["indicators"] if i["id"] == "mood")
     assert heart["latest"] == 64 and heart["latest_source"] == "manual"
     assert mood["locked"] is True and "latest" not in mood and "latest_source" not in mood
+
+
+def test_reports_and_calibration_are_for_their_owner_only(client):
+    """Reports and calibration carry mood values and notes, so nobody else may open them."""
+    client.post("/api/v1/members/engineer/logs", params={"viewer": "engineer"},
+                json={"kind": "note", "day": DAY, "text": "engineer private note"})
+    url = "/api/v1/members/engineer"
+    for viewer in ("cmo", "commander", "systems"):
+        assert client.get(f"{url}/report", params={"viewer": viewer, "day": DAY}).status_code == 403
+        assert client.get(f"{url}/report.html", params={"viewer": viewer, "day": DAY}).status_code == 403
+        assert client.get(f"{url}/calibration", params={"viewer": viewer}).status_code == 403
+        assert client.delete(f"{url}/calibration", params={"viewer": viewer}).status_code == 403
+    own = client.get(f"{url}/report", params={"viewer": "engineer", "day": DAY})
+    assert own.status_code == 200 and "engineer private note" in own.json()["text"]
+    assert client.get(f"{url}/calibration", params={"viewer": "engineer"}).status_code == 200
+    assert client.get("/api/v1/members/nobody/report", params={"viewer": "nobody"}).status_code == 404
+
+
+def test_someone_else_cannot_delete_a_calibration(client):
+    url = "/api/v1/members/engineer/calibration"
+    values = client.get(url, params={"viewer": "engineer"}).json()["simulated"]
+    assert client.put(url, params={"viewer": "engineer"}, json={"values": values}).status_code == 200
+    assert client.delete(url, params={"viewer": "cmo"}).status_code == 403
+    assert client.get(url, params={"viewer": "engineer"}).json()["saved"] is not None

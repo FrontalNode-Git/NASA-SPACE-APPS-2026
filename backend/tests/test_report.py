@@ -23,12 +23,12 @@ def test_report_summarises_statuses_drifts_and_links_risks(client, content):
 
 
 def test_quiet_day_report_links_no_risks(client):
-    report = client.get("/api/v1/members/commander/report", params={"day": 8}).json()
+    report = client.get("/api/v1/members/commander/report", params={"viewer": "commander", "day": 8}).json()
     assert report["overall"] == "nominal" and report["linked_risks"] == [] and report["drifts"] == []
 
 
 def test_missing_reading_is_reported(client):
-    report = client.get("/api/v1/members/cmo/report", params={"day": DAY}).json()
+    report = client.get("/api/v1/members/cmo/report", params={"viewer": "cmo", "day": DAY}).json()
     assert report["missing"] == ["Body temperature"]
     assert "Missing today: Body temperature" in report["text"]
 

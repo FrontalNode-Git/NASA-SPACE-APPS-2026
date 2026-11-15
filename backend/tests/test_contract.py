@@ -109,7 +109,7 @@ def test_crew_report(client):
     }
     assert set(crew["requested_by"]) == {"id", "name", "role"}
     # each member is a full report, the same shape as GET /members/{id}/report
-    own = client.get("/api/v1/members/cmo/report", params={"day": DAY}).json()
+    own = client.get("/api/v1/members/cmo/report", params={"viewer": "cmo", "day": DAY}).json()
     assert all(set(m) == set(own) for m in crew["members"])
 
 

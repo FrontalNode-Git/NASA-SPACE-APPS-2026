@@ -67,7 +67,7 @@ class LogIn(BaseModel):
 
 
 class ReadingsIn(BaseModel):
-    """A daily check-in. A null value withdraws that entry so the sensor value shows again."""
+    """A daily check-in. A null value withdraws that entry so the simulated value shows again."""
 
     day: int = Field(ge=1, le=sim.MAX_DAY)
     values: dict[str, float | None]
@@ -75,6 +75,14 @@ class ReadingsIn(BaseModel):
 
 class CalibrationIn(BaseModel):
     values: dict[str, list[float | None]]
+
+
+def _own(member: str, viewer: str, what: str) -> None:
+    """Reports and calibration hold mood values and notes, so only their owner may open them."""
+    if member not in sim.PROFILES:
+        raise service.UnknownMember(member)
+    if viewer != member:
+        raise HTTPException(status_code=403, detail=f"only {member} can see their own {what}")
 
 
 def _seed(seed: str) -> str:
@@ -151,7 +159,10 @@ def create_app() -> FastAPI:
 
     # ------------------------------------------------------------ calibration
     @app.get(f"{API}/members/{{member}}/calibration", tags=["calibration"])
-    def get_calibration(member: str, seed: str = Seed, store: service.Store = Session) -> dict[str, object]:
+    def get_calibration(
+        member: str, viewer: str = "engineer", seed: str = Seed, store: service.Store = Session
+    ) -> dict[str, object]:
+        _own(member, viewer, "calibration")
         simulated = service.simulated_calibration(get_content(), member, _seed(seed))
         return {"simulated": simulated, "saved": store.calibration.get(member)}
 
@@ -168,17 +179,24 @@ def create_app() -> FastAPI:
         return {"saved": store.calibration[member]}
 
     @app.delete(f"{API}/members/{{member}}/calibration", tags=["calibration"])
-    def delete_calibration(member: str, store: service.Store = Session) -> dict[str, bool]:
+    def delete_calibration(member: str, viewer: str = "engineer", store: service.Store = Session) -> dict[str, bool]:
+        _own(member, viewer, "calibration")
         store.calibration.pop(member, None)
         return {"ok": True}
 
     # ------------------------------------------------------------ report
     @app.get(f"{API}/members/{{member}}/report", tags=["report"])
-    def report(member: str, day: int = Day, seed: str = Seed, store: service.Store = Session) -> dict[str, object]:
+    def report(
+        member: str, viewer: str = "engineer", day: int = Day, seed: str = Seed, store: service.Store = Session
+    ) -> dict[str, object]:
+        _own(member, viewer, "report")
         return build_report(get_content(), store, member, day, _seed(seed))
 
     @app.get(f"{API}/members/{{member}}/report.html", response_class=HTMLResponse, tags=["report"])
-    def report_html(member: str, day: int = Day, seed: str = Seed, store: service.Store = Session) -> str:
+    def report_html(
+        member: str, viewer: str = "engineer", day: int = Day, seed: str = Seed, store: service.Store = Session
+    ) -> str:
+        _own(member, viewer, "report")
         return render_html(build_report(get_content(), store, member, day, _seed(seed)))
 
     # The medical officer's report for the whole crew, and sending it to the Commander.

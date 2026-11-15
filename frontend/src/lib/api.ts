@@ -70,7 +70,7 @@ export const api = {
     }),
   calibration: (member: string, seed: string) =>
     request<{ simulated: CalibrationValues; saved: CalibrationValues | null }>(
-      `/members/${member}/calibration${qs({ seed })}`,
+      `/members/${member}/calibration${qs({ viewer: member, seed })}`,
     ),
   saveCalibration: (member: string, values: CalibrationValues) =>
     request<{ saved: CalibrationValues }>(`/members/${member}/calibration${qs({ viewer: member })}`, {
@@ -78,12 +78,12 @@ export const api = {
       body: JSON.stringify({ values }),
     }),
   clearCalibration: (member: string) =>
-    request<{ ok: boolean }>(`/members/${member}/calibration`, { method: 'DELETE' }),
+    request<{ ok: boolean }>(`/members/${member}/calibration${qs({ viewer: member })}`, { method: 'DELETE' }),
   report: (member: string, day: number, seed: string) =>
-    request<Report>(`/members/${member}/report${qs({ day, seed })}`),
+    request<Report>(`/members/${member}/report${qs({ viewer: member, day, seed })}`),
   /** A plain link cannot send headers, so the printable report takes the session in the query. */
   reportHtmlUrl: (member: string, day: number, seed: string) =>
-    `${API}/members/${member}/report.html${qs({ day, seed, session: SESSION })}`,
+    `${API}/members/${member}/report.html${qs({ viewer: member, day, seed, session: SESSION })}`,
   /** Every member's report in one. The server gives it to the Chief Medical Officer only. */
   crewReport: (viewer: string, day: number, seed: string) => request<CrewReport>(`/crew/report${qs({ viewer, day, seed })}`),
   crewReportHtmlUrl: (viewer: string, day: number, seed: string) =>
