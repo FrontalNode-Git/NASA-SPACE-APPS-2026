@@ -23,6 +23,7 @@ export function Dashboard() {
   const dash = useApp((s) => s.dash);
   const viewer = useApp((s) => s.viewer);
   const setMember = useApp((s) => s.setMember);
+  const run = useApp((s) => s.run);
   const [params] = useSearchParams();
   const focus = params.get('indicator');
   // The card last opened from the "needs attention" list. Kept apart from `focus` so that
@@ -113,7 +114,7 @@ export function Dashboard() {
       <div className="grid gap-4 xl:grid-cols-[minmax(0,5fr)_minmax(0,7fr)]">
         <div className="order-2 flex flex-col gap-4 xl:order-1">
           <BodyPanel />
-          <Panel title={t('dash.notes')} className="xl:flex-1">
+          <Panel title={t('dash.notes')} className="xl:flex xl:flex-1 xl:flex-col">
             {dash.logs_locked ? (
               <div className="flex items-start gap-2 text-sm text-muted" data-testid="notes-locked">
                 <LockIcon />
@@ -137,6 +138,14 @@ export function Dashboard() {
               <p className="mt-3 flex items-center gap-1.5 text-xs text-muted">
                 <LockIcon size={13} /> {t('privacy.own')}
               </p>
+            )}
+            {/* The panel is as tall as the vitals beside it; its action sits at the foot. */}
+            {dash.own && (
+              <div className="mt-auto pt-4">
+                <Button primary className="w-full" onClick={() => run({ type: 'quick_log' })} data-testid="add-log">
+                  {t('dash.addLog')} <kbd className="ml-2 rounded border border-bg/40 px-1.5 text-xs font-normal">L</kbd>
+                </Button>
+              </div>
             )}
           </Panel>
         </div>

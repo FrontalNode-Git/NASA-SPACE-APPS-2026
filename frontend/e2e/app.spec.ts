@@ -21,6 +21,15 @@ let expected: RegExp | null = null;
 test.beforeEach(async ({ page }) => {
   problems = [];
   expected = null;
+  // A returning visitor: the first-visit tour hint has been dealt with. Its own tests undo this.
+  await page.addInitScript(() => {
+    try {
+      // (A first-visit test sets this flag once; after that, what the app remembers is left alone.)
+      if (!sessionStorage.getItem('e2e-first-visit')) localStorage.setItem('vital-tour-seen', '1');
+    } catch {
+      // storage unavailable: nothing to set
+    }
+  });
   page.on('console', (m) => {
     if (m.type() === 'error') problems.push(`console: ${m.text()}`);
   });
@@ -249,9 +258,11 @@ test('dashboard tells the drift story on the demo day', async ({ page }) => {
 
 test('what is not built yet is shown as planned, in plain words', async ({ page }) => {
   await open(page, '/mission');
-  for (const id of ['distance-comm-delay', 'radiation-dose-rate']) {
-    await expect(page.locator(`[data-pending-id="${id}"]`)).toHaveText('Planned · Not in this version yet');
-  }
+  // What is still missing is one quiet list, not two empty panels.
+  await expect(page.getByRole('heading', { name: 'Planned for a later version' })).toBeVisible();
+  await expect(page.locator('[data-pending-id="distance-comm-delay"]')).toHaveText('Communication delay to Earth');
+  await expect(page.locator('[data-pending-id="radiation-dose-rate"]')).toHaveText('Radiation dose rate');
+  await expect(page.getByTestId('mission-planned').locator('li')).toHaveCount(2);
   await page.locator('[data-env="pressurized-rover"]').click();
   await expect(page.locator('[data-pending-id="env-pressurized-rover"]')).toBeVisible();
   await open(page, '/modules');
@@ -734,4 +745,108 @@ test('playback is reachable from Find and by voice words', async ({ page }) => {
   await expect(page.getByTestId('play-toggle')).toHaveAttribute('aria-pressed', 'true');
   await page.getByTestId('play-toggle').click();
   await expect(page.getByTestId('play-toggle')).toHaveAttribute('aria-pressed', 'false');
+});
+
+test('a first-time visitor is offered the tour once', async ({ page }) => {
+  // This one is a first visit: undo the returning-visitor setup.
+  await page.addInitScript(() => {
+    if (sessionStorage.getItem('e2e-first-visit')) return;
+    sessionStorage.setItem('e2e-first-visit', '1');
+    localStorage.removeItem('vital-tour-seen');
+  });
+  await open(page);
+  const hint = page.getByTestId('tour-hint');
+  await expect(hint).toBeVisible();
+  await expect(hint).toContainText('Take the two-minute guided tour');
+  const box = await hint.boundingBox();
+  expect((box?.x ?? 0) + (box?.width ?? 0)).toBeLessThanOrEqual(page.viewportSize()?.width ?? 0);
+
+  // Turning it away is remembered: it does not come back on a reload or on another screen.
+  await page.getByTestId('tour-dismiss').click();
+  await expect(hint).toHaveCount(0);
+  await page.reload();
+  await expect(page.locator('#main')).toBeVisible();
+  await expect(page.getByTestId('tour-hint')).toHaveCount(0);
+  await page.goto('/#/crew');
+  await expect(page.getByTestId('tour-hint')).toHaveCount(0);
+});
+
+test('the tour hint starts the tour, and is gone for good afterwards', async ({ page }) => {
+  await page.addInitScript(() => {
+    if (sessionStorage.getItem('e2e-first-visit')) return;
+    sessionStorage.setItem('e2e-first-visit', '1');
+    localStorage.removeItem('vital-tour-seen');
+  });
+  await open(page);
+  await page.getByTestId('tour-start').click();
+  await expect(page.getByTestId('presenter')).toBeVisible();
+  await expect(page.getByTestId('presenter-step')).toHaveText('1 / 10');
+  await expect(page.getByTestId('tour-hint')).toHaveCount(0);
+  await page.getByRole('button', { name: 'Close' }).click(); // leave the tour
+  await expect(page.getByTestId('presenter')).toHaveCount(0);
+  await page.reload();
+  await expect(page.locator('#main')).toBeVisible();
+  await expect(page.getByTestId('tour-hint')).toHaveCount(0);
+});
+
+test('the hint stays away from links that already start the tour or the demo', async ({ page }) => {
+  await page.addInitScript(() => {
+    if (sessionStorage.getItem('e2e-first-visit')) return;
+    sessionStorage.setItem('e2e-first-visit', '1');
+    localStorage.removeItem('vital-tour-seen');
+  });
+  await page.goto('/?tour');
+  await expect(page.getByTestId('presenter')).toBeVisible();
+  await expect(page.getByTestId('tour-hint')).toHaveCount(0);
+  await page.evaluate(() => localStorage.removeItem('vital-tour-seen')); // a fresh visitor again
+  await page.goto('/?demo');
+  await expect(page.locator('#main')).toBeVisible();
+  await expect(page.getByTestId('tour-hint')).toHaveCount(0);
+});
+
+test('every screen ends with a way back to a clean start', async ({ page }) => {
+  await open(page);
+  const footer = page.getByTestId('page-footer');
+  await expect(footer).toContainText('All readings are simulated');
+  // Type a reading, then reset from the foot of the page.
+  await page.getByTestId('check-in-heart_rate').fill('75');
+  await page.getByTestId('check-in-save').click();
+  await expect(page.getByTestId('body-scan')).toHaveAttribute('data-heart-bpm', '75');
+  await page.getByTestId('footer-reset').click();
+  await expect(page.getByTestId('toast').filter({ hasText: 'Demo reset' })).toBeVisible();
+  await expect(page.getByTestId('body-scan')).toHaveAttribute('data-heart-bpm', '63');
+  await expect(page.getByTestId('day-label')).toHaveText('Mission day 20');
+  // And the tour can be replayed from there.
+  await page.getByTestId('footer-replay').click();
+  await expect(page.getByTestId('presenter-step')).toHaveText('1 / 10');
+  // The footer is on the other screens too.
+  await page.goto('/#/report');
+  await expect(page.getByTestId('page-footer')).toBeVisible();
+});
+
+test('the log panel has a quick-log button, and it opens the quick log', async ({ page }) => {
+  await open(page);
+  const add = page.getByTestId('add-log');
+  await expect(add).toBeVisible();
+  await expect(add).toContainText('Add a quick log');
+  await add.click();
+  await expect(page.getByTestId('quick-log')).toBeVisible();
+  await page.keyboard.press('Escape');
+  // Someone else's log is private: no button, and the lock message instead.
+  await page.getByTestId('viewer-select').selectOption('cmo');
+  await page.locator('[data-nav="/crew"]').click();
+  await page.getByTestId('crew-grid').locator('[data-member="engineer"]').click();
+  await expect(page.getByTestId('notes-locked')).toBeVisible();
+  await expect(page.getByTestId('add-log')).toHaveCount(0);
+});
+
+test('mission progress sits under the day label and follows the day', async ({ page }) => {
+  await open(page);
+  // There is no line across the top of the page.
+  await expect(page.getByTestId('scroll-progress')).toHaveCount(0);
+  const track = page.getByTestId('day-label').getByTestId('mission-progress');
+  await expect(track).toHaveAttribute('aria-valuenow', '20');
+  await page.getByTestId('day-next').click();
+  await expect(track).toHaveAttribute('aria-valuenow', '21');
+  await expect(page.getByTestId('day-label')).toHaveText('Mission day 21');
 });
