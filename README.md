@@ -231,3 +231,7 @@ Health content: NASA Human Research Program and Canadian Space Agency public pag
 [docs/SOURCES.txt](docs/SOURCES.txt). VITAL is not affiliated with or endorsed by NASA or the CSA.
 
 Interface icons: "Health and Wellness Icons" by Mycogen, used under an Envato Elements licence held by FrontalNode (details in [frontend/src/assets/icons/README.txt](frontend/src/assets/icons/README.txt)). The search and microphone icons were drawn for VITAL.
+
+## Licence
+
+VITAL is released under the [MIT License](LICENSE). The interface icons in [frontend/src/assets/icons/](frontend/src/assets/icons/) are third-party and are not covered by it (see Credits above).
